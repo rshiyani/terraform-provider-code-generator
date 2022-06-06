@@ -1,0 +1,42 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package aci
+
+import(
+    {% for import in imports  %}
+    "{{ import }}"
+    {% endfor %}
+) 
+
+func Provider() *schema.Provider {
+	return &schema.Provider{
+		Schema: map[string]*schema.Schema{
+			{% for schema in schemas %}
+				{{ schemaHelper.getSchemaEle(schema) }}
+			{% endfor %}
+		},
+
+		ResourcesMap: map[string]*schema.Resource{
+            {% for resource in resources %}
+            "{{provider_name |lower +"_"+resource}}": resource{{provider_name | capitalize}}{{schemaHelper.genFuncName(resource)}}(),
+            {% endfor %}
+        },
+		
+		DataSourcesMap: map[string]*schema.Resource{
+            {% for ds in datasources %}
+            "{{provider_name |lower +"_"+ds}}": dataSource{{provider_name | capitalize}}{{schemaHelper.genFuncName(ds)}}(),
+            {% endfor %}
+        },
+
+		ConfigureFunc: configureClient,
+	}
+}
+
+func configureClient(d *schema.ResourceData) (interface{}, error) {
+    {% for schema in schemas %}
+    {{schema.attribute}} := d.Get("{{schema.attribute}}").({{schema.type}})
+    {% endfor %}
+	return nil, nil
+}
+
+
+

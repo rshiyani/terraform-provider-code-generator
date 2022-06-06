@@ -1,0 +1,28 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package aci
+
+import(
+    {% for import in imports  %}
+    "{{ import }}"
+    {% endfor %}
+) 
+
+func resource{{provider_name | capitalize}}{{name | capitalize}}() *schema.Resource {
+	return &schema.Resource{
+        CreateContext: resource{{provider_name | capitalize}}{{name | capitalize}}Create,
+		UpdateContext: resource{{provider_name | capitalize}}{{name | capitalize}}Update,
+		ReadContext:   resource{{provider_name | capitalize}}{{name | capitalize}}Read,
+		DeleteContext: resource{{provider_name | capitalize}}{{name | capitalize}}Delete,
+
+
+        Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
+
+		Schema: map[string]*schema.Schema{
+			{% for schema in schemas %}
+				{{ schemaHelper.getSchemaEle(schema) }}
+			{% endfor %}
+		},
+	}
+}

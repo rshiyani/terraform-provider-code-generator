@@ -1,0 +1,101 @@
+provider_name: "Aci"
+name: "Contract"
+imports:
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+schemas:
+  - attribute: "tenant_dn"
+    type: "string"
+    required: "true"
+    forcenew: "true"
+    sensitive: "true"
+    description: "tenant DN"
+
+  - attribute: "name"
+    type: "string"
+    required: "true"
+    forcenew: "true"
+    description: "contract name"
+    validation:
+      func_name: "StringInSlice"
+      ignore_case: "true"
+      params:
+        - "1"
+        - "2"
+        - "3"
+
+  - attribute: "prio"
+    type: "string"
+    optional: "true"
+    computed: "true"
+    description: "prio"
+    validation:
+      func_name: "IsCIDRNetwork"
+      params:
+        - 1
+        - 2
+  - attribute: "filter"
+    type: "list"
+    optional: "true"
+    computed: "true"
+    description: "filter list"
+    max_items: 10
+    element:
+      type: "resource"
+      schema:
+        - attribute: "filter_name"
+          type: "string"
+          required: "true"
+          description: "name of filter"
+        - attribute: "id"
+          type: "string"
+          computed: "true"
+          description: "id of filter"
+          default_func: "true"
+          envvar: "ID"
+        - attribute: "description"
+          type: "string"
+          optional: "true"
+          computed: "true"
+          description: "description of filter"
+          default_func: "true"
+        - attribute: "filter_entry"
+          type: "list"
+          optional: "true"
+          computed: "true"
+          description: "list of filter_entry"
+          min_items: 1
+          max_items: 4
+          element:
+            type: "resource"
+            schema:
+              - attribute: "casts"
+                type: "set"
+                required: "true"
+                element:
+                  type: "schema"
+                  schema:
+                    type: "string"
+              - attribute: "filter_entry_name"
+                type: "string"
+                required: "true"
+                description: "name of filter entry"
+                diff_suppress: true
+              - attribute: "id"
+                type: "string"
+                computed: "true"
+                description: "id of filter entry"
+                validation:
+                  func_name: "IsIPv6Address"
+              - attribute: "apply_to_frag"
+                type: "string"
+                optional: "true"
+                computed: "true"
+                validation:
+                  func_name: "StringInSlice"
+                  ignore_case: "false"
+                  params:
+                    - "yes"
+                    - "no"
+                description: "apply to fragment"

@@ -1,0 +1,138 @@
+{% macro genFuncName(name) %}
+    {% set nameList = name.split('_') | map('capitalize') | join("") %}
+    {{- nameList -}}
+{% endmacro %}
+
+{% macro checkRequired(required) %}
+    {% if required is defined %}
+        Required: {{required}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkOptional(optional) %}
+    {% if optional is defined %}
+        Optional: {{optional}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkForceNew(forcenew) %}
+    {% if forcenew is defined %}
+        ForceNew: {{forcenew}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkDefault(default) %}
+    {% if default is defined %}
+        Default: {{default}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkComputed(computed) %}
+    {% if computed is defined %}
+        Computed: {{computed}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkDescription(desc) %}
+    {% if desc is defined %}
+        Description: "{{desc}}",
+    {% endif %}
+{% endmacro %}
+
+{% macro checkDefaultFunc(flag, env) %}
+    {% if flag is defined %}
+        {% if env is defined %}
+            DefaultFunc: schema.EnvDefaultFunc("{{env}}", nil),
+        {% else %}
+            DefaultFunc: func() (interface{}, error) {
+                // [TO DO]: Write your code here
+                return nil, nil
+            },
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro checkValidation(valid) %}
+    {% if valid is defined %}
+        {% if valid.func_name == 'StringInSlice' or valid.func_name == 'StringNotInSlice' %}
+            ValidateDiagFunc: validation.ToDiagFunc(validation.{{valid.func_name}}([]string{
+                {% for func in valid.params %}
+                    "{{func}}",
+                {% endfor %}
+            }, {{valid.ignore_case}}),
+            ),
+        {% elif valid.func_name == 'IsCIDRNetwork' %}
+            ValidateDiagFunc: validation.ToDiagFunc(
+                validation.{{valid.func_name}}({{valid.params[0]}}, {{valid.params[1]}}),
+            ),
+        {% else %}
+            ValidateDiagFunc: validation.ToDiagFunc(validation.{{valid.func_name}}),
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro checkMaxItems(num) %}
+    {% if num is defined %}
+        MaxItems: {{num}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkMinItems(num) %}
+    {% if num is defined %}
+        MinItems: {{num}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkSensitive(isSensitive) %}
+    {% if isSensitive is defined %}
+        Sensitive: {{isSensitive}},
+    {% endif %}
+{% endmacro %}
+
+{% macro checkDiffSuppress(flag) %}
+    {% if flag %}
+        DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool {
+                // [TO DO]: Write your code here
+                return false 
+            },
+    {% endif %}
+{% endmacro %}
+
+{% macro getSchemaEle(schema) %}
+    "{{ schema.attribute }}": &schema.Schema{
+        {{checkType(schema)}}
+    },
+{% endmacro %}
+
+{% macro checkType(schema) %}
+    {% if schema.type is defined %}
+        Type: schema.Type{{schema.type | capitalize}},
+        {{checkSensitive(schema.sensitive)-}}
+        {{checkRequired(schema.required)-}}
+        {{checkComputed(schema.computed)-}}
+        {{checkOptional(schema.optional)-}}
+        {{checkForceNew(schema.forcenew)-}}
+        {{checkDefault(schema.default)-}}
+        {{checkDefaultFunc(schema.default_func, schema.envvar)-}}
+        {{checkDescription(schema.description)-}}
+        {{checkValidation(schema.validation)-}}
+        {{checkDiffSuppress(schema.diff_suppress)-}}
+        {% if schema.type == "list" or schema.type == "set" %}
+            {{checkMaxItems(schema.max_items)-}}
+            {{checkMinItems(schema.min_items)-}}
+            {% if schema.element.type == "schema" %}
+                Elem: &schema.Schema{
+                    {{checkType(schema.element.schema)}}
+                },
+            {% elif schema.element.type == "resource" %}
+                Elem: &schema.Resource{
+                    Schema: map[string]*schema.Schema{
+                    {% for schema in schema.element.schema %}
+                        {{ getSchemaEle(schema) }}
+                    {% endfor %}
+                    },
+                },
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
