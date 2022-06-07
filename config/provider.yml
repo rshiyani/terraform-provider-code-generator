@@ -11,19 +11,19 @@ datasources:
 schemas:
   - attribute: "username"
     type: "string"
-    required: "true"
-    default_func: "true"
+    required: true
+    default_func: true
     envvar: "ACI_USERNAME"
     description: "Username of the ACI user"
   - attribute: "password"
     type: "string"
-    required: "true"
-    default_func: "true"
+    required: true
+    default_func: true
     envvar: "ACI_PASSWORD"
     description: "Password of the ACI user"
   - attribute: "url"
     type: "string"
-    required: "true"
-    default_func: "true"
+    required: true
+    default_func: true
     envvar: "ACI_URL"
     description: "URL of the ACI server"

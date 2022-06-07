@@ -7,28 +7,40 @@ imports:
 schemas:
   - attribute: "tenant_dn"
     type: "string"
-    required: "true"
-    forcenew: "true"
-    sensitive: "true"
+    required: true
+    forcenew: true
+    sensitive: true
     description: "tenant DN"
 
   - attribute: "name"
     type: "string"
-    required: "true"
-    forcenew: "true"
+    required: true
+    forcenew: true
     description: "contract name"
     validation:
       func_name: "StringInSlice"
-      ignore_case: "true"
+      ignore_case: "false"
       params:
         - "1"
         - "2"
         - "3"
 
+  - attribute: "my_map"
+    type: "map"
+    required: true
+    forcenew: true
+    sensitive: true
+    description: "My map for testing"
+    validation:
+      func_name: "StringinSLice"
+    element:
+      schema:
+        type: "string"
+
   - attribute: "prio"
     type: "string"
-    optional: "true"
-    computed: "true"
+    optional: true
+    computed: true
     description: "prio"
     validation:
       func_name: "IsCIDRNetwork"
@@ -37,8 +49,8 @@ schemas:
         - 2
   - attribute: "filter"
     type: "list"
-    optional: "true"
-    computed: "true"
+    optional: true
+    computed: true
     description: "filter list"
     max_items: 10
     element:
@@ -46,24 +58,24 @@ schemas:
       schema:
         - attribute: "filter_name"
           type: "string"
-          required: "true"
+          required: true
           description: "name of filter"
         - attribute: "id"
           type: "string"
-          computed: "true"
+          computed: true
           description: "id of filter"
-          default_func: "true"
+          default_func: true
           envvar: "ID"
         - attribute: "description"
           type: "string"
-          optional: "true"
-          computed: "true"
+          optional: true
+          computed: true
           description: "description of filter"
-          default_func: "true"
+          default_func: true
         - attribute: "filter_entry"
           type: "list"
-          optional: "true"
-          computed: "true"
+          optional: true
+          computed: true
           description: "list of filter_entry"
           min_items: 1
           max_items: 4
@@ -72,26 +84,26 @@ schemas:
             schema:
               - attribute: "casts"
                 type: "set"
-                required: "true"
+                required: true
                 element:
                   type: "schema"
                   schema:
                     type: "string"
               - attribute: "filter_entry_name"
                 type: "string"
-                required: "true"
+                required: true
                 description: "name of filter entry"
                 diff_suppress: true
               - attribute: "id"
                 type: "string"
-                computed: "true"
+                computed: true
                 description: "id of filter entry"
                 validation:
                   func_name: "IsIPv6Address"
               - attribute: "apply_to_frag"
                 type: "string"
-                optional: "true"
-                computed: "true"
+                optional: true
+                computed: true
                 validation:
                   func_name: "StringInSlice"
                   ignore_case: "false"
