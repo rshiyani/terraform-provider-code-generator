@@ -1,6 +1,6 @@
 from jinja2 import Environment, FileSystemLoader
 import yaml
-from utils import camelize, pascalize
+from utils import camelize, pascalize, snakify
 
 config = yaml.full_load(open('./config/resources/contract.yml'))
 env = Environment(loader=FileSystemLoader('./templates'),
@@ -8,6 +8,8 @@ env = Environment(loader=FileSystemLoader('./templates'),
 
 env.filters["camelize"] = camelize
 env.filters["pascalize"] = pascalize
+env.filters["snakify"] = snakify
+
 template = env.get_template('model.j2')
 
 # to save the results
