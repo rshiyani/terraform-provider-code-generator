@@ -1,0 +1,15 @@
+from jinja2 import Environment, FileSystemLoader
+import yaml
+from utils import camelize, pascalize
+
+config = yaml.full_load(open('./config/resources/contract.yml'))
+env = Environment(loader=FileSystemLoader('./templates'),
+                  trim_blocks=True, lstrip_blocks=True)
+
+env.filters["camelize"] = camelize
+env.filters["pascalize"] = pascalize
+template = env.get_template('model.j2')
+
+# to save the results
+with open("model_output.go", "w") as fh:
+    fh.write(template.render(config))
