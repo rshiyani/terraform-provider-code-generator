@@ -1,35 +1,58 @@
+{% set validFuncList=[
+    "IsCIDR",
+    "IsIPAddress",
+    "IsIPv4Address",
+    "IsIPv4Range",
+    "IsIPv6Address",
+    "IsMACAddress",
+    "IsPortNumber",
+    "IsPortNumberOrZero",
+    "IsRFC3339Time",
+    "IsURLWithHTTPS",
+    "IsURLWithHTTPorHTTPS",
+    "IsUUID",
+    "ListOfUniqueStrings",
+    "NoZeroValues",
+    "StringIsBase64",
+    "StringIsEmpty",
+    "StringIsJSON",
+    "StringIsNotEmpty",
+    "StringIsNotWhiteSpace",
+    "StringIsValidRegExp",
+    "StringIsWhiteSpace"] %}
+
 {% macro genFuncName(name) %}
     {% set nameList = name.split('_') | map('capitalize') | join("") %}
     {{- nameList -}}
 {% endmacro %}
 
 {% macro checkRequired(required) %}
-    {% if required is defined %}
-        Required: {{required}},
+    {% if required is true %}
+        Required: true,
     {% endif %}
 {% endmacro %}
 
 {% macro checkOptional(optional) %}
-    {% if optional is defined %}
-        Optional: {{optional}},
+    {% if optional is true %}
+        Optional: true,
     {% endif %}
 {% endmacro %}
 
 {% macro checkForceNew(forcenew) %}
-    {% if forcenew is defined %}
-        ForceNew: {{forcenew}},
+    {% if forcenew is true  %}
+        ForceNew: true,
     {% endif %}
 {% endmacro %}
 
 {% macro checkDefault(default) %}
-    {% if default is defined %}
-        Default: {{default}},
+    {% if default is true  %}
+        Default: true,
     {% endif %}
 {% endmacro %}
 
 {% macro checkComputed(computed) %}
-    {% if computed is defined %}
-        Computed: {{computed}},
+    {% if computed is true  %}
+        Computed: true,
     {% endif %}
 {% endmacro %}
 
@@ -40,12 +63,12 @@
 {% endmacro %}
 
 {% macro checkDefaultFunc(flag, env) %}
-    {% if flag is defined %}
+    {% if flag is true %}
         {% if env is defined %}
             DefaultFunc: schema.EnvDefaultFunc("{{env}}", nil),
         {% else %}
             DefaultFunc: func() (interface{}, error) {
-                // [TO DO]: Write your code here
+                // [TODO]: Write your code here
                 return nil, nil
             },
         {% endif %}
@@ -59,14 +82,16 @@
                 {% for func in valid.params %}
                     "{{func}}",
                 {% endfor %}
-            }, {{valid.ignore_case}}),
+            }, {{valid.ignore_case is true | lower}}),
             ),
         {% elif valid.func_name == 'IsCIDRNetwork' %}
             ValidateDiagFunc: validation.ToDiagFunc(
                 validation.{{valid.func_name}}({{valid.params[0]}}, {{valid.params[1]}}),
             ),
-        {% else %}
+        {% elif valid.func_name in validFuncList %}
             ValidateDiagFunc: validation.ToDiagFunc(validation.{{valid.func_name}}),
+        {% else %}
+        // [ERROR]: {{valid.func_name}} may be a Typo or not in AutoGen List. Please refer docs once.
         {% endif %}
     {% endif %}
 {% endmacro %}
@@ -84,15 +109,15 @@
 {% endmacro %}
 
 {% macro checkSensitive(isSensitive) %}
-    {% if isSensitive is defined %}
-        Sensitive: {{isSensitive}},
+    {% if isSensitive is true %}
+        Sensitive: true,
     {% endif %}
 {% endmacro %}
 
 {% macro checkDiffSuppress(flag) %}
     {% if flag %}
         DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool {
-                // [TO DO]: Write your code here
+                // [TODO]: Write your code here
                 return false 
             },
     {% endif %}
@@ -133,6 +158,10 @@
                     },
                 },
             {% endif %}
+        {% elif schema.type == "map" %}
+            Elem: &schema.Schema{
+                {{checkType(schema.element.schema)}}
+            },
         {% endif %}
     {% endif %}
 {% endmacro %}
