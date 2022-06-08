@@ -1,4 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
+{% import './helpers/create.j2' as createHelper %}
 package aci
 
 import(
@@ -25,4 +26,41 @@ func resource{{provider_name | capitalize}}{{name | capitalize}}() *schema.Resou
 			{% endfor %}
 		},
 	}
+}
+
+
+func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	
+	{{provider_name | lower}}Client := m.(*client.Client)
+	{{name | lower}}Attr = models.{{name | pascalize}}Attributes{}
+	
+	{% for schema in schemas %}
+		{% if schema.required is true %}
+			{% if schema.type == "string" %}
+				{{name | lower}}Attr.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.({{schema.type}})
+			{% endif %}
+		{% elif schema.optional is true %}
+			{% if schema.type == "string" %}
+				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+					{{name | lower}}Attr.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.({{schema.type}})
+				}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+
+	
+	{{name | lower}} := models.New{{name | capitalize}}({{name | lower}}Attr)
+		
+	err := {{provider_name | lower}}Client.Save({{name | lower}})
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	{% for schema in schemas %}
+		{% if schema.element is defined %}
+			{% if schema.element.type == "resource" %}
+				{{createHelper.genCreateElement(schema)}}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	return resource{{provider_name | capitalize}}{{name | capitalize}}Read(ctx, d, m)
 }

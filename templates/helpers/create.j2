@@ -1,0 +1,70 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+{% macro genCreateElement(schema) %}
+if {{schema.attribute | capitalize}}s, ok := d.GetOk("{{schema.attribute | lower}}"); ok {
+    {{schema.attribute | lower}}s := {{schema.attribute | capitalize}}s.([]interface{})
+    {% set name = schema.attribute %}
+    for _, val := range {{schema.attribute | lower}}s {
+        {{schema.attribute | lower}}Attr := models.{{schema.attribute | capitalize}}Attributes{}
+        {{schema.attribute | lower}} := val.(map[string]interface{})
+        {% for schema in schema.element.schema %}
+            {% if schema.required is true %}
+                {% if schema.type == "string" %}
+                {{name | lower}}Attr.{{schema.attribute | pascalize}} = {{name | lower}}["{{schema.attribute | lower}}"].({{schema.type}})
+                {% endif %}
+            {% else %}
+                {% if schema.type == "string" %}
+                    if {{schema.attribute | pascalize}}, ok := d.Get("{{schema.attribute}}"); ok {
+                    {{name | lower}}Attr.{{schema.attribute | pascalize}} = {{name | lower}}["{{schema.attribute | lower}}"].({{schema.type}})                    
+                    }
+                {% elif schema.element is defined %}
+                        {% if schema.element.type == "resource" %}
+                        {{getResourceElement(schema, name)}}
+                        {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    }
+    {{schema.attribute | lower}}model := models.New{{schema.attribute | capitalize}}({{schema.attribute | lower}}Attr)
+
+    err := {{provider_name | lower}}Client.Save({{schema.attribute | lower}}model)
+    if err != nil {
+        return diag.FromErr(err)
+    }
+}
+{% endmacro %}
+
+
+{% macro getResourceElement(resource,name) %}
+if {{name | lower}}["{{resource.attribute | lower}}"] != nil {
+    {{resource.attribute}}s := {{name | lower}}["{{resource.attribute | lower}}"].([]interface{})
+    
+    for _, val := range {{resource.attribute}}s {
+        {{resource.attribute}}Attr := models.{{schemaHelper.genFuncName(resource.attribute)}}Attributes{}
+        {{resource.attribute}} := val.(map[string]interface{})
+        {% set temp = resource.attribute %}
+        {% for schema in resource.element.schema %}
+            {% if schema.required is true %}
+                {% if schema.type == "string" %}
+                    {{temp | lower}}Attr.{{schema.attribute | pascalize}} = {{temp}}["{{schema.attribute | lower}}"].({{schema.type}})
+                {% endif %}
+            {% elif schema.optional is true %}
+                {% if schema.type == "string" %}
+                    if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+                    {{temp | lower}}Attr.{{schema.attribute | pascalize}} = {{temp}}["{{schema.attribute | lower}}"].({{schema.type}})
+                    }
+                {% elif schema.element is defined %}
+                    {% if schema.element.type == "resource" %}
+                        {{getResourceElement(schema, temp)}}
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    }
+    {{resource.attribute}} := models.New{{schemaHelper.genFuncName(resource.attribute)}}({{resource.attribute}}Attr)
+    err := {{provider_name | lower}}aciClient.Save({{resource.attribute | lower}}model)
+    if err != nil {
+        return diag.FromErr(err)
+    }        
+}
+{% endmacro %}
+

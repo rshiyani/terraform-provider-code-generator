@@ -1,6 +1,8 @@
 package aci
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
@@ -101,7 +103,7 @@ func resourceAciContract() *schema.Resource {
 							MinItems:    1,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"casts": &schema.Schema{
+									"cast": &schema.Schema{
 										Type:     schema.TypeSet,
 										Required: true,
 										Elem: &schema.Schema{
@@ -145,4 +147,63 @@ func resourceAciContract() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+
+	aciClient := m.(*client.Client)
+	contractAttr = models.ContractAttributes{}
+
+	contractAttr.TenantDn = TenantDn.(string)
+	contractAttr.Name = Name.(string)
+	if Prio, ok := d.GetOk("prio"); ok {
+		contractAttr.Prio = Prio.(string)
+	}
+
+	contract := models.NewContract(contractAttr)
+
+	err := aciClient.Save(contract)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	if Filters, ok := d.GetOk("filter"); ok {
+		filters := Filters.([]interface{})
+		for _, val := range filters {
+			filterAttr := models.FilterAttributes{}
+			filter := val.(map[string]interface{})
+			filterAttr.FilterName = filter["filter_name"].(string)
+			if Id, ok := d.Get("id"); ok {
+				filterAttr.Id = filter["id"].(string)
+			}
+			if Description, ok := d.Get("description"); ok {
+				filterAttr.Description = filter["description"].(string)
+			}
+			if filter["filter_entry"] != nil {
+				filter_entrys := filter["filter_entry"].([]interface{})
+
+				for _, val := range filter_entrys {
+					filter_entryAttr := models.FilterEntryAttributes{}
+					filter_entry := val.(map[string]interface{})
+					filter_entryAttr.FilterEntryName = filter_entry["filter_entry_name"].(string)
+					if ApplyToFrag, ok := d.GetOk("apply_to_frag"); ok {
+						filter_entryAttr.ApplyToFrag = filter_entry["apply_to_frag"].(string)
+					}
+				}
+				filter_entry := models.NewFilterEntry(filter_entryAttr)
+				err := aciClient.Save(filter_entrymodel)
+				if err != nil {
+					return diag.FromErr(err)
+				}
+			}
+
+		}
+		filtermodel := models.NewFilter(filterAttr)
+
+		err := Client.Save(filtermodel)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	return resourceAciContractRead(ctx, d, m)
 }
