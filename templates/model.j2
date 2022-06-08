@@ -9,7 +9,9 @@ package models
             {% elif schema.element.type == "schema" %}
                 {{schema.attribute | pascalize}}s []{{schema.element.schema.type-}}
             {% endif %}
-        {% else %}
+        {% elif schema.type == "map" %}
+            {{schema.attribute | pascalize}} interface{}
+        {%- else %}
             {{schema.attribute | pascalize}} {{schema.type-}}
         {% endif %}
     {% endif %}
