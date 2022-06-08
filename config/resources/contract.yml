@@ -19,23 +19,11 @@ schemas:
     description: "contract name"
     validation:
       func_name: "StringInSlice"
-      ignore_case: "false"
+      ignore_case: true
       params:
         - "1"
         - "2"
         - "3"
-
-  - attribute: "my_map"
-    type: "map"
-    required: true
-    forcenew: true
-    sensitive: true
-    description: "My map for testing"
-    validation:
-      func_name: "StringinSLice"
-    element:
-      schema:
-        type: "string"
 
   - attribute: "prio"
     type: "string"
@@ -82,7 +70,7 @@ schemas:
           element:
             type: "resource"
             schema:
-              - attribute: "casts"
+              - attribute: "cast"
                 type: "set"
                 required: true
                 element:

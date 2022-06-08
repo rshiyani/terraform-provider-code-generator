@@ -1,0 +1,57 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package models
+
+{% macro printAttrAndType(schema) %}
+    {% if schema.type is defined %}
+        {% if schema.type == "list" or schema.type == "set" %}
+            {% if schema.element.type == "resource" %}
+                {{schema.attribute | pascalize}}s []{{schema.attribute | pascalize -}}
+            {% elif schema.element.type == "schema" %}
+                {{schema.attribute | pascalize}}s []{{schema.element.schema.type-}}
+            {% endif %}
+        {% else %}
+            {{schema.attribute | pascalize}} {{schema.type-}}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro printOmitEmpty(schema) %}
+    {% if schema.required is true -%}
+    {% else -%}
+        ,omitempty
+    {%- endif %}
+{% endmacro %}
+
+{% macro generateModel(schemas, name) %}
+    type {{name | pascalize}} struct {
+        {% for schema in schemas %}
+            {{printAttrAndType(schema)}} `json:"{{schema.attribute | snakify}}{{printOmitEmpty(schema)}}"`
+        {% endfor %}
+    }
+{% endmacro %}
+
+{% macro search(schemas) %}
+    {% for schema in schemas %}
+        {% if schema.type == "list" or schema.type == "set" %}
+            {% if schema.element.type == "resource" %}
+                {{generateModel(schema.element.schema, schema.attribute)}}
+                {{search(schema.element.schema)}}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{{generateModel(schemas, name)}}
+{{search(schemas)}}
+func ({{name | camelize}} *{{name | pascalize}}) ToMap() (map[string]interface{}, error) {
+    {{name | camelize}}JSON, err := json.Marshal({{name | camelize}})
+    if err != nil {
+        return nil, err
+    }
+    {{name | camelize}}Map := make(map[string]interface{})
+    err = json.Unmarshal({{name | camelize}}JSON, &{{name | camelize}}Map)
+    if err != nil {
+        return nil, err
+    }
+    return {{name | camelize}}Map, nil
+}
