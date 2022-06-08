@@ -1,70 +1,81 @@
 {% import './helpers/schema.j2' as schemaHelper %}
-{% macro genCreateElement(schema) %}
+{% set PrimitiveTypeList = ["string","bool","int"]%}
+
+
+{% macro genCreateElement(schema, parentName) %}
 if {{schema.attribute | capitalize}}s, ok := d.GetOk("{{schema.attribute | lower}}"); ok {
     {{schema.attribute | lower}}s := {{schema.attribute | capitalize}}s.([]interface{})
-    {% set name = schema.attribute %}
-    for _, val := range {{schema.attribute | lower}}s {
-        {{schema.attribute | lower}}Attr := models.{{schema.attribute | capitalize}}Attributes{}
-        {{schema.attribute | lower}} := val.(map[string]interface{})
-        {% for schema in schema.element.schema %}
-            {% if schema.required is true %}
-                {% if schema.type == "string" %}
-                {{name | lower}}Attr.{{schema.attribute | pascalize}} = {{name | lower}}["{{schema.attribute | lower}}"].({{schema.type}})
-                {% endif %}
-            {% else %}
-                {% if schema.type == "string" %}
-                    if {{schema.attribute | pascalize}}, ok := d.Get("{{schema.attribute}}"); ok {
-                    {{name | lower}}Attr.{{schema.attribute | pascalize}} = {{name | lower}}["{{schema.attribute | lower}}"].({{schema.type}})                    
-                    }
-                {% elif schema.element is defined %}
-                        {% if schema.element.type == "resource" %}
-                        {{getResourceElement(schema, name)}}
-                        {% endif %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    }
-    {{schema.attribute | lower}}model := models.New{{schema.attribute | capitalize}}({{schema.attribute | lower}}Attr)
-
-    err := {{provider_name | lower}}Client.Save({{schema.attribute | lower}}model)
-    if err != nil {
-        return diag.FromErr(err)
-    }
-}
+    {{genCreateElementBody(schema, parentName)}}
 {% endmacro %}
 
+{% macro genCreateElementInternal(schema, recivedMapName, parentName) %}
+if {{recivedMapName}}["{{schema.attribute}}"] != nil {
+    {{schema.attribute | lower}}s := {{recivedMapName}}["{{schema.attribute}}"].([]interface{})
+    {{genCreateElementBody(schema, parentName)}}
+{% endmacro %}
 
-{% macro getResourceElement(resource,name) %}
-if {{name | lower}}["{{resource.attribute | lower}}"] != nil {
-    {{resource.attribute}}s := {{name | lower}}["{{resource.attribute | lower}}"].([]interface{})
+{% macro genCreateElementBody(schema, parentName) %}
+    {# pending 1#}
     
-    for _, val := range {{resource.attribute}}s {
-        {{resource.attribute}}Attr := models.{{schemaHelper.genFuncName(resource.attribute)}}Attributes{}
-        {{resource.attribute}} := val.(map[string]interface{})
-        {% set temp = resource.attribute %}
-        {% for schema in resource.element.schema %}
+    {% set attrName = schema.attribute %}
+    for _, val := range {{schema.attribute | lower}}s {
+        {% set modelName = schema.attribute  %}
+        {{modelName}} := models.{{schema.attribute | pascalize}}{}
+        {% set map = (schema.attribute | camelize)+"Map" %}
+        {% set currentResourceName = schema.attribute | lower %}
+        {{map}} := val.(map[string]interface{})
+        {% for schema in schema.element.schema %}
             {% if schema.required is true %}
-                {% if schema.type == "string" %}
-                    {{temp | lower}}Attr.{{schema.attribute | pascalize}} = {{temp}}["{{schema.attribute | lower}}"].({{schema.type}})
+                {% if schema.type in PrimitiveTypeList %}
+                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].({{schema.type}})
+                {% elif schema.type == "float" %}
+                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(float64)
+                {% elif schema.type == "map" %}
+                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(map[string]interface{})
+                {% elif schema.type == "set" %}
+                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(*schema.Set).List()
+                {% elif schema.type == "list" %}
+                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].([]interface{})
                 {% endif %}
             {% elif schema.optional is true %}
-                {% if schema.type == "string" %}
-                    if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
-                    {{temp | lower}}Attr.{{schema.attribute | pascalize}} = {{temp}}["{{schema.attribute | lower}}"].({{schema.type}})
+                {% if schema.type in PrimitiveTypeList %}
+                    if {{map}}["{{schema.attribute | lower}}"] != nil {
+                        {{ modelName }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].({{schema.type}})                    
                     }
-                {% elif schema.element is defined %}
+                {% elif schema.type == "float" %}
+                    if {{map}}["{{schema.attribute | lower}}"] != nil {
+                        {{ modelName }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(float64)                    
+                    }
+                {% elif schema.type == "map" %}
                     {% if schema.element.type == "resource" %}
-                        {{getResourceElement(schema, temp)}}
+                    {{genCreateElementInternal(schema, map, currentResourceName)}}
+                    {% elif schema.element.type == "schema" %}
+                    if {{map}}["{{schema.attribute | lower}}"] != nil {
+                        {{ modelName }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(map[string]interface{})                    
+                    }
+                    {% endif %}
+
+                {% elif schema.type == "set" %}
+                    {% if schema.element.type == "resource" %}
+                    {{genCreateElementInternal(schema, map, currentResourceName)}}
+                    {% elif schema.element.type == "schema" %}
+                    if {{map}}["{{schema.attribute | lower}}"] != nil {
+                        {{ modelName }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(*schema.Set).List()                
+                    }
+                    {% endif %}
+                {% elif schema.type == "list" %}
+                    {% if schema.element.type == "resource" %}
+                    {{genCreateElementInternal(schema, map, currentResourceName)}}
+                    {% elif schema.element.type == "schema" %}
+                    if {{map}}["{{schema.attribute | lower}}"] != nil {
+                        {{ modelName }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].([]interface{})               
+                    }
                     {% endif %}
                 {% endif %}
             {% endif %}
         {% endfor %}
+
+        {{parentName | lower}}.{{schema.attribute| pascalize}}s = append({{parentName}}.{{schema.attribute| pascalize}}s, {{modelName}})
     }
-    {{resource.attribute}} := models.New{{schemaHelper.genFuncName(resource.attribute)}}({{resource.attribute}}Attr)
-    err := {{provider_name | lower}}aciClient.Save({{resource.attribute | lower}}model)
-    if err != nil {
-        return diag.FromErr(err)
-    }        
 }
 {% endmacro %}
-
