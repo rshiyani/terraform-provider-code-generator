@@ -5,7 +5,7 @@ import(
     {% for import in imports  %}
     "{{ import }}"
     {% endfor %}
-) 
+)
 
 func resource{{provider_name | capitalize}}{{name | capitalize}}() *schema.Resource {
 	return &schema.Resource{

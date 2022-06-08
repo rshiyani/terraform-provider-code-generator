@@ -82,7 +82,7 @@ schemas:
           element:
             type: "resource"
             schema:
-              - attribute: "casts"
+              - attribute: "cast"
                 type: "set"
                 required: true
                 element:
