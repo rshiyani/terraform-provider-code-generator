@@ -1,5 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
-package aci
+package {{provider_name | snakify}}
 
 import(
     {% for import in imports  %}
@@ -7,12 +7,12 @@ import(
     {% endfor %}
 )
 
-func resource{{provider_name | capitalize}}{{name | capitalize}}() *schema.Resource {
+func resource{{provider_name | pascalize}}{{name | pascalize}}() *schema.Resource {
 	return &schema.Resource{
-        CreateContext: resource{{provider_name | capitalize}}{{name | capitalize}}Create,
-		UpdateContext: resource{{provider_name | capitalize}}{{name | capitalize}}Update,
-		ReadContext:   resource{{provider_name | capitalize}}{{name | capitalize}}Read,
-		DeleteContext: resource{{provider_name | capitalize}}{{name | capitalize}}Delete,
+        CreateContext: resource{{provider_name | pascalize}}{{name | pascalize}}Create,
+		UpdateContext: resource{{provider_name | pascalize}}{{name | pascalize}}Update,
+		ReadContext:   resource{{provider_name | pascalize}}{{name | pascalize}}Read,
+		DeleteContext: resource{{provider_name | pascalize}}{{name | pascalize}}Delete,
 
 
         Importer: &schema.ResourceImporter{
