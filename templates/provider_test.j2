@@ -1,5 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
-package {{provider_name | lower}}
+package {{provider_name | snakify}}
 
 import (
 	{% for import in imports_for_test %}
@@ -13,7 +13,7 @@ var testAccProvider *schema.Provider
 func init() {
 	testAccProvider = Provider()
 	testAccProviders = map[string]*schema.Provider{
-		"{{provider_name | lower}}": testAccProvider,
+		"{{provider_name | snakify}}": testAccProvider,
 	}
 }
 
@@ -38,7 +38,7 @@ func testAccPreCheck(t *testing.T) {
 }
 
 var providerFactories = map[string]func() (*schema.Provider, error){
-	"{{provider_name | lower}}": func() (*schema.Provider, error) {
+	"{{provider_name | snakify}}": func() (*schema.Provider, error) {
 		return testAccProvider, nil
 	},
 }
