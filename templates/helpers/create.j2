@@ -20,24 +20,48 @@ if {{recivedMapName}}["{{schema.attribute}}"] != nil {
     {% set attrName = schema.attribute %}
     for _, val := range {{schema.attribute | lower}}s {
         {% set modelName = schema.attribute  %}
-        {{modelName}} := models.{{schema.attribute | pascalize}}{}
         {% set map = (schema.attribute | camelize)+"Map" %}
         {% set currentResourceName = schema.attribute | lower %}
+        {{modelName}} := models.{{schema.attribute | pascalize}}{
+            {% for schema in schema.element.schema %}
+                {% if schema.required is true %}
+                    {% if schema.type in PrimitiveTypeList %}
+                        {{schema.attribute | pascalize}} : d.Get({{map}}["{{schema.attribute | lower}}"]).({{schema.type}}),
+                    {% elif schema.type == "float" %}
+                        {{schema.attribute | pascalize}} : d.Get({{map}}["{{schema.attribute | lower}}"]).(float64),
+                    {% elif schema.type == "map" %}
+                        {{schema.attribute | pascalize}} : d.Get({{map}}["{{schema.attribute | lower}}"]).(map[string]interface{}),
+                    {% elif schema.type == "set" %}
+                        {% if schema.element is defined %}
+                            {% if schema.element.type == "schema" %}
+                                {% if schema.element.schema.type in PrimitiveTypeList %}
+                                    {{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.element.schema.type}}),
+                                {% elif schema.element.schema.type == "float" %}
+                                    {{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
+                                {% endif %}
+                            {% else %}
+                                {{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").([]models.{{schema.attribute | pascalize}}),
+                            {% endif %}
+                        {% endif %}
+                    {% elif schema.type == "list" %}
+                        {% if schema.element is defined %}
+                            {% if schema.element.type == "schema" %}
+                                {% if schema.element.schema.type in PrimitiveTypeList %}
+                                    {{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.element.schema.type}}),
+                                {% elif schema.element.schema.type == "float" %}
+                                    {{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
+                                {% endif %}
+                            {% else %}
+                                {{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").([]models.{{schema.attribute | pascalize}}),
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        }
         {{map}} := val.(map[string]interface{})
         {% for schema in schema.element.schema %}
-            {% if schema.required is true %}
-                {% if schema.type in PrimitiveTypeList %}
-                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].({{schema.type}})
-                {% elif schema.type == "float" %}
-                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(float64)
-                {% elif schema.type == "map" %}
-                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(map[string]interface{})
-                {% elif schema.type == "set" %}
-                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].(*schema.Set).List()
-                {% elif schema.type == "list" %}
-                {{attrName | lower}}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].([]interface{})
-                {% endif %}
-            {% elif schema.optional is true %}
+            {% if schema.optional is true %}
                 {% if schema.type in PrimitiveTypeList %}
                     if {{map}}["{{schema.attribute | lower}}"] != nil {
                         {{ modelName }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute | lower}}"].({{schema.type}})                    

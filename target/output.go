@@ -3,7 +3,6 @@ package aci
 import (
 	"context"
 
-	"github.com/RutvikS-crest/movies-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
@@ -96,22 +95,13 @@ func resourceAciContract() *schema.Resource {
 						},
 
 						"filter_entry": &schema.Schema{
-							Type:        schema.TypeList,
-							Computed:    true,
-							Optional:    true,
+							Type:        schema.TypeSet,
+							Required:    true,
 							Description: "list of filter_entry",
 							MaxItems:    4,
 							MinItems:    1,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"cast": &schema.Schema{
-										Type:     schema.TypeSet,
-										Required: true,
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
-									},
-
 									"filter_entry_name": &schema.Schema{
 										Type:        schema.TypeString,
 										Required:    true,
@@ -119,26 +109,6 @@ func resourceAciContract() *schema.Resource {
 										DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool {
 											// [TODO]: Write your code here
 											return false
-										},
-									},
-
-									"entry_next": &schema.Schema{
-										Type:        schema.TypeList,
-										Computed:    true,
-										Optional:    true,
-										Description: "list of filter_entry",
-										MaxItems:    5,
-										MinItems:    1,
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"test": &schema.Schema{
-													Type:     schema.TypeSet,
-													Required: true,
-													Elem: &schema.Schema{
-														Type: schema.TypeString,
-													},
-												},
-											},
 										},
 									},
 
@@ -176,48 +146,23 @@ func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m in
 	contract = models.Contract{
 		TenantDn: d.Get("tenant_dn").(string),
 		Name:     d.Get("name").(string),
+		MyMap:    d.Get("my_map").(map[string]interface{}),
 	}
 
 	if Prio, ok := d.GetOk("prio"); ok {
 		contract.Prio = Prio.(string)
 	}
-
 	if Filters, ok := d.GetOk("filter"); ok {
 		filters := Filters.([]interface{})
 
 		for _, val := range filters {
-			filter := models.Filter{}
+			filter := models.Filter{
+				FilterName:  d.Get(filterMap["filter_name"]).(string),
+				FilterEntry: d.Get("filter_entry").([]models.FilterEntry),
+			}
 			filterMap := val.(map[string]interface{})
-			filter.FilterName = filterMap["filter_name"].(string)
 			if filterMap["description"] != nil {
 				filter.Description = filterMap["description"].(string)
-			}
-			if filterMap["filter_entry"] != nil {
-				filter_entrys := filterMap["filter_entry"].([]interface{})
-
-				for _, val := range filter_entrys {
-					filter_entry := models.FilterEntry{}
-					filterEntryMap := val.(map[string]interface{})
-					filter_entry.Cast = filterEntryMap["cast"].(*schema.Set).List()
-					filter_entry.FilterEntryName = filterEntryMap["filter_entry_name"].(string)
-					if filterEntryMap["entry_next"] != nil {
-						entry_nexts := filterEntryMap["entry_next"].([]interface{})
-
-						for _, val := range entry_nexts {
-							entry_next := models.EntryNext{}
-							entryNextMap := val.(map[string]interface{})
-							entry_next.Test = entryNextMap["test"].(*schema.Set).List()
-
-							filter_entry.EntryNexts = append(filter_entry.EntryNexts, entry_next)
-						}
-					}
-
-					if filterEntryMap["apply_to_frag"] != nil {
-						filter_entry.ApplyToFrag = filterEntryMap["apply_to_frag"].(string)
-					}
-
-					filter.FilterEntrys = append(filter.FilterEntrys, filter_entry)
-				}
 			}
 
 			contract.Filters = append(Contract.Filters, filter)

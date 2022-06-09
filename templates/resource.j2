@@ -1,5 +1,6 @@
 {% import './helpers/schema.j2' as schemaHelper %}
 {% import './helpers/create.j2' as createHelper %}
+{% set PrimitiveTypeList = ["string","bool","int"]%}
 package {{provider_name | lower}}
 
 import(
@@ -35,8 +36,36 @@ func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m in
 	{{name | lower}} = models.{{name | pascalize}}{
 		{% for schema in schemas %}
 			{% if schema.required is true %}
-				{% if schema.type == "string" %}
+				{% if schema.type in PrimitiveTypeList %}
 					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.type}}),
+				{% elif schema.type == "float" %}
+					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
+				{% elif schema.type == "map" %}
+					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(map[string]interface{}),
+				{% elif schema.type == "list" %}
+					{% if schema.element is defined %}
+						{% if schema.element.type == "schema" %}
+							{% if schema.element.schema.type in PrimitiveTypeList %}
+								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.element.schema.type}}),
+							{% elif schema.element.schema.type == "float" %}
+								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
+							{% endif %}
+						{% else %}
+							{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").([]models.{{schema.attribute | pascalize}}),
+						{% endif %}
+					{% endif %}
+				{% elif schema.type == "set" %}
+					{% if schema.element is defined %}
+						{% if schema.element.type == "schema" %}
+							{% if schema.element.schema.type in PrimitiveTypeList %}
+								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.element.schema.type}}),
+							{% elif schema.element.schema.type == "float" %}
+								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
+							{% endif %}
+						{% else %}
+							{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").([]models.{{schema.attribute | pascalize}}),
+						{% endif %}
+					{% endif %}
 				{% endif %}
 			{% endif %}
 		{% endfor %}
@@ -44,19 +73,39 @@ func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m in
 	
 	{% for schema in schemas %}
 		{% if schema.optional is true %}
-			{% if schema.type == "string" %}
+			{% if schema.type in PrimitiveTypeList %}
 				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
 					{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.({{schema.type}})
 				}
-			{% endif %}
-		{% endif %}
-	{% endfor %}
-		
-	
-	{% for schema in schemas %}
-		{% if schema.element is defined %}
-			{% if schema.element.type == "resource" %}
-				{{createHelper.genCreateElement(schema, name)}}
+			{% elif schema.type == "float" %}
+				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+					{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(float64)
+				}
+			{% elif schema.type == "map" %}
+				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+					{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(map[string]interface{})
+				}
+			{% elif schema.type == "list" %}
+				{% if schema.element is defined %}
+					{% if schema.element.type == "resource" %}
+						{{createHelper.genCreateElement(schema, name)}}
+					{% else %}
+						if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+							{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.([]interface{})
+						}		
+					{% endif %}
+				{% endif %}
+			{% elif schema.type == "set" %}
+				{% if schema.element is defined %}
+					{% if schema.element.type == "resource" %}
+						{{createHelper.genCreateElement(schema, name)}}
+					{% else %}
+					if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+						{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(*schema.Set).List()
+					}	
+					{% endif %}
+				{% endif %}
+				
 			{% endif %}
 		{% endif %}
 	{% endfor %}
