@@ -2,7 +2,11 @@ package aci
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/RutvikS-crest/movies-go-client/client"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
@@ -36,7 +40,7 @@ func resourceAciContract() *schema.Resource {
 					"1",
 					"2",
 					"3",
-				}, false),
+				}, true),
 				),
 			},
 
@@ -178,7 +182,43 @@ func resourceAciContract() *schema.Resource {
 	}
 }
 
+func setContractAttributes(contract *models.Contract, d *schema.ResourceData) *schema.ResourceData {
+	contractMap := contract.ToMap()
+
+	contractId, err := getIdFromContractModel(&contractMap)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(contractId)
+	d.Set("tenant_dn", contractMap["tenant_dn"])
+	d.Set("name", contractMap["name"])
+	d.Set("my_map", contractMap["my_map"])
+	d.Set("prio", contractMap["prio"])
+	d.Set("cast", contractMap["cast"])
+	d.Set("filter", contractMap["filter"])
+
+	return d
+}
+
+func getContractAttributes(client *client.Client, id string) (*models.Contract, error) {
+
+	contract, err := client.GetContract(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return contract, nil
+}
+
+func getIdFromContractModel(contract *models.Contract) {
+	// [TODO]: Write your code to get Id ,here
+}
+
 func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+
+	tflog.Debug(ctx, "Contract: Beginning Creation")
 
 	aciClient := m.(*client.Client)
 	contract = models.Contract{
@@ -254,10 +294,14 @@ func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	tflog.Debug(ctx, "Contract: Creation Finished Successfully")
 	return resourceAciContractRead(ctx, d, m)
 }
 
 func resourceAciContractUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+
+	tflog.Debug(ctx, fmt.Sprintf("Contract: Beginning Update with ID: %s", d.Id()))
 
 	aciClient := m.(*client.Client)
 	contract = models.Contract{
@@ -333,10 +377,16 @@ func resourceAciContractUpdate(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	tflog.Debug(ctx, fmt.Sprintf("Contract: Update Finished Successfully with ID: %s", d.Id()))
+
 	return resourceAciContractRead(ctx, d, m)
 }
 
 func resourceAciContractDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+
+	tflog.Debug(ctx, fmt.Sprintf("Contract: Beginning Delete with ID: %s", d.Id()))
+
 	aciClient := m.(*client.Client)
 
 	err := aciClient.DeleteContract(d.Id())
@@ -345,5 +395,41 @@ func resourceAciContractDelete(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	d.SetId("")
+
+	tflog.Debug(ctx, fmt.Sprintf("Contract: Delete Finished Successfully with ID: %s", d.Id()))
+
 	return diag.FromErr(err)
+}
+
+func resourceAciContractRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+
+	tflog.Debug(ctx, "Contract: Beginning Read")
+
+	aciClient := m.(*client.Client)
+
+	contractMap := models.Contract{
+		TenantDn: d.Get("tenant_dn"),
+
+		Name: d.Get("name"),
+	}
+
+	contractId, err := getIdFromContractModel(&contractMap)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	contract, err := getContractAttributes(aciClient, contractId)
+
+	if err != nil {
+		d.SetId("")
+		return nil
+	}
+	_, err = setContractAttributes(contract, d)
+	if err != nil {
+		d.SetId("")
+		return nil
+	}
+
+	tflog.Debug(ctx, "Contract: Read Finished Successfully")
+
+	return nil
 }
