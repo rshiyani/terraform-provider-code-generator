@@ -1,148 +1,468 @@
 package aci
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"fmt"
+	"regexp"
+	"testing"
 )
 
-func resourceAciContract() *schema.Resource {
-	return &schema.Resource{
-		CreateContext: resourceAciContractCreate,
-		UpdateContext: resourceAciContractUpdate,
-		ReadContext:   resourceAciContractRead,
-		DeleteContext: resourceAciContractDelete,
+func TestAccAciContract_Basic(t *testing.T) {
+	var contract_default models.Contract
+	var contract_updated models.Contract
+	resourceName := "aci_contract.test"
 
-		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
-		},
+	// [TODO]: Add makeTestVariable() to utils.go file
+	rName := makeTestVariable(acctest.RandString(5))
+	rOther := makeTestVariable(acctest.RandString(5))
 
-		Schema: map[string]*schema.Schema{
-			"tenant_dn": &schema.Schema{
-				Type:        schema.TypeString,
-				Sensitive:   true,
-				Required:    true,
-				ForceNew:    true,
-				Description: "tenant DN",
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testAccCheckAciContractDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      CreateAccContractWithoutName(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
 			},
-
-			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "contract name",
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{
-					"1",
-					"2",
-					"3",
-				}, false),
-				),
+			{
+				Config:      CreateAccContractWithoutIpv4(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
 			},
-
-			"my_map": &schema.Schema{
-				Type:        schema.TypeMap,
-				Sensitive:   true,
-				Required:    true,
-				ForceNew:    true,
-				Description: "My map for testing",
-				// [ERROR]: StringinSLice may be a Typo or not in AutoGen List. Please refer docs once.
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
+			{
+				Config:      CreateAccContractWithoutIpv6(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
 			},
-
-			"prio": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Optional:    true,
-				Description: "prio",
-				ValidateDiagFunc: validation.ToDiagFunc(
-					validation.IsCIDRNetwork(1, 2),
-				),
+			{
+				Config:      CreateAccContractWithoutMac(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
 			},
-
-			"filter": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Optional:    true,
-				Description: "filter list",
-				MaxItems:    10,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"filter_name": &schema.Schema{
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: "name of filter",
-						},
-
-						"id": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							DefaultFunc: schema.EnvDefaultFunc("ID", nil),
-							Description: "id of filter",
-						},
-
-						"description": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
-							DefaultFunc: func() (interface{}, error) {
-								// [TODO]: Write your code here
-								return nil, nil
-							},
-							Description: "description of filter",
-						},
-
-						"filter_entry": &schema.Schema{
-							Type:        schema.TypeList,
-							Computed:    true,
-							Optional:    true,
-							Description: "list of filter_entry",
-							MaxItems:    4,
-							MinItems:    1,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"casts": &schema.Schema{
-										Type:     schema.TypeSet,
-										Required: true,
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
-									},
-
-									"filter_entry_name": &schema.Schema{
-										Type:        schema.TypeString,
-										Required:    true,
-										Description: "name of filter entry",
-										DiffSuppressFunc: func(k, oldValue, newValue string, d *schema.ResourceData) bool {
-											// [TODO]: Write your code here
-											return false
-										},
-									},
-
-									"id": &schema.Schema{
-										Type:             schema.TypeString,
-										Computed:         true,
-										Description:      "id of filter entry",
-										ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv6Address),
-									},
-
-									"apply_to_frag": &schema.Schema{
-										Type:        schema.TypeString,
-										Computed:    true,
-										Optional:    true,
-										Description: "apply to fragment",
-										ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{
-											"yes",
-											"no",
-										}, false),
-										),
-									},
-								},
-							},
-						},
-					},
-				},
+			{
+				Config:      CreateAccContractWithoutCidr(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutTime(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutUrlHttps(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutUrlHttp(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutUuid(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutBase64(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutJson(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutRegExp(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutPortNumber(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutPortWithZero(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutNuclearCode(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutTestScore(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
+			},
+			{
+				Config:      CreateAccContractWithoutPercentage(rName),
+				ExpectError: regexp.MustCompile(`Missing required argument`),
 			},
 		},
-	}
+	})
+}
+
+func CreateAccContractWithoutName(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutIpv4(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutIpv6(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutMac(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutCidr(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutTime(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutUrlHttps(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutUrlHttp(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutUuid(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutBase64(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutJson(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutRegExp(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutPortNumber(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutPortWithZero(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutNuclearCode(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			test_score = 1
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutTestScore(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			percentage = 0
+		}
+	`)
+}
+func CreateAccContractWithoutPercentage(rName string) string {
+	return fmt.Sprintf(`
+		resource "aci_contract" "test" {
+			name = "ufl4ow8f3q"
+			ipv4 = "71.230.128.82"
+			ipv6 = "fb2d:2b35:b822:be17:b361:6691"
+			mac = "52:af:5f:a6:77:24"
+			cidr = "198.45.35.129/9"
+			time = "2022-06-10T05:05:34.280848+00:00"
+			url_https = "https://er388ujn1sa2dn2.com"
+			url_http = "http://clb80ylsgjrrf6d.com"
+			uuid = "f56c3da5-e87a-11ec-a5f9-7c8ae19799de"
+			base_64 = "b2tjYThwc25pcg=="
+			json = '{ "attribute" : "value" }'
+			reg_exp = "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+			port_number = 1
+			port_with_zero = 0
+			nuclear_code = "ufl4ow8f3q"
+			test_score = 1
+		}
+	`)
 }

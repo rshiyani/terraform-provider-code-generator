@@ -14,3 +14,7 @@ def pascalize(s):
 def snakify(name):
     s1 = sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def is_list(value):
+    return isinstance(value, list)

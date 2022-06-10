@@ -1,5 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
-package aci
+package {{provider_name | lower}}
 
 import(
     {% for import in imports  %}

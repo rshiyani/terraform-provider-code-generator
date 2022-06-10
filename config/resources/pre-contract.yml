@@ -1,0 +1,218 @@
+provider_name: "Aci"
+name: "Contract"
+imports:
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+schemas:
+  - attribute: "name"
+    type: "string"
+    required: true
+    forcenew: true
+    description: "name"
+
+  - attribute: "ipv4"
+    type: "string"
+    # optional: true
+    required: true
+    description: "IP-address v4"
+    validation:
+      func_name: "IsIPv4Address"
+
+  - attribute: "ipv6"
+    type: "string"
+    # optional: true
+    required: true
+    description: "IP-address v6"
+    validation:
+      func_name: "IsIPv6Address"
+
+  - attribute: "mac"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsMACAddress"
+
+  - attribute: "cidr"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsCIDR"
+
+  - attribute: "time"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsRFC3339Time"
+
+  - attribute: "url_https"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsURLWithHTTPS"
+
+  - attribute: "url_http"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsURLWithHTTPorHTTPS"
+
+  - attribute: "uuid"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsUUID"
+
+  - attribute: "base_64"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "StringIsBase64"
+
+  - attribute: "json"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "StringIsJSON"
+
+  - attribute: "reg_exp"
+    type: "string"
+    # optional: true
+    required: true
+    validation:
+      func_name: "StringIsValidRegExp"
+
+  - attribute: "gender"
+    type: "string"
+    validation:
+      func_name: "StringInSlice"
+      ignore_case: true
+      params:
+        - "male"
+        - "female"
+        - "other"
+
+  - attribute: "port_number"
+    type: "int"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsPortNumber"
+
+  - attribute: "port_with_zero"
+    type: "int"
+    # optional: true
+    required: true
+    validation:
+      func_name: "IsPortNumberOrZero"
+
+  - attribute: "nuclear_code"
+    # optional: true
+    required: true
+    sensitive: true
+    description: "Nuclear code"
+    validation:
+      func_name: "NotInYourList"
+    type: "string"
+    # type: "list"
+    # element:
+    #   schema:
+    #     type: "string"
+
+  - attribute: "test_score"
+    type: "int"
+    required: true
+    # optional: true
+    computed: true
+    description: "range"
+    validation:
+      func_name: "IntBetween"
+      params:
+        - 1
+        - 100
+
+  - attribute: "percentage"
+    type: "float"
+    required: true
+    # optional: true
+    computed: true
+    validation:
+      func_name: "FloatBetween"
+      params:
+        - 0
+        - 100
+
+  - attribute: "filter"
+    type: "list"
+    optional: true
+    # required: true
+    computed: true
+    description: "filter list"
+    max_items: 10
+    element:
+      type: "resource"
+      schema:
+        - attribute: "filter_name"
+          type: "string"
+          required: true
+          description: "name of filter"
+        - attribute: "id"
+          type: "string"
+          computed: true
+          description: "id of filter"
+          default_func: true
+          envvar: "FILTER_ID"
+        - attribute: "description"
+          type: "string"
+          optional: true
+          computed: true
+          description: "description of filter"
+          default_func: true
+        - attribute: "filter_entry"
+          type: "list"
+          optional: true
+          computed: true
+          description: "list of filter_entry"
+          min_items: 1
+          max_items: 4
+          element:
+            type: "resource"
+            schema:
+              - attribute: "id_list"
+                type: "set"
+                required: true
+                element:
+                  type: "schema"
+                  schema:
+                    type: "string"
+              - attribute: "filter_entry_name"
+                type: "string"
+                required: true
+                description: "name of filter entry"
+                diff_suppress: true
+              - attribute: "ipv6"
+                type: "string"
+                optional: true
+                # computed: true
+                description: "ipv6"
+                validation:
+                  func_name: "IsIPv6Address"
+              - attribute: "apply_to_frag"
+                type: "string"
+                optional: true
+                computed: true
+                validation:
+                  func_name: "StringInSlice"
+                  ignore_case: "false"
+                  params:
+                    - "yes"
+                    - "no"
+                description: "apply to fragment"

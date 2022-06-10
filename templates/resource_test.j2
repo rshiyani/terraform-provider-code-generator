@@ -1,0 +1,80 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package {{provider_name | lower}}
+
+{% set requiredAttrSchemaList = [] %}
+
+{% macro printStepWithoutRequiredArguments() %}
+	{% for schema in schemas %}
+		{% if schema.required is true %}
+		{
+			Config: CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}(rName),
+			ExpectError: regexp.MustCompile(`Missing required argument`),
+		},
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+
+
+func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T) {
+	var {{name | camelize}}_default models.{{name | pascalize}}
+	var {{name | camelize}}_updated models.{{name | pascalize}}
+	resourceName := "{{provider_name | lower}}_{{name | camelize}}.test"
+	
+	// [TODO]: Add makeTestVariable() to utils.go file
+	rName := makeTestVariable(acctest.RandString(5))
+	rOther := makeTestVariable(acctest.RandString(5))
+	
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviders,
+		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
+		Steps: []resource.TestStep{
+			{{printStepWithoutRequiredArguments()}}
+		},
+	})
+}
+
+
+
+{% macro setRequiredAttrList() %}
+	{% for schema in schemas %}
+		{% if schema.required is true %}
+			{% set requiredAttrSchemaList = requiredAttrSchemaList.append(schema) %}
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+
+{% macro printQuote(schema) %}
+	{%- if schema.type == "string" -%}
+		{%- if schema.subtype == "json" -%}
+		'
+		{%- else -%}
+		"
+		{%- endif -%}
+	{%- endif -%}
+{% endmacro %}
+
+{% macro printFunctionWithoutRequiredArguments() %}
+	{% for schema in schemas %}
+		{% if schema.required is true %}
+func CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}(rName string) string {
+	return fmt.Sprintf(`
+		resource "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+			{% for sch in requiredAttrSchemaList %}
+				{% if schema.attribute != sch.attribute %}
+					{% if (sch.test_params.valid | is_list) %}
+			{{sch.attribute}} = {{printQuote(sch)}}{{sch.test_params.valid[0]}}{{printQuote(sch)}}
+					{% else %}
+			{{sch.attribute}} = {{printQuote(sch)}}{{sch.test_params.valid}}{{printQuote(sch)}}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		}
+	`)
+}
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+
+{{setRequiredAttrList()}}
+{{printFunctionWithoutRequiredArguments()}}
