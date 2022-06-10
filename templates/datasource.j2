@@ -20,29 +20,26 @@ func dataSource{{provider_name | pascalize}}{{name | pascalize}}() *schema.Resou
 }
 
 func dataSource{{provider_name | pascalize}}{{name | pascalize}}Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	{{provider_name}}Client := m.(*client.Client)
+	
+	{{provider_name | camelize}}Client := m.(*client.Client)
 
-   {# {% for schema in schemas %}
-		{{ schemaHelper.getRequired(schema) }}
-    {% endfor %} #}
-
-    {{name | pascalize}}Map := models.{{name | pascalize}}{
+    {{name | camelize}}Model := models.{{name | pascalize}}{
     {% for schema in schemas %}
 		{{ schemaHelper.getRequiredModel(schema) }}
     {% endfor %}
 	}
 
-    {{name}}Id, err := getIdFrom{{name | pascalize}}Model(&{{name | pascalize}}Map)
+    {{name | camelize}}Id, err := getIdFrom{{name | pascalize}}Model(&{{name | camelize}}Model)
 	if err != nil {
 		return diag.FromErr(err)
 	}
     
-    {{name}}, err := get{{name | pascalize}}Attributes({{provider_name}}Client, {{name}}Id)
+    {{name | camelize}}, err := get{{name | pascalize}}Attributes({{provider_name | camelize}}Client, {{name | camelize}}Id)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = set{{name | pascalize}}Attributes({{name}}, d)
+	_, err = set{{name | pascalize}}Attributes({{name | camelize}}, d)
 	if err != nil {
 		return diag.FromErr(err)
 	}

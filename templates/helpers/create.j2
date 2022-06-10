@@ -1,0 +1,114 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+{% set PrimitiveTypeList = ["string","bool","int"]%}
+
+
+{% macro genCreateElement(schema, parentName) %}
+if {{schema.attribute | pascalize}}s, ok := d.GetOk("{{schema.attribute | camelize}}"); ok {
+    {% if schema.type == "list" %}
+        {{schema.attribute | camelize}}s := {{schema.attribute | pascalize}}s.([]interface{})
+    {% elif schema.type == "set" %}
+        {{schema.attribute | camelize}}s := {{schema.attribute | pascalize}}s.(*schema.Set).List()  
+    {% endif %}
+    {{genCreateElementBody(schema, parentName)}}
+}
+{% endmacro %}
+
+{% macro genCreateElementRequired(schema, parentName) %}
+    {% if schema.type == "list" %}
+    {{schema.attribute | camelize}}s := d.Get("{{schema.attribute | camelize}}").([]interface{})
+    {% elif schema.type == "set" %}
+    {{schema.attribute | camelize}}s := d.Get("{{schema.attribute | camelize}}").(*schema.Set).List()  
+    {% endif %}
+    {{genCreateElementBody(schema, parentName)}}
+{% endmacro %}
+
+{% macro genCreateElementInternal(schema, recivedMapName, parentName) %}
+if {{recivedMapName}}["{{schema.attribute}}"] != nil {
+    {% if schema.type == "list" %}
+        {{schema.attribute | camelize}}s := {{recivedMapName}}["{{schema.attribute}}"].([]interface{})
+    {% elif schema.type == "set" %}
+        {{schema.attribute | camelize}}s := {{recivedMapName}}["{{schema.attribute}}"].(*schema.Set).List()
+    {% endif %}
+    {{genCreateElementBody(schema, parentName)}}
+}
+{% endmacro %}
+
+{% macro genCreateElementBody(schema, parentName) %}
+    
+    {% set attrName = schema.attribute %}
+    for _, val := range {{schema.attribute | camelize}}s {
+        {% set modelName = schema.attribute  %}
+        {% set map = (schema.attribute | camelize)+"Map" %}
+        {% set currentResourceName = schema.attribute | camelize %}
+        {{map}} := val.(map[string]interface{})
+        {{modelName | camelize}} := models.{{schema.attribute | pascalize}}{
+            {% for schema in schema.element.schema %}
+                {% if schema.required is true %}
+                    {% if schema.type in PrimitiveTypeList %}
+                        {{schema.attribute | pascalize}} : {{map}}["{{schema.attribute}}"].({{schema.type}}),
+                    {% elif schema.type == "float" %}
+                        {{schema.attribute | pascalize}} : {{map}}["{{schema.attribute}}"].(float64),
+                    {% elif schema.type == "map" %}
+                        {{schema.attribute | pascalize}} : {{map}}["{{schema.attribute}}"].(map[string]interface{}),
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        }
+        {% for schema in schema.element.schema %}
+            {% if schema.required is true %}
+                {% if schema.type == "set" or schema.type == "list" %}
+                    {% if schema.element is defined %}
+                        {% if schema.element.type == "schema" %}
+                            {% if schema.element.schema.type in PrimitiveTypeList %}
+                                {{ modelName | camelize }}.{{schema.attribute | pascalize}}s = {{map}}["{{schema.attribute}}"].({{schema.element.schema.type}})
+                            {% elif schema.element.schema.type == "float" %}
+                                {{ modelName | camelize }}.{{schema.attribute | pascalize}}s = {{map}}["{{schema.attribute}}"].(float64)
+                            {% endif %}
+                        {% else %}
+                            {{genCreateElementInternal(schema, map, modelName)}}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% elif schema.optional is true %}
+                {% if schema.type in PrimitiveTypeList %}
+                    if {{map}}["{{schema.attribute | camelize}}"] != nil {
+                        {{ modelName | camelize }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute}}"].({{schema.type}})                    
+                    }
+                {% elif schema.type == "float" %}
+                    if {{map}}["{{schema.attribute | camelize}}"] != nil {
+                        {{ modelName | camelize }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute}}"].(float64)                    
+                    }
+                {% elif schema.type == "map" %}
+                    {% if schema.element.type == "resource" %}
+                    {{genCreateElementInternal(schema, map, currentResourceName)}}
+                    {% elif schema.element.type == "schema" %}
+                    if {{map}}["{{schema.attribute | camelize}}"] != nil {
+                        {{ modelName | camelize }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute}}"].(map[string]interface{})                    
+                    }
+                    {% endif %}
+
+                {% elif schema.type == "set" %}
+                    {% if schema.element.type == "resource" %}
+                    {{genCreateElementInternal(schema, map, currentResourceName)}}
+                    {% elif schema.element.type == "schema" %}
+                    if {{map}}["{{schema.attribute | camelize}}"] != nil {
+                        {{ modelName | camelize }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute}}"].(*schema.Set).List()                
+                    }
+                    {% endif %}
+                {% elif schema.type == "list" %}
+                    {% if schema.element.type == "resource" %}
+                    {{genCreateElementInternal(schema, map, currentResourceName)}}
+                    {% elif schema.element.type == "schema" %}
+                    if {{map}}["{{schema.attribute | camelize}}"] != nil {
+                        {{ modelName | camelize }}.{{schema.attribute | pascalize}} = {{map}}["{{schema.attribute}}"].([]interface{})               
+                    }
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        {{parentName | camelize}}.{{schema.attribute| pascalize}}s = append({{parentName}}.{{schema.attribute| pascalize}}s, {{modelName| camelize}})
+    }
+
+{% endmacro %}
+

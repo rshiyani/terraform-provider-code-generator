@@ -3,6 +3,7 @@ package aci
 import (
 	"context"
 
+	"github.com/RutvikS-crest/movies-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -36,8 +37,17 @@ func dataSourceAciContract() *schema.Resource {
 				Description: "prio",
 			},
 
+			"cast": &schema.Schema{
+				Type:     schema.TypeSet,
+				Required: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+
 			"filter": &schema.Schema{
 				Type:        schema.TypeList,
+				Required:    true,
 				Computed:    true,
 				Description: "filter list",
 				Elem: &schema.Resource{
@@ -62,15 +72,37 @@ func dataSourceAciContract() *schema.Resource {
 
 						"filter_entry": &schema.Schema{
 							Type:        schema.TypeList,
+							Required:    true,
 							Computed:    true,
 							Description: "list of filter_entry",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
+									"entry_next": &schema.Schema{
+										Type:     schema.TypeList,
+										Required: true,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"entry_next_name": &schema.Schema{
+													Type:     schema.TypeString,
+													Required: true,
+												},
+											},
+										},
+									},
+
 									"cast": &schema.Schema{
 										Type:     schema.TypeSet,
 										Required: true,
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"cast2": &schema.Schema{
+													Type:     schema.TypeSet,
+													Required: true,
+													Elem: &schema.Schema{
+														Type: schema.TypeString,
+													},
+												},
+											},
 										},
 									},
 
@@ -102,27 +134,26 @@ func dataSourceAciContract() *schema.Resource {
 }
 
 func dataSourceAciContractRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	AciClient := m.(*client.Client)
 
-	ContractMap := models.Contract{
-		TenantDn: d.Get("tenantDn"),
+	aciClient := m.(*client.Client)
+
+	contractMap := models.Contract{
+		TenantDn: d.Get("tenant_dn"),
 
 		Name: d.Get("name"),
-
-		MyMap: d.Get("myMap"),
 	}
 
-	ContractId, err := getIdFromContractModel(&ContractMap)
+	contractId, err := getIdFromContractModel(&contractMap)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	Contract, err := getContractAttributes(AciClient, ContractId)
+	contract, err := getContractAttributes(aciClient, contractId)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	_, err = setContractAttributes(Contract, d)
+	_, err = setContractAttributes(contract, d)
 	if err != nil {
 		return diag.FromErr(err)
 	}

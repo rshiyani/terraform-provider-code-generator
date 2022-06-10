@@ -200,14 +200,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getRequired(schema) %}
-    {% if schema.required is true %}
-        {{schema.attribute}}:= d.Get("{{schema.attribute | camelize}}")
-    {% endif %}
-{% endmacro %}
-
 {% macro getRequiredModel(schema) %}
-    {% if schema.required is true %}
-        {{schema.attribute| pascalize}}:  d.Get("{{schema.attribute | camelize}}"),
+    {% if schema.required is true and schema.type not in ["list","set","map"]  %}
+        {{schema.attribute| pascalize}}:  d.Get("{{schema.attribute }}"),
     {% endif %}
 {% endmacro %}

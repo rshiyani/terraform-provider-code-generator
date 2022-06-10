@@ -10,7 +10,7 @@ package models
                 {{schema.attribute | pascalize}}s []{{schema.element.schema.type-}}
             {% endif %}
         {% elif schema.type == "map" %}
-            {{schema.attribute | pascalize}} interface{}
+            {{schema.attribute | pascalize}} map[string]interface{}
         {%- else %}
             {{schema.attribute | pascalize}} {{schema.type-}}
         {% endif %}

@@ -13,5 +13,5 @@ env.filters["snakify"] = snakify
 template = env.get_template('model.j2')
 
 # to save the results
-with open("model_output.go", "w") as fh:
+with open("./target/model_output.go", "w") as fh:
     fh.write(template.render(config))
