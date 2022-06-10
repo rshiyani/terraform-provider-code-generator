@@ -165,3 +165,49 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
+{% macro getDataSchemaEle(schema) %}
+    "{{ schema.attribute }}": &schema.Schema{
+        {{checkTypeD(schema)}}
+    },
+{% endmacro %}
+
+{% macro checkTypeD(schema) %}
+        {% if schema.type is defined %}
+        Type: schema.Type{{schema.type | capitalize}},
+        {{checkRequired(schema.required)-}}
+        {{checkComputed(schema.computed)-}} 
+        {{checkDescription(schema.description)-}}
+        {% if schema.type == "list" or schema.type == "set" %}
+            {% if schema.element.type == "schema" %}
+                Elem: &schema.Schema{
+                    {{checkType(schema.element.schema)}}
+                },
+            {% elif schema.element.type == "resource" %}
+                Elem: &schema.Resource{
+                    Schema: map[string]*schema.Schema{
+                    {% for schema in schema.element.schema %}
+                        {{ getDataSchemaEle(schema) }}
+                    {% endfor %}
+                    },
+                },
+            {% endif %}
+        {% elif schema.type == "TypeMap" %}
+            Elem: &schema.Schema{
+                {{checkType(schema.element.schema)}}
+            },
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro getRequired(schema) %}
+    {% if schema.required is true %}
+        {{schema.attribute}}:= d.Get("{{schema.attribute | camelize}}")
+    {% endif %}
+{% endmacro %}
+
+{% macro getRequiredModel(schema) %}
+    {% if schema.required is true %}
+        {{schema.attribute| pascalize}}:  d.Get("{{schema.attribute | camelize}}"),
+    {% endif %}
+{% endmacro %}

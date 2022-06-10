@@ -2,6 +2,7 @@ provider_name: "Aci"
 name: "Contract"
 imports:
   - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/diag"
   - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 schemas:
@@ -19,7 +20,7 @@ schemas:
     description: "contract name"
     validation:
       func_name: "StringInSlice"
-      ignore_case: "false"
+      ignore_case: true
       params:
         - "1"
         - "2"
