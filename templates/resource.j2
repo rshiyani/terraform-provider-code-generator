@@ -1,7 +1,7 @@
 {% import './helpers/schema.j2' as schemaHelper %}
 {% import './helpers/create.j2' as createHelper %}
 {% set PrimitiveTypeList = ["string","bool","int"]%}
-package {{provider_name | lower}}
+package {{provider_name | camelize}}
 
 import(
     {% for import in imports  %}
@@ -9,12 +9,12 @@ import(
     {% endfor %}
 )
 
-func resource{{provider_name | capitalize}}{{name | capitalize}}() *schema.Resource {
+func resource{{provider_name | pascalize}}{{name | pascalize}}() *schema.Resource {
 	return &schema.Resource{
-        CreateContext: resource{{provider_name | capitalize}}{{name | capitalize}}Create,
-		UpdateContext: resource{{provider_name | capitalize}}{{name | capitalize}}Update,
-		ReadContext:   resource{{provider_name | capitalize}}{{name | capitalize}}Read,
-		DeleteContext: resource{{provider_name | capitalize}}{{name | capitalize}}Delete,
+        CreateContext: resource{{provider_name | pascalize}}{{name | pascalize}}Create,
+		UpdateContext: resource{{provider_name | pascalize}}{{name | pascalize}}Update,
+		ReadContext:   resource{{provider_name | pascalize}}{{name | pascalize}}Read,
+		DeleteContext: resource{{provider_name | pascalize}}{{name | pascalize}}Delete,
 
 
         Importer: &schema.ResourceImporter{
@@ -30,10 +30,10 @@ func resource{{provider_name | capitalize}}{{name | capitalize}}() *schema.Resou
 }
 
 
-func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resource{{provider_name | pascalize}}{{name | pascalize}}Create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	
-	{{provider_name | lower}}Client := m.(*client.Client)
-	{{name | lower}} = models.{{name | pascalize}}{
+	{{provider_name | camelize}}Client := m.(*client.Client)
+	{{name | camelize}} = models.{{name | pascalize}}{
 		{% for schema in schemas %}
 			{% if schema.required is true %}
 				{% if schema.type in PrimitiveTypeList %}
@@ -41,78 +41,145 @@ func resourceAciContractCreate(ctx context.Context, d *schema.ResourceData, m in
 				{% elif schema.type == "float" %}
 					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
 				{% elif schema.type == "map" %}
-					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(map[string]interface{}),
-				{% elif schema.type == "list" %}
-					{% if schema.element is defined %}
-						{% if schema.element.type == "schema" %}
-							{% if schema.element.schema.type in PrimitiveTypeList %}
-								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.element.schema.type}}),
-							{% elif schema.element.schema.type == "float" %}
-								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
-							{% endif %}
-						{% else %}
-							{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").([]models.{{schema.attribute | pascalize}}),
-						{% endif %}
-					{% endif %}
-				{% elif schema.type == "set" %}
-					{% if schema.element is defined %}
-						{% if schema.element.type == "schema" %}
-							{% if schema.element.schema.type in PrimitiveTypeList %}
-								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.element.schema.type}}),
-							{% elif schema.element.schema.type == "float" %}
-								{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
-							{% endif %}
-						{% else %}
-							{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").([]models.{{schema.attribute | pascalize}}),
-						{% endif %}
-					{% endif %}
+					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}"),
 				{% endif %}
 			{% endif %}
 		{% endfor %}
 	}
 	
 	{% for schema in schemas %}
-		{% if schema.optional is true %}
+		
+		{% if schema.required is true %}
+			{% if schema.type == "list" or schema.type == "set" %}
+				{% if schema.element is defined %}
+					{% if schema.element.type == "schema" %}
+						{% if schema.element.schema.type in PrimitiveTypeList %}
+							{{name | camelize}}.{{schema.attribute | pascalize}}s = d.Get("{{schema.attribute}}").([]{{schema.element.schema.type}})
+						{% elif schema.element.schema.type == "float" %}
+							{{name | camelize}}.{{schema.attribute | pascalize}}s = d.Get("{{schema.attribute}}").([]float64)
+						{% endif %}
+					{% else %}
+						{{createHelper.genCreateElementRequired(schema, name)}}
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		{% elif schema.optional is true %}
 			{% if schema.type in PrimitiveTypeList %}
 				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
-					{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.({{schema.type}})
+					{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.({{schema.type}})
 				}
 			{% elif schema.type == "float" %}
 				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
-					{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(float64)
+					{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(float64)
 				}
 			{% elif schema.type == "map" %}
 				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
-					{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(map[string]interface{})
+					{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}
 				}
-			{% elif schema.type == "list" %}
+			{% elif schema.type == "list" or schema.type == "set"%}
 				{% if schema.element is defined %}
 					{% if schema.element.type == "resource" %}
 						{{createHelper.genCreateElement(schema, name)}}
 					{% else %}
 						if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
-							{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.([]interface{})
+							{% if schema.type== "list" %}
+								{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.([]interface{})
+							{% else %}
+								{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(*schema.Set).List()
+							{% endif %}
 						}		
 					{% endif %}
 				{% endif %}
-			{% elif schema.type == "set" %}
-				{% if schema.element is defined %}
-					{% if schema.element.type == "resource" %}
-						{{createHelper.genCreateElement(schema, name)}}
-					{% else %}
-					if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
-						{{name | lower}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(*schema.Set).List()
-					}	
-					{% endif %}
-				{% endif %}
-				
 			{% endif %}
 		{% endif %}
 	{% endfor %}
 
-	err := {{provider_name | lower}}Client.Create{{name | capitalize}}({{name | lower}})
+	err := {{provider_name | camelize}}Client.Create{{name | pascalize}}({{name | camelize}})
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	return resource{{provider_name | capitalize}}{{name | capitalize}}Read(ctx, d, m)
+	return resource{{provider_name | pascalize}}{{name | pascalize}}Read(ctx, d, m)
+}
+
+func resource{{provider_name | pascalize}}{{name | pascalize}}Update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	
+	{{provider_name | camelize}}Client := m.(*client.Client)
+	{{name | camelize}} = models.{{name | pascalize}}{
+		{% for schema in schemas %}
+			{% if schema.required is true %}
+				{% if schema.type in PrimitiveTypeList %}
+					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").({{schema.type}}),
+				{% elif schema.type == "float" %}
+					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}").(float64),
+				{% elif schema.type == "map" %}
+					{{schema.attribute | pascalize}}: d.Get("{{schema.attribute}}"),
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+	}
+	
+	{% for schema in schemas %}
+		
+		{% if schema.required is true %}
+			{% if schema.type == "list" or schema.type == "set" %}
+				{% if schema.element is defined %}
+					{% if schema.element.type == "schema" %}
+						{% if schema.element.schema.type in PrimitiveTypeList %}
+							{{name | camelize}}.{{schema.attribute | pascalize}}s = d.Get("{{schema.attribute}}").([]{{schema.element.schema.type}})
+						{% elif schema.element.schema.type == "float" %}
+							{{name | camelize}}.{{schema.attribute | pascalize}}s = d.Get("{{schema.attribute}}").([]float64)
+						{% endif %}
+					{% else %}
+						{{createHelper.genCreateElementRequired(schema, name)}}
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		{% elif schema.optional is true %}
+			{% if schema.type in PrimitiveTypeList %}
+				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+					{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.({{schema.type}})
+				}
+			{% elif schema.type == "float" %}
+				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+					{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(float64)
+				}
+			{% elif schema.type == "map" %}
+				if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+					{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}
+				}
+			{% elif schema.type == "list" or schema.type == "set"%}
+				{% if schema.element is defined %}
+					{% if schema.element.type == "resource" %}
+						{{createHelper.genCreateElement(schema, name)}}
+					{% else %}
+						if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
+							{% if schema.type== "list" %}
+								{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.([]interface{})
+							{% else %}
+								{{name | camelize}}.{{schema.attribute | pascalize}} = {{schema.attribute | pascalize}}.(*schema.Set).List()
+							{% endif %}
+						}		
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+
+	err := {{provider_name | camelize}}Client.Update{{name | pascalize}}({{name | camelize}})
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	return resource{{provider_name | pascalize}}{{name | pascalize}}Read(ctx, d, m)
+}
+
+func resource{{provider_name | pascalize}}{{name | pascalize}}Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	{{provider_name | camelize}}Client := m.(*client.Client)
+
+	err := {{provider_name | camelize}}Client.Delete{{name | pascalize}}(d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId("")
+	return diag.FromErr(err)
 }

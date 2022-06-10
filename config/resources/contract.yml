@@ -47,9 +47,16 @@ schemas:
       params:
         - 1
         - 2
+  - attribute: "cast"
+    type: "set"
+    required: true
+    element:
+      type: "schema"
+      schema:
+        type: "string"
   - attribute: "filter"
     type: "list"
-    optional: true
+    required: true
     computed: true
     description: "filter list"
     max_items: 10
@@ -74,7 +81,7 @@ schemas:
           default_func: true
         - attribute: "filter_entry"
           type: "list"
-          optional: true
+          required: true
           computed: true
           description: "list of filter_entry"
           min_items: 1
@@ -82,13 +89,29 @@ schemas:
           element:
             type: "resource"
             schema:
+              - attribute: "entry_next"
+                type: "list"
+                required: true
+                element:
+                  type: "resource"
+                  schema:
+                  - attribute: "entry_next_name" 
+                    required: true               
+                    type: "string"
               - attribute: "cast"
                 type: "set"
                 required: true
                 element:
-                  type: "schema"
+                  type: "resource"
                   schema:
-                    type: "string"
+                    - attribute: "cast2"
+                      required: true
+                      type: "set"
+                      element:
+                        type: "schema"
+                        schema:
+                          type: "string"
+                        
               - attribute: "filter_entry_name"
                 type: "string"
                 required: true
