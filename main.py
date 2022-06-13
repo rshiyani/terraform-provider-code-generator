@@ -1,27 +1,28 @@
 from jinja2 import Environment, FileSystemLoader
 import yaml
 import random
-from utils import camelize, pascalize, snakify, is_list
+from utils import camelize, pascalize, snakify, is_list, quote
 import string
 import datetime
 import uuid
 import base64
 
 
-def generateRandomValues(data):
-    data["cidr"] = {
+def generate_random_values(data):
+    data["types"] = {}
+    data["types"]["cidr"] = {
         "valid": '.'.join('%s' % random.randint(0, 255) for i in range(4)) + "/" + str(random.randint(0, 31)),
         "invalid": '.'.join('%s' % random.randint(256, 300) for i in range(4)) + "/" + str(random.randint(0, 31))
     }
-    data["ipv4"] = {
+    data["types"]["ipv4"] = {
         "valid": '.'.join('%s' % random.randint(0, 255) for i in range(4)),
         "invalid": '.'.join('%s' % random.randint(256, 300) for i in range(4))
     }
-    data["ipv6"] = {
+    data["types"]["ipv6"] = {
         "valid": ':'.join('%x' % random.randint(0, 16**4) for i in range(6)),
         "invalid": 'invalidIPv6'
     }
-    data["mac"] = {
+    data["types"]["mac"] = {
         "valid": ':'.join('%02x' % random.randint(0, 255) for i in range(6)),
         "invalid": 'invalidMAC'
     }
@@ -33,45 +34,45 @@ def generateRandomValues(data):
     #     "valid": random.randint(0, 65535),
     #     "invalid": random.randint(65536, 66000)
     # }
-    data["time"] = {
-        "valid": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "invalid": datetime.datetime.now()
+    data["types"]["time"] = {
+        "valid": str(datetime.datetime.now(datetime.timezone.utc).isoformat()),
+        "invalid": str(datetime.datetime.now())
     }
-    data["url-http"] = {
+    data["types"]["url-http"] = {
         "valid": 'http://{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15))),
         "invalid": 'ht:/{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15)))
     }
-    data["url-https"] = {
+    data["types"]["url-https"] = {
         "valid": 'https://{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15))),
         "invalid": 'hts:/{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15)))
     }
-    data["uuid"] = {
+    data["types"]["uuid"] = {
         "valid": str(uuid.uuid1()),
         "invalid": "invalid323Uuid12"
     }
-    data["string"] = {
+    data["types"]["string"] = {
         "valid": ''.join(random.choices(string.ascii_lowercase + string.digits, k=10)),
         "invalid": 12345
     }
-    data["json"] = {
-        "valid": "{ \"attribute\" : \"value\" }",
-        "invalid": "{ name : val"
+    data["types"]["json"] = {
+        "valid": "json({ \"attribute\" : \"value\" })",
+        "invalid": "json({ name : val)"
     }
-    data["regex"] = {
-        "valid": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+    data["types"]["regex"] = {
+        "valid": r'(?m)^[0-9]{2}$',
         "invalid": r'[0-9)++'
     }
-    data["base64"] = {
+    data["types"]["base64"] = {
         "valid": (base64.b64encode((''.join(random.choices(string.ascii_lowercase + string.digits, k=10))).encode("ascii"))).decode("ascii"),
         "invalid": "a3+J1b%mFs//"
     }
     return data
 
 
-def preProcess():
+def pre_process():
     with open("./config/resources/pre-contract.yml", 'r') as stream:
         data = yaml.safe_load(stream)
-    data = generateRandomValues(data)
+    data = generate_random_values(data)
     # print(data)
 
     typeMap = {
@@ -81,8 +82,8 @@ def preProcess():
         # "IsIPv4Range": "",
         "IsIPv6Address": "ipv6",
         "IsMACAddress": "mac",
-        "IsPortNumber": "port",
-        "IsPortNumberOrZero": "port0",
+        # "IsPortNumber": "port",
+        # "IsPortNumberOrZero": "port0",
         "IsRFC3339Time": "time",
         "IsURLWithHTTPS": "url-https",
         "IsURLWithHTTPorHTTPS": "url-http",
@@ -104,13 +105,15 @@ def preProcess():
                     schema["subtype"] = typeMap[schema["validation"]["func_name"]]
                 else:
                     schema["subtype"] = "string"
+            # set random value as per subtype
+                schema["test_params"] = {
+                "valid": [data["types"][schema["subtype"]]["valid"]],
+                "invalid": [data["types"][schema["subtype"]]["invalid"]]
+                }
             else:
                 schema["subtype"] = "string"
-            # set random value as per subtype
-            schema["test_params"] = {
-                "valid": data[schema["subtype"]]["valid"],
-                "invalid": data[schema["subtype"]]["invalid"]
-            }
+            
+
         elif schema["type"] == "int":
             if "validation" in schema:
                 if schema["validation"]["func_name"] == "IntBetween":
@@ -152,15 +155,42 @@ def preProcess():
             else:
                 schema["subtype"] = "float"
         elif schema["type"] == "bool":
-            schema["test_params"] = {
-                "valid": "true",
-                "invalid": "truee"
-            }
+            schema["subtype"] = "bool"
+        #     schema["test_params"] = {
+        #         "valid": ["true"],
+        #         "invalid": ["truee"]
+        #     }
     with open('./config/resources/contract.yml', 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
 
+def pre_process_for_provider():
+    with open("./config/pre-provider.yml", 'r') as stream:
+        data = yaml.safe_load(stream)
+    data = generate_random_values(data)
+    with open('./config/provider.yml', 'w') as outfile:
+        yaml.dump(data, outfile, default_flow_style=False)
 
-preProcess()
+pre_process()
+# pre_process_for_provider()
+
+# config = yaml.full_load(open('./config/provider.yml'))
+# env = Environment(loader=FileSystemLoader('./templates'),
+#                   trim_blocks=True, lstrip_blocks=True)
+
+
+# env.filters["camelize"] = camelize
+# env.filters["pascalize"] = pascalize
+# env.filters["snakify"] = snakify
+# env.filters["is_list"] = is_list
+# env.filters["quote"] = quote
+
+
+# template = env.get_template('provider_test.j2')
+
+# # to save the results
+# with open("target/provider_test_output.go", "w") as fh:
+#     fh.write(template.render(config))
+
 
 config = yaml.full_load(open('./config/resources/contract.yml'))
 env = Environment(loader=FileSystemLoader('./templates'),

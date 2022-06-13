@@ -1,46 +1,69 @@
-base64:
-  invalid: a3+J1b%mFs//
-  valid: b2tjYThwc25pcg==
-cidr:
-  invalid: 294.281.295.288/3
-  valid: 198.45.35.129/9
 imports:
 - github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
 - github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation
-ipv4:
-  invalid: 280.281.292.269
-  valid: 71.230.128.82
-ipv6:
-  invalid: invalidIPv6
-  valid: fb2d:2b35:b822:be17:b361:6691
-json:
-  invalid: '{ name : val'
-  valid: '{ "attribute" : "value" }'
-mac:
-  invalid: invalidMAC
-  valid: 52:af:5f:a6:77:24
 name: Contract
 provider_name: Aci
-regex:
-  invalid: '[0-9)++'
-  valid: \b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b
 schemas:
 - attribute: name
-  description: name
+  description: name of someone
   forcenew: true
-  required: true
   subtype: string
   test_params:
-    invalid: 12345
-    valid: ufl4ow8f3q
+    invalid:
+    - 234
+    - 987
+    valid:
+    - Hello
+    - World
   type: string
+- attribute: id
+  description: id of someone
+  forcenew: true
+  required: true
+  subtype: int
+  test_params:
+    invalid:
+    - Hello
+    - World
+    valid:
+    - 234
+    - 987
+  type: int
+- attribute: weight
+  description: weight of someone
+  forcenew: true
+  required: true
+  subtype: float
+  test_params:
+    invalid:
+    - Hello
+    - World
+    valid:
+    - 23.4
+    - 987
+  type: float
+- attribute: is_good_student
+  description: Honesty of someone
+  forcenew: true
+  required: true
+  subtype: bool
+  test_params:
+    invalid:
+    - 235
+    - World
+    valid:
+    - true
+    - false
+  type: bool
 - attribute: ipv4
   description: IP-address v4
-  required: true
+  optional: true
   subtype: ipv4
   test_params:
-    invalid: 280.281.292.269
-    valid: 71.230.128.82
+    invalid:
+    - 296.281.285.274
+    valid:
+    - 101.235.83.204
   type: string
   validation:
     func_name: IsIPv4Address
@@ -49,8 +72,10 @@ schemas:
   required: true
   subtype: ipv6
   test_params:
-    invalid: invalidIPv6
-    valid: fb2d:2b35:b822:be17:b361:6691
+    invalid:
+    - invalidIPv6
+    valid:
+    - 1cc9:d6b9:7b99:4f83:eb3b:d2aa
   type: string
   validation:
     func_name: IsIPv6Address
@@ -58,17 +83,21 @@ schemas:
   required: true
   subtype: mac
   test_params:
-    invalid: invalidMAC
-    valid: 52:af:5f:a6:77:24
+    invalid:
+    - invalidMAC
+    valid:
+    - d9:88:f1:b2:2c:66
   type: string
   validation:
     func_name: IsMACAddress
 - attribute: cidr
-  required: true
+  optional: true
   subtype: cidr
   test_params:
-    invalid: 294.281.295.288/3
-    valid: 198.45.35.129/9
+    invalid:
+    - 280.283.272.286/11
+    valid:
+    - 92.170.124.56/7
   type: string
   validation:
     func_name: IsCIDR
@@ -76,17 +105,21 @@ schemas:
   required: true
   subtype: time
   test_params:
-    invalid: &id001 2022-06-10 10:35:34.280848
-    valid: '2022-06-10T05:05:34.280848+00:00'
+    invalid:
+    - '2022-06-13 18:21:15.953419'
+    valid:
+    - '2022-06-13T12:51:15.953419+00:00'
   type: string
   validation:
     func_name: IsRFC3339Time
 - attribute: url_https
-  required: true
+  optional: true
   subtype: url-https
   test_params:
-    invalid: hts:/mwr55uu54uidy92.com
-    valid: https://er388ujn1sa2dn2.com
+    invalid:
+    - hts:/wmw6xh4gq4xevbc.com
+    valid:
+    - https://vue6ep1bbldkfa9.com
   type: string
   validation:
     func_name: IsURLWithHTTPS
@@ -94,35 +127,43 @@ schemas:
   required: true
   subtype: url-http
   test_params:
-    invalid: ht:/2egn4f7t90tfzhc.com
-    valid: http://clb80ylsgjrrf6d.com
+    invalid:
+    - ht:/5f6kjcinv9vqo6c.com
+    valid:
+    - http://bxgacoq7epli06c.com
   type: string
   validation:
     func_name: IsURLWithHTTPorHTTPS
 - attribute: uuid
-  required: true
+  optional: true
   subtype: uuid
   test_params:
-    invalid: invalid323Uuid12
-    valid: f56c3da5-e87a-11ec-a5f9-7c8ae19799de
+    invalid:
+    - invalid323Uuid12
+    valid:
+    - 83325e73-eb17-11ec-9b4b-7c8ae1943087
   type: string
   validation:
     func_name: IsUUID
 - attribute: base_64
-  required: true
+  optional: true
   subtype: base64
   test_params:
-    invalid: a3+J1b%mFs//
-    valid: b2tjYThwc25pcg==
+    invalid:
+    - a3+J1b%mFs//
+    valid:
+    - OGc2Nm9rOW54eQ==
   type: string
   validation:
     func_name: StringIsBase64
 - attribute: json
-  required: true
+  optional: true
   subtype: json
   test_params:
-    invalid: '{ name : val'
-    valid: '{ "attribute" : "value" }'
+    invalid:
+    - 'json({ name : val)'
+    valid:
+    - 'json({ "attribute" : "value" })'
   type: string
   validation:
     func_name: StringIsJSON
@@ -130,16 +171,20 @@ schemas:
   required: true
   subtype: regex
   test_params:
-    invalid: '[0-9)++'
-    valid: \b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b
+    invalid:
+    - '[0-9)++'
+    valid:
+    - (?m)^[0-9]{2}$
   type: string
   validation:
     func_name: StringIsValidRegExp
 - attribute: gender
   subtype: string
   test_params:
-    invalid: 12345
-    valid: ufl4ow8f3q
+    invalid:
+    - 12345
+    valid:
+    - 701vogs508
   type: string
   validation:
     func_name: StringInSlice
@@ -149,7 +194,7 @@ schemas:
     - female
     - other
 - attribute: port_number
-  required: true
+  optional: true
   subtype: port
   test_params:
     invalid:
@@ -163,7 +208,7 @@ schemas:
   validation:
     func_name: IsPortNumber
 - attribute: port_with_zero
-  required: true
+  optional: true
   subtype: port0
   test_params:
     invalid:
@@ -179,19 +224,21 @@ schemas:
     func_name: IsPortNumberOrZero
 - attribute: nuclear_code
   description: Nuclear code
-  required: true
+  optional: true
   sensitive: true
   subtype: string
   test_params:
-    invalid: 12345
-    valid: ufl4ow8f3q
+    invalid:
+    - 12345
+    valid:
+    - 701vogs508
   type: string
   validation:
     func_name: NotInYourList
 - attribute: test_score
   computed: true
   description: range
-  required: true
+  optional: true
   subtype: range
   test_params:
     invalid:
@@ -209,7 +256,7 @@ schemas:
     - 100
 - attribute: percentage
   computed: true
-  required: true
+  optional: true
   subtype: range
   test_params:
     invalid:
@@ -289,18 +336,40 @@ schemas:
   max_items: 10
   optional: true
   type: list
-string:
-  invalid: 12345
-  valid: ufl4ow8f3q
-time:
-  invalid: *id001
-  valid: '2022-06-10T05:05:34.280848+00:00'
-url-http:
-  invalid: ht:/2egn4f7t90tfzhc.com
-  valid: http://clb80ylsgjrrf6d.com
-url-https:
-  invalid: hts:/mwr55uu54uidy92.com
-  valid: https://er388ujn1sa2dn2.com
-uuid:
-  invalid: invalid323Uuid12
-  valid: f56c3da5-e87a-11ec-a5f9-7c8ae19799de
+types:
+  base64:
+    invalid: a3+J1b%mFs//
+    valid: OGc2Nm9rOW54eQ==
+  cidr:
+    invalid: 280.283.272.286/11
+    valid: 92.170.124.56/7
+  ipv4:
+    invalid: 296.281.285.274
+    valid: 101.235.83.204
+  ipv6:
+    invalid: invalidIPv6
+    valid: 1cc9:d6b9:7b99:4f83:eb3b:d2aa
+  json:
+    invalid: 'json({ name : val)'
+    valid: 'json({ "attribute" : "value" })'
+  mac:
+    invalid: invalidMAC
+    valid: d9:88:f1:b2:2c:66
+  regex:
+    invalid: '[0-9)++'
+    valid: (?m)^[0-9]{2}$
+  string:
+    invalid: 12345
+    valid: 701vogs508
+  time:
+    invalid: '2022-06-13 18:21:15.953419'
+    valid: '2022-06-13T12:51:15.953419+00:00'
+  url-http:
+    invalid: ht:/5f6kjcinv9vqo6c.com
+    valid: http://bxgacoq7epli06c.com
+  url-https:
+    invalid: hts:/wmw6xh4gq4xevbc.com
+    valid: https://vue6ep1bbldkfa9.com
+  uuid:
+    invalid: invalid323Uuid12
+    valid: 83325e73-eb17-11ec-9b4b-7c8ae1943087

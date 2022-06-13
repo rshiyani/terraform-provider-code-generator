@@ -1,33 +1,70 @@
-provider_name: "Aci"
-imports:
-  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-  - "github.com/ciscoecosystem/aci-go-client/client"
-imports_for_test:
-  - "os"
-  - "testing"
-  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-resources:
-  - "tenant"
-  - "application_profile"
 datasources:
-  - "tenant"
-  - "application_profile"
+- tenant
+- application_profile
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/ciscoecosystem/aci-go-client/client
+imports_for_test:
+- os
+- testing
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+provider_name: Aci
+resources:
+- tenant
+- application_profile
 schemas:
-  - attribute: "username"
-    type: "string"
-    required: true
-    default_func: true
-    envvar: "ACI_USERNAME"
-    description: "Username of the ACI user"
-  - attribute: "password"
-    type: "string"
-    required: true
-    default_func: true
-    envvar: "ACI_PASSWORD"
-    description: "Password of the ACI user"
-  - attribute: "url"
-    type: "string"
-    required: true
-    default_func: true
-    envvar: "ACI_URL"
-    description: "URL of the ACI server"
+- attribute: username
+  default_func: true
+  description: Username of the ACI user
+  envvar: ACI_USERNAME
+  required: true
+  type: string
+- attribute: password
+  default_func: true
+  description: Password of the ACI user
+  envvar: ACI_PASSWORD
+  required: true
+  type: string
+- attribute: url
+  default_func: true
+  description: URL of the ACI server
+  envvar: ACI_URL
+  required: true
+  type: string
+types:
+  base64:
+    invalid: a3+J1b%mFs//
+    valid: anFsOXlpM3hqdA==
+  cidr:
+    invalid: 297.273.273.279/11
+    valid: 166.180.39.7/3
+  ipv4:
+    invalid: 264.284.273.258
+    valid: 139.231.130.228
+  ipv6:
+    invalid: invalidIPv6
+    valid: f62e:7c46:412:2b24:8ccd:3c7c
+  json:
+    invalid: 'json({ name : val)'
+    valid: 'json({ "attribute" : "value" })'
+  mac:
+    invalid: invalidMAC
+    valid: cf:8b:85:36:b5:08
+  regex:
+    invalid: '[0-9)++'
+    valid: (?m)^[0-9]{2}$
+  string:
+    invalid: 12345
+    valid: tvwuc7y4se
+  time:
+    invalid: 2022-06-13 17:14:30.398002
+    valid: '2022-06-13T11:44:30.398002+00:00'
+  url-http:
+    invalid: ht:/e831z5ijewcfm7b.com
+    valid: http://mtfgvi1dml20xaj.com
+  url-https:
+    invalid: hts:/kh4it35gw0ccb88.com
+    valid: https://skjp9b56jtd5fav.com
+  uuid:
+    invalid: invalid323Uuid12
+    valid: 2fb31dfc-eb0e-11ec-ad4c-7c8ae1943087

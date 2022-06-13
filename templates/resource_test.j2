@@ -1,9 +1,43 @@
 {% import './helpers/schema.j2' as schemaHelper %}
 package {{provider_name | lower}}
 
+var resource{{name | pascalize}}Test = map[string]interface{}{
+	{% for schema in schemas %}
+		{% if schema.type not in ["list","set","map"] and schema.test_params is defined%}
+			{% if schema.type == "float" %}
+				"{{schema.attribute}}" : map[string]interface{}{
+					"valid": []float64{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+				},
+			{% elif schema.type == "string" %}
+				"{{schema.attribute}}" : map[string]interface{}{
+					"valid": []string{ {{ schema.test_params.valid | map("tojson") | join(', ')}} },
+					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+				},
+			{% else %}
+				"{{schema.attribute}}" : map[string]interface{}{
+					"valid": []{{schema.type}}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+				},
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	
+}
+
 {% set requiredAttrSchemaList = [] %}
 
-{% macro printStepWithoutRequiredArguments() %}
+{% macro printQuote(schema) %}
+	{%- if schema.type == "string" -%}
+		{%- if schema.subtype == "json" -%}
+		'
+		{%- else -%}
+		"
+		{%- endif -%}
+	{%- endif -%}
+{% endmacro %}
+
+{% macro printStepsWithoutRequiredArguments() %}
 	{% for schema in schemas %}
 		{% if schema.required is true %}
 		{
@@ -14,6 +48,19 @@ package {{provider_name | lower}}
 	{% endfor %}
 {% endmacro %}
 
+{% macro printStepsForConfig() %}
+	{
+		Config: CreateAcc{{name | pascalize}}Config(rName),
+		Check: resource.ComposeTestCheckFunc(
+			testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_default),
+			{% for schema in schemas %}
+				{% if schema.type != "list" and schema.type != "set" and schema.type != "map" %}
+					resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", {{printQuote(schema)}}{# Add default value #}{{printQuote(schema)}}),
+				{% endif %}
+			{% endfor %}
+		),
+	},
+{% endmacro %}
 
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T) {
 	var {{name | camelize}}_default models.{{name | pascalize}}
@@ -29,12 +76,11 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 		ProviderFactories: testAccProviders,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
 		Steps: []resource.TestStep{
-			{{printStepWithoutRequiredArguments()}}
+			{{printStepsWithoutRequiredArguments()}}
+			{{printStepsForConfig()}}
 		},
 	})
 }
-
-
 
 {% macro setRequiredAttrList() %}
 	{% for schema in schemas %}
@@ -44,37 +90,46 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 	{% endfor %}
 {% endmacro %}
 
-{% macro printQuote(schema) %}
-	{%- if schema.type == "string" -%}
-		{%- if schema.subtype == "json" -%}
-		'
-		{%- else -%}
-		"
-		{%- endif -%}
-	{%- endif -%}
-{% endmacro %}
-
 {% macro printFunctionWithoutRequiredArguments() %}
 	{% for schema in schemas %}
 		{% if schema.required is true %}
 func CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}(rName string) string {
 	return fmt.Sprintf(`
 		resource "{{provider_name | camelize}}_{{name | camelize}}" "test" {
-			{% for sch in requiredAttrSchemaList %}
-				{% if schema.attribute != sch.attribute %}
-					{% if (sch.test_params.valid | is_list) %}
-			{{sch.attribute}} = {{printQuote(sch)}}{{sch.test_params.valid[0]}}{{printQuote(sch)}}
-					{% else %}
-			{{sch.attribute}} = {{printQuote(sch)}}{{sch.test_params.valid}}{{printQuote(sch)}}
+			{% set reqArgs = [] %}
+			{% for sch in schemas %}
+				{% if sch.required is true %}
+					{% if sch.attribute != schema.attribute %}
+					{{sch.attribute}} = "%v"
+						{% if sch.type == "float" %}
+							{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]float64)[0]') or "" }}
+						{% else %}
+							{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]'+sch.type+')[0]') or "" }}
+						{% endif %}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
 		}
-	`)
+	`,{{reqArgs | join(', ')}})
 }
 		{% endif %}
 	{% endfor %}
 {% endmacro %}
 
+{% macro printFunctionForConfig() %}
+func CreateAcc{{name | pascalize}}Config(rName string) string {
+	return fmt.Sprintf(`
+		resource  "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+			{% for schema in schemas %}
+				{% if schema.required is true %}
+					{{schema.attribute}} = {{printQuote(schema)}}%v{{printQuote(schema)}}
+				{% endif %}
+			{% endfor %}
+		}
+	`)
+}
+{% endmacro %}
+
 {{setRequiredAttrList()}}
 {{printFunctionWithoutRequiredArguments()}}
+{{printFunctionForConfig()}}

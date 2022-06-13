@@ -18,3 +18,8 @@ def snakify(name):
 
 def is_list(value):
     return isinstance(value, list)
+
+def quote(s):
+    if str(s)[:5] == 'json(':
+        return '`'+str(s)+'`'
+    return '"'+str(s)+'"'

@@ -7,14 +7,59 @@ imports:
 schemas:
   - attribute: "name"
     type: "string"
+    # required: true
+    forcenew: true
+    description: "name of someone"
+    test_params:
+      valid:
+        - "Hello"
+        - "World"
+      invalid:
+        - 234
+        - 987
+
+  - attribute: "id"
+    type: "int"
     required: true
     forcenew: true
-    description: "name"
+    description: "id of someone"
+    test_params:
+      valid:
+        - 234
+        - 987
+      invalid:
+        - "Hello"
+        - "World"
+
+  - attribute: "weight"
+    type: "float"
+    required: true
+    forcenew: true
+    description: "weight of someone"
+    test_params:
+      valid:
+        - 23.4
+        - 987
+      invalid:
+        - "Hello"
+        - "World"
+  - attribute: "is_good_student"
+    type: "bool"
+    required: true
+    forcenew: true
+    description: "Honesty of someone"
+    test_params:
+      valid:
+        - true
+        - false
+      invalid:
+        - 235
+        - "World"
 
   - attribute: "ipv4"
     type: "string"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     description: "IP-address v4"
     validation:
       func_name: "IsIPv4Address"
@@ -36,8 +81,8 @@ schemas:
 
   - attribute: "cidr"
     type: "string"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     validation:
       func_name: "IsCIDR"
 
@@ -50,8 +95,8 @@ schemas:
 
   - attribute: "url_https"
     type: "string"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     validation:
       func_name: "IsURLWithHTTPS"
 
@@ -64,22 +109,22 @@ schemas:
 
   - attribute: "uuid"
     type: "string"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     validation:
       func_name: "IsUUID"
 
   - attribute: "base_64"
     type: "string"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     validation:
       func_name: "StringIsBase64"
 
   - attribute: "json"
     type: "string"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     validation:
       func_name: "StringIsJSON"
 
@@ -102,21 +147,21 @@ schemas:
 
   - attribute: "port_number"
     type: "int"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     validation:
       func_name: "IsPortNumber"
 
   - attribute: "port_with_zero"
     type: "int"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     validation:
       func_name: "IsPortNumberOrZero"
 
   - attribute: "nuclear_code"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     sensitive: true
     description: "Nuclear code"
     validation:
@@ -129,8 +174,8 @@ schemas:
 
   - attribute: "test_score"
     type: "int"
-    required: true
-    # optional: true
+    # required: true
+    optional: true
     computed: true
     description: "range"
     validation:
@@ -141,8 +186,8 @@ schemas:
 
   - attribute: "percentage"
     type: "float"
-    required: true
-    # optional: true
+    # required: true
+    optional: true
     computed: true
     validation:
       func_name: "FloatBetween"

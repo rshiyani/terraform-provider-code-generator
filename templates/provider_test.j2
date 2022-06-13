@@ -7,6 +7,15 @@ import (
     {% endfor %}
 )
 
+var Test = map[string]interface{}{
+	{% for type, value in types.items() %}
+		"{{type}}": map[string]interface{}{
+			"valid": {{ value.valid | quote}},
+			"invalid": {{value.invalid | quote}},
+		},
+	{% endfor %}
+}
+
 var testAccProviders map[string]*schema.Provider
 var testAccProvider *schema.Provider
 

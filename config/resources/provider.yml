@@ -1,0 +1,81 @@
+base64:
+  invalid: a3+J1b%mFs//
+  valid: M3g2aDNwdDRodA==
+cidr:
+  invalid: 277.278.289.294/15
+  valid: 187.92.134.66/2
+datasources:
+- tenant
+- application_profile
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/ciscoecosystem/aci-go-client/client
+imports_for_test:
+- os
+- testing
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+ipv4:
+  invalid: 271.262.264.269
+  valid: 144.64.221.118
+ipv6:
+  invalid: invalidIPv6
+  valid: b433:bb25:861a:c4f:fddb:b0a5
+json:
+  invalid: '{ name : val'
+  valid: '{ "attribute" : "value" }'
+mac:
+  invalid: invalidMAC
+  valid: 0f:9a:d7:2f:08:c7
+provider_name: Aci
+regex:
+  invalid: '[0-9)++'
+  valid: \b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b
+resources:
+- tenant
+- application_profile
+schemas:
+- attribute: username
+  default_func: true
+  description: Username of the ACI user
+  envvar: ACI_USERNAME
+  required: true
+  subtype: string
+  test_params:
+    invalid: 12345
+    valid: 841jh203al
+  type: string
+- attribute: password
+  default_func: true
+  description: Password of the ACI user
+  envvar: ACI_PASSWORD
+  required: true
+  subtype: string
+  test_params:
+    invalid: 12345
+    valid: 841jh203al
+  type: string
+- attribute: url
+  default_func: true
+  description: URL of the ACI server
+  envvar: ACI_URL
+  required: true
+  subtype: string
+  test_params:
+    invalid: 12345
+    valid: 841jh203al
+  type: string
+string:
+  invalid: 12345
+  valid: 841jh203al
+time:
+  invalid: 2022-06-13 15:01:29.020640
+  valid: '2022-06-13T09:31:29.020640+00:00'
+url-http:
+  invalid: ht:/kcu3b7b0v9nkh4e.com
+  valid: http://nrm6onapyq99rky.com
+url-https:
+  invalid: hts:/95pkigs2tijclg9.com
+  valid: https://4fjk1khvl0uvy0k.com
+uuid:
+  invalid: invalid323Uuid12
+  valid: 9a6d94c4-eafb-11ec-953a-7c8ae1943087
