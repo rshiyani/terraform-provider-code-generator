@@ -213,15 +213,15 @@
 {% endmacro %}
 
 {% macro getTestAttr(schema) %}
-    {% if schema.type != "map" and schema.type != "list" and schema.type != "set" %}
+    {% if schema.type not in ["map","list","set"] %}
         resource.TestCheckResourceAttrPair(dataSourceName, "{{schema.attribute}}", resourceName, "{{schema.attribute}}"),
-    {% elif schema.type == "set" or schema.type == "list" %}
+    {% elif schema.type in ["list","set"] %}
         resource.TestCheckResourceAttrPair(dataSourceName, "{{schema.attribute}}.#", resourceName, "{{schema.attribute}}.#"),
     {% endif %}
 {% endmacro %}
 
 {% macro getRequiredDNFunc(name,schema) %}
-    {% if schema.required is true and schema.type != "map" and schema.type != "list" and schema.type != "set" %}
+    {% if schema.required is true and schema.type not in ["map","list","set"] %}
     {
         Config:      CreateAcc{{name}}DSWithoutRequired{{schema.attribute | pascalize}}("{{schema.attribute}}"),
         ExpectError: regexp.MustCompile(`Missing required argument`),
@@ -229,14 +229,30 @@
     {% endif %}
 {% endmacro %}
 
-{% macro getRequiredDNFuncWithoutVar(provider_name,name,schema) %}
+{% macro getRequiredDNFuncWithoutVar(provider_name,name,schemas) %}
+{% for schema in schemas %}
 func CreateAcc{{name | pascalize}}DSWithoutRequired{{schema.attribute | pascalize}}(rName string) string {
-	fmt.Println("=== STEP  Basic: Testing {{name | pascalize}} data source creation without required {{schema.attribute | pascalize}}")
-	resource := fmt.Sprintf(`
+    fmt.Println("=== STEP  Basic: Testing {{name | pascalize}} data source creation without required {{schema.attribute | pascalize}}")
+	
+    resource := CreateAcc{{name | pascalize}}Config(rName)
+    resource += fmt.Sprintf(`
 	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
-		{{schema.attribute}} = "%s"
+        {% set reqArgs = [] %}
+        {% for sch in schemas %}   
+            {%- if sch.attribute != schema.attribute and sch.required is true %}
+        {{sch.attribute}} = "%v"
+                {% if sch.type == "float" %}
+                    {{- reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]float64)[0]') or "" -}}
+                {% else %}
+                    {{- reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]'+sch.type+')[0]') or "" -}}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
 	}
-	`, rName)
+	`,{{reqArgs | join(',\n')}})
 	return resource
 }
+{% endfor %}
 {% endmacro %}
+
+                        

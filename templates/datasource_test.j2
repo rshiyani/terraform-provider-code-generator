@@ -7,6 +7,38 @@ import(
     {% endfor %}
 )
 
+{# remove below var after resource_test#}
+var resourceContractTest = map[string]interface{}{
+	"name" : map[string]interface{}{
+		"valid": []string{ "Hello", "World" },
+		"invalid": []interface{}{ 234, 987 },
+	},
+	"id" : map[string]interface{}{
+		"valid": []int{ 234, 987 },
+		"invalid": []interface{}{ "Hello", "World" },
+	},
+	"weight" : map[string]interface{}{
+		"valid": []float64{ 23.4, 987 },
+		"invalid": []interface{}{ "Hello", "World" },
+	},
+		"ipv4_for" : map[string]interface{}{
+			"valid": Test["ipv4"].(map[string]interface{})["valid"].([]string),
+			"invalid": Test["ipv4"].(map[string]interface{})["invalid"].([]interface{}),
+		},
+	"port_number" : map[string]interface{}{
+		"valid": []int{ 1, 53, 65535 },
+		"invalid": []interface{}{ 0, 65536 },
+	},
+	"test_score" : map[string]interface{}{
+		"valid": []int{ 1, 100, 50 },
+		"invalid": []interface{}{ 0, 101 },
+	},
+			"valid_cidr" : map[string]interface{}{
+				"valid": []int{ 0, 32 },
+				"invalid": []int{349, 57},
+			},
+
+}
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}DataSource_Basic(t *testing.T) {
 	resourceName := "{{provider_name | camelize}}_{{name | camelize}}.test"
     dataSourceName := "data.{{provider_name | camelize}}_{{name | camelize}}.test"
@@ -30,17 +62,17 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}DataSource_Basic(t 
 				),
 			},
             {
-				Config:      CreateAcc{{name | pascalize}}DataSourceUpdate(rName, randomParameter, randomValue),
+				Config:      CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(rName, randomParameter, randomValue),
 				ExpectError: regexp.MustCompile(`An argument named (.)+ is not expected here.`),
 			},
 
 			{
-				Config:      CreateAcc{{name | pascalize}}WithInvalidParentDn(rName),
+				Config:      CreateAcc{{name | pascalize}}DataSourceWithInvalidName(rName),
 				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
 			},
 
 			{
-				Config: CreateAcc{{name | pascalize}}DataSourceUpdatedResource(rName, "annotation", "orchestrator:terraform-testacc"),
+				Config: CreateAcc{{name | pascalize}}UpdateConfigDataSource(rName, "annotation", "orchestrator:terraform-testacc"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrPair(dataSourceName, "annotation", resourceName, "annotation"),
 				),
@@ -49,19 +81,82 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}DataSource_Basic(t 
 	})
 }
 
-{% for schema in schemas %}
-	{{ schemaHelper.getRequiredDNFuncWithoutVar(provider_name,name,schema) }}
-{% endfor %}
+
+{{ schemaHelper.getRequiredDNFuncWithoutVar(provider_name,name,schemas) }}
 
 
 func CreateAcc{{name | pascalize}}ConfigDataSource(rName string) string {
 	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source creation with required arguments only")
-	resource := fmt.Sprintf(`
-		{{ schemaHelper.getParent(name) }}
+	resource := CreateAcc{{name | pascalize}}Config(rName)
+	resource += fmt.Sprintf(`
 
 	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
-		tenant_dn = {{provider_name | camelize}}_{{name | camelize}}.test.tenant_dn
-		name = {{provider_name | camelize}}_{{name | camelize}}.test.name
+		{% for schema in schemas %}
+			{% if schema.required is true  %}
+			{{schema.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}
+			{% endif %}
+		{% endfor %}
+	}
+	`)
+	return resource
+}
+
+func CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(rName, key, value string) string {
+	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source creation with random attributes")
+	resource := CreateAcc{{name | pascalize}}Config(rName)
+	resource += fmt.Sprintf(`
+
+	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+		{% for schema in schemas %}
+			{% if schema.required is true  %}
+			{{schema.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}
+			{% endif %}
+		{% endfor %}
+			%s = "%s"
+	}
+	`, rName, rName, key, value)
+	return resource
+}
+
+func CreateAcc{{name | pascalize}}DataSourceWithInvalidName(rName string) string {
+	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source with invalid name")
+	resource := CreateAcc{{name | pascalize}}Config(rName)
+	resource += fmt.Sprintf(`
+	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+		{% for schema in schemas %}
+			{% if schema.required is true and schema.attribute != "name" %}
+			{{schema.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}
+			{% endif %}
+		{% endfor %}
+			name = "${ {{provider_name | camelize}}_{{name | camelize}}.test.name}abc"
+	}
+	`)
+	return resource
+}
+func CreateAcc{{name | pascalize}}UpdatedConfigDataSource(rName, key, value string) string {
+	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source with updated resource")
+	//TODO : add resource below to update attribute 
+	resource := fmt.Sprintf(`
+	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+		{% for schema in schemas %}
+			{% if schema.required is true  %}
+			{{schema.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}
+			{% endif %}
+		{% endfor %}
+	}
+	`, rName, rName, key, value)
+	return resource
+}
+{#remove below func after resource_test#}
+func CreateAccContractConfig(rName string) string {
+	fmt.Println("=== STEP  testing contract creation with required arguments only")
+	resource := fmt.Sprintf(`
+	resource "aci_tenant" "test"{
+		name = "%s"
+	}
+	resource "aci_contract" "test" {
+		tenant_dn = aci_tenant.test.id
+		name = "%s"
 	}
 	`, rName, rName)
 	return resource

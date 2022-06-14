@@ -5,6 +5,37 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
+var resourceContractTest = map[string]interface{}{
+	"name": map[string]interface{}{
+		"valid":   []string{"Hello", "World"},
+		"invalid": []interface{}{234, 987},
+	},
+	"id": map[string]interface{}{
+		"valid":   []int{234, 987},
+		"invalid": []interface{}{"Hello", "World"},
+	},
+	"weight": map[string]interface{}{
+		"valid":   []float64{23.4, 987},
+		"invalid": []interface{}{"Hello", "World"},
+	},
+	"ipv4_for": map[string]interface{}{
+		"valid":   Test["ipv4"].(map[string]interface{})["valid"].([]string),
+		"invalid": Test["ipv4"].(map[string]interface{})["invalid"].([]interface{}),
+	},
+	"port_number": map[string]interface{}{
+		"valid":   []int{1, 53, 65535},
+		"invalid": []interface{}{0, 65536},
+	},
+	"test_score": map[string]interface{}{
+		"valid":   []int{1, 100, 50},
+		"invalid": []interface{}{0, 101},
+	},
+	"valid_cidr": map[string]interface{}{
+		"valid":   []int{0, 32},
+		"invalid": []int{349, 57},
+	},
+}
+
 func TestAccAciContractDataSource_Basic(t *testing.T) {
 	resourceName := "aci_contract.test"
 	dataSourceName := "data.aci_contract.test"
@@ -144,17 +175,17 @@ func TestAccAciContractDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config:      CreateAccContractDataSourceUpdate(rName, randomParameter, randomValue),
+				Config:      CreateAccContractUpdatedConfigDataSourceRandomAttr(rName, randomParameter, randomValue),
 				ExpectError: regexp.MustCompile(`An argument named (.)+ is not expected here.`),
 			},
 
 			{
-				Config:      CreateAccContractWithInvalidParentDn(rName),
+				Config:      CreateAccContractDataSourceWithInvalidName(rName),
 				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
 			},
 
 			{
-				Config: CreateAccContractDataSourceUpdatedResource(rName, "annotation", "orchestrator:terraform-testacc"),
+				Config: CreateAccContractUpdateConfigDataSource(rName, "annotation", "orchestrator:terraform-testacc"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrPair(dataSourceName, "annotation", resourceName, "annotation"),
 				),
@@ -165,217 +196,906 @@ func TestAccAciContractDataSource_Basic(t *testing.T) {
 
 func CreateAccContractDSWithoutRequiredName(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Name")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		name = "%s"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredIpv4(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Ipv4")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		ipv4 = "%s"
+        name = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredIpv6(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Ipv6")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		ipv6 = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredMac(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Mac")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		mac = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredCidr(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Cidr")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		cidr = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredTime(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Time")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		time = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredUrlHttps(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required UrlHttps")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		url_https = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredUrlHttp(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required UrlHttp")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		url_http = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredUuid(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Uuid")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		uuid = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredBase64(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Base64")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		base_64 = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredJson(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Json")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		json = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],``
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredRegExp(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required RegExp")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		reg_exp = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredGender(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Gender")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		gender = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredPortNumber(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required PortNumber")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		port_number = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredPortWithZero(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required PortWithZero")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		port_with_zero = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredNuclearCode(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required NuclearCode")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		nuclear_code = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredTestScore(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required TestScore")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		test_score = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredPercentage(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Percentage")
-	resource := fmt.Sprintf(`
+
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		percentage = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0])
 	return resource
 }
-
 func CreateAccContractDSWithoutRequiredFilter(rName string) string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Filter")
-	resource := fmt.Sprintf(`
-	data "aci_contract" "test" {
-		filter = "%s"
-	}
-	`, rName)
-	return resource
-}
 
-func CreateAccContractDSWithoutRequired(rName string) string {
-	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required")
-	resource := fmt.Sprintf(`
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-		name = "%s"
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
 	}
-	`, rName)
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
 	return resource
 }
 
 func CreateAccContractConfigDataSource(rName string) string {
 	fmt.Println("=== STEP  Basic: testing Contract data source creation with required arguments only")
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
+
+	data "aci_contract" "test" {
+			name = aci_contract.test.name
+			ipv4 = aci_contract.test.ipv4
+			ipv6 = aci_contract.test.ipv6
+			mac = aci_contract.test.mac
+			cidr = aci_contract.test.cidr
+			time = aci_contract.test.time
+			url_https = aci_contract.test.url_https
+			url_http = aci_contract.test.url_http
+			uuid = aci_contract.test.uuid
+			base_64 = aci_contract.test.base_64
+			json = aci_contract.test.json
+			reg_exp = aci_contract.test.reg_exp
+			port_number = aci_contract.test.port_number
+			port_with_zero = aci_contract.test.port_with_zero
+			nuclear_code = aci_contract.test.nuclear_code
+			test_score = aci_contract.test.test_score
+			percentage = aci_contract.test.percentage
+	}
+	`)
+	return resource
+}
+
+func CreateAccContractUpdatedConfigDataSourceRandomAttr(rName, key, value string) string {
+	fmt.Println("=== STEP  Basic: testing Contract data source creation with random attributes")
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
+
+	data "aci_contract" "test" {
+			name = aci_contract.test.name
+			ipv4 = aci_contract.test.ipv4
+			ipv6 = aci_contract.test.ipv6
+			mac = aci_contract.test.mac
+			cidr = aci_contract.test.cidr
+			time = aci_contract.test.time
+			url_https = aci_contract.test.url_https
+			url_http = aci_contract.test.url_http
+			uuid = aci_contract.test.uuid
+			base_64 = aci_contract.test.base_64
+			json = aci_contract.test.json
+			reg_exp = aci_contract.test.reg_exp
+			port_number = aci_contract.test.port_number
+			port_with_zero = aci_contract.test.port_with_zero
+			nuclear_code = aci_contract.test.nuclear_code
+			test_score = aci_contract.test.test_score
+			percentage = aci_contract.test.percentage
+			%s = "%s"
+	}
+	`, rName, rName, key, value)
+	return resource
+}
+
+func CreateAccContractDataSourceWithInvalidName(rName string) string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid name")
+	resource := CreateAccContractConfig(rName)
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+			ipv4 = aci_contract.test.ipv4
+			ipv6 = aci_contract.test.ipv6
+			mac = aci_contract.test.mac
+			cidr = aci_contract.test.cidr
+			time = aci_contract.test.time
+			url_https = aci_contract.test.url_https
+			url_http = aci_contract.test.url_http
+			uuid = aci_contract.test.uuid
+			base_64 = aci_contract.test.base_64
+			json = aci_contract.test.json
+			reg_exp = aci_contract.test.reg_exp
+			port_number = aci_contract.test.port_number
+			port_with_zero = aci_contract.test.port_with_zero
+			nuclear_code = aci_contract.test.nuclear_code
+			test_score = aci_contract.test.test_score
+			percentage = aci_contract.test.percentage
+			name = "${ aci_contract.test.name}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractUpdatedConfigDataSource(rName, key, value string) string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with updated resource")
+	//TODO : add resource below to update attribute
 	resource := fmt.Sprintf(`
-	resource "aci_resource" "test"{
+	data "aci_contract" "test" {
+			name = aci_contract.test.name
+			ipv4 = aci_contract.test.ipv4
+			ipv6 = aci_contract.test.ipv6
+			mac = aci_contract.test.mac
+			cidr = aci_contract.test.cidr
+			time = aci_contract.test.time
+			url_https = aci_contract.test.url_https
+			url_http = aci_contract.test.url_http
+			uuid = aci_contract.test.uuid
+			base_64 = aci_contract.test.base_64
+			json = aci_contract.test.json
+			reg_exp = aci_contract.test.reg_exp
+			port_number = aci_contract.test.port_number
+			port_with_zero = aci_contract.test.port_with_zero
+			nuclear_code = aci_contract.test.nuclear_code
+			test_score = aci_contract.test.test_score
+			percentage = aci_contract.test.percentage
+	}
+	`, rName, rName, key, value)
+	return resource
+}
+func CreateAccContractConfig(rName string) string {
+	fmt.Println("=== STEP  testing contract creation with required arguments only")
+	resource := fmt.Sprintf(`
+	resource "aci_tenant" "test"{
 		name = "%s"
 	}
 	resource "aci_contract" "test" {
 		tenant_dn = aci_tenant.test.id
 		name = "%s"
-	}
-	data "aci_contract" "test" {
-		tenant_dn = aci_contract.test.tenant_dn
-		name = aci_contract.test.name
 	}
 	`, rName, rName)
 	return resource
