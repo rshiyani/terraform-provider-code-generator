@@ -7,7 +7,7 @@ imports:
 schemas:
   - attribute: "name"
     type: "string"
-    # required: true
+    required: true
     forcenew: true
     description: "name of someone"
     test_params:
@@ -43,107 +43,107 @@ schemas:
       invalid:
         - "Hello"
         - "World"
-  - attribute: "is_good_student"
-    type: "bool"
-    required: true
-    forcenew: true
-    description: "Honesty of someone"
-    test_params:
-      valid:
-        - true
-        - false
-      invalid:
-        - 235
-        - "World"
+  # - attribute: "is_good_student"
+  #   type: "bool"
+  #   required: true
+  #   forcenew: true
+  #   description: "Honesty of someone"
+  #   test_params:
+  #     valid:
+  #       - true
+  #       - false
+  #     invalid:
+  #       - 235
+  #       - "World"
 
-  - attribute: "ipv4"
+  - attribute: "ipv4_for"
     type: "string"
-    optional: true
-    # required: true
+    # optional: true
+    required: true
     description: "IP-address v4"
     validation:
       func_name: "IsIPv4Address"
 
-  - attribute: "ipv6"
-    type: "string"
-    # optional: true
-    required: true
-    description: "IP-address v6"
-    validation:
-      func_name: "IsIPv6Address"
+  # - attribute: "ipv6"
+  #   type: "string"
+  #   # optional: true
+  #   required: true
+  #   description: "IP-address v6"
+  #   validation:
+  #     func_name: "IsIPv6Address"
 
-  - attribute: "mac"
-    type: "string"
-    # optional: true
-    required: true
-    validation:
-      func_name: "IsMACAddress"
+  # - attribute: "mac"
+  #   type: "string"
+  #   # optional: true
+  #   required: true
+  #   validation:
+  #     func_name: "IsMACAddress"
 
-  - attribute: "cidr"
-    type: "string"
-    optional: true
-    # required: true
-    validation:
-      func_name: "IsCIDR"
+  # - attribute: "cidr"
+  #   type: "string"
+  #   optional: true
+  #   # required: true
+  #   validation:
+  #     func_name: "IsCIDR"
 
-  - attribute: "time"
-    type: "string"
-    # optional: true
-    required: true
-    validation:
-      func_name: "IsRFC3339Time"
+  # - attribute: "time"
+  #   type: "string"
+  #   # optional: true
+  #   required: true
+  #   validation:
+  #     func_name: "IsRFC3339Time"
 
-  - attribute: "url_https"
-    type: "string"
-    optional: true
-    # required: true
-    validation:
-      func_name: "IsURLWithHTTPS"
+  # - attribute: "url_https"
+  #   type: "string"
+  #   optional: true
+  #   # required: true
+  #   validation:
+  #     func_name: "IsURLWithHTTPS"
 
-  - attribute: "url_http"
-    type: "string"
-    # optional: true
-    required: true
-    validation:
-      func_name: "IsURLWithHTTPorHTTPS"
+  # - attribute: "url_http"
+  #   type: "string"
+  #   # optional: true
+  #   required: true
+  #   validation:
+  #     func_name: "IsURLWithHTTPorHTTPS"
 
-  - attribute: "uuid"
-    type: "string"
-    optional: true
-    # required: true
-    validation:
-      func_name: "IsUUID"
+  # - attribute: "uuid"
+  #   type: "string"
+  #   optional: true
+  #   # required: true
+  #   validation:
+  #     func_name: "IsUUID"
 
-  - attribute: "base_64"
-    type: "string"
-    optional: true
-    # required: true
-    validation:
-      func_name: "StringIsBase64"
+  # - attribute: "base_64"
+  #   type: "string"
+  #   optional: true
+  #   # required: true
+  #   validation:
+  #     func_name: "StringIsBase64"
 
-  - attribute: "json"
-    type: "string"
-    optional: true
-    # required: true
-    validation:
-      func_name: "StringIsJSON"
+  # - attribute: "json"
+  #   type: "string"
+  #   optional: true
+  #   # required: true
+  #   validation:
+  #     func_name: "StringIsJSON"
 
-  - attribute: "reg_exp"
-    type: "string"
-    # optional: true
-    required: true
-    validation:
-      func_name: "StringIsValidRegExp"
+  # - attribute: "reg_exp"
+  #   type: "string"
+  #   # optional: true
+  #   required: true
+  #   validation:
+  #     func_name: "StringIsValidRegExp"
 
-  - attribute: "gender"
-    type: "string"
-    validation:
-      func_name: "StringInSlice"
-      ignore_case: true
-      params:
-        - "male"
-        - "female"
-        - "other"
+  # - attribute: "gender"
+  #   type: "string"
+  #   validation:
+  #     func_name: "StringInSlice"
+  #     ignore_case: true
+  #     params:
+  #       - "male"
+  #       - "female"
+  #       - "other"
 
   - attribute: "port_number"
     type: "int"
@@ -152,25 +152,25 @@ schemas:
     validation:
       func_name: "IsPortNumber"
 
-  - attribute: "port_with_zero"
-    type: "int"
-    optional: true
-    # required: true
-    validation:
-      func_name: "IsPortNumberOrZero"
+  # - attribute: "port_with_zero"
+  #   type: "int"
+  #   optional: true
+  #   # required: true
+  #   validation:
+  #     func_name: "IsPortNumberOrZero"
 
-  - attribute: "nuclear_code"
-    optional: true
-    # required: true
-    sensitive: true
-    description: "Nuclear code"
-    validation:
-      func_name: "NotInYourList"
-    type: "string"
-    # type: "list"
-    # element:
-    #   schema:
-    #     type: "string"
+  # - attribute: "nuclear_code"
+  #   optional: true
+  #   # required: true
+  #   sensitive: true
+  #   description: "Nuclear code"
+  #   validation:
+  #     func_name: "NotInYourList"
+  #   type: "string"
+  #   # type: "list"
+  #   # element:
+  #   #   schema:
+  #   #     type: "string"
 
   - attribute: "test_score"
     type: "int"
@@ -183,81 +183,109 @@ schemas:
       params:
         - 1
         - 100
-
-  - attribute: "percentage"
-    type: "float"
+  - attribute: "string_in_some_names"
+    type: "string"
     # required: true
     optional: true
     computed: true
+    description: "string in valid list"
+    default: parth
     validation:
-      func_name: "FloatBetween"
+      func_name: "StringInSlice"
+      params:
+        - parth
+        - aarsh
+        - arjun
+        - alfatah
+        - krunal
+      ignore_case: true
+
+  - attribute: "valid_cidr"
+    type: "string"
+    # required: true
+    optional: true
+    computed: true
+    description: "cidr network"
+    validation:
+      func_name: "IsCIDRNetwork"
       params:
         - 0
-        - 100
+        - 32
+      ignore_case: true
+  # - attribute: "percentage"
+  #   type: "float"
+  #   # required: true
+  #   optional: true
+  #   computed: true
+  #   validation:
+  #     func_name: "FloatBetween"
+  #     params:
+  #       - 0
+  #       - 100
 
-  - attribute: "filter"
-    type: "list"
-    optional: true
-    # required: true
-    computed: true
-    description: "filter list"
-    max_items: 10
-    element:
-      type: "resource"
-      schema:
-        - attribute: "filter_name"
-          type: "string"
-          required: true
-          description: "name of filter"
-        - attribute: "id"
-          type: "string"
-          computed: true
-          description: "id of filter"
-          default_func: true
-          envvar: "FILTER_ID"
-        - attribute: "description"
-          type: "string"
-          optional: true
-          computed: true
-          description: "description of filter"
-          default_func: true
-        - attribute: "filter_entry"
-          type: "list"
-          optional: true
-          computed: true
-          description: "list of filter_entry"
-          min_items: 1
-          max_items: 4
-          element:
-            type: "resource"
-            schema:
-              - attribute: "id_list"
-                type: "set"
-                required: true
-                element:
-                  type: "schema"
-                  schema:
-                    type: "string"
-              - attribute: "filter_entry_name"
-                type: "string"
-                required: true
-                description: "name of filter entry"
-                diff_suppress: true
-              - attribute: "ipv6"
-                type: "string"
-                optional: true
-                # computed: true
-                description: "ipv6"
-                validation:
-                  func_name: "IsIPv6Address"
-              - attribute: "apply_to_frag"
-                type: "string"
-                optional: true
-                computed: true
-                validation:
-                  func_name: "StringInSlice"
-                  ignore_case: "false"
-                  params:
-                    - "yes"
-                    - "no"
-                description: "apply to fragment"
+  # - attribute: "filter"
+  #   type: "list"
+  #   # optional: true
+  #   required: true
+  #   computed: true
+  #   description: "filter list"
+  #   max_items: 10
+  #   element:
+  #     type: "resource"
+  #     schema:
+  #       - attribute: "filter_name"
+  #         type: "string"
+  #         required: true
+  #         description: "name of filter"
+  #       - attribute: "id"
+  #         type: "string"
+  #         computed: true
+  #         description: "id of filter"
+  #         default_func: true
+  #         envvar: "FILTER_ID"
+  #       - attribute: "description"
+  #         type: "string"
+  #         optional: true
+  #         computed: true
+  #         description: "description of filter"
+  #         default_func: true
+  #       - attribute: "filter_entry"
+  #         type: "list"
+  #         optional: true
+  #         computed: true
+  #         description: "list of filter_entry"
+  #         min_items: 1
+  #         max_items: 4
+  #         element:
+  #           type: "resource"
+  #           schema:
+  #             - attribute: "id_list"
+  #               type: "set"
+  #               required: true
+  #               element:
+  #                 type: "schema"
+  #                 schema:
+  #                   type: "string"
+  #             - attribute: "filter_entry_name"
+  #               type: "string"
+  #               required: true
+  #               description: "name of filter entry"
+  #               diff_suppress: true
+  #             - attribute: "ipv6"
+  #               type: "string"
+  #               optional: true
+  #               # computed: true
+  #               description: "ipv6"
+  #               validation:
+  #                 func_name: "IsIPv6Address"
+  #             - attribute: "apply_to_frag"
+  #               type: "string"
+  #               optional: true
+  #               computed: true
+  #               validation:
+  #                 func_name: "StringInSlice"
+  #                 ignore_case: "false"
+  #                 params:
+  #                   - "yes"
+  #                   - "no"
+  #               description: "apply to fragment"

@@ -39,12 +39,12 @@ def generate_random_values(data):
         "invalid": str(datetime.datetime.now())
     }
     data["types"]["url-http"] = {
-        "valid": 'http://{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15))),
-        "invalid": 'ht:/{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15)))
+        "valid": "http://{}.com".format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15))),
+        "invalid": "ht:/{}.com".format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15)))
     }
     data["types"]["url-https"] = {
-        "valid": 'https://{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15))),
-        "invalid": 'hts:/{}.com'.format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15)))
+        "valid": "https://{}.com".format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15))),
+        "invalid": "hts:/{}.com".format(''.join(random.choices(string.ascii_lowercase + string.digits, k=15)))
     }
     data["types"]["uuid"] = {
         "valid": str(uuid.uuid1()),
@@ -79,37 +79,46 @@ def pre_process():
         "IsCIDR": "cidr",
         "IsIPAddress": "ipv4",
         "IsIPv4Address": "ipv4",
-        # "IsIPv4Range": "",
         "IsIPv6Address": "ipv6",
         "IsMACAddress": "mac",
-        # "IsPortNumber": "port",
-        # "IsPortNumberOrZero": "port0",
         "IsRFC3339Time": "time",
         "IsURLWithHTTPS": "url-https",
         "IsURLWithHTTPorHTTPS": "url-http",
         "IsUUID": "uuid",
-        # "ListOfUniqueStrings": "",
-        # "NoZeroValues": "",
         "StringIsBase64": "base64",
-        # "StringIsEmpty": "",
         "StringIsJSON": "json",
-        # "StringIsNotEmpty": "",
-        # "StringIsNotWhiteSpace": "",
         "StringIsValidRegExp": "regex",
-        # "StringIsWhiteSpace": ""
     }
     for schema in data['schemas']:
         if schema["type"] == "string":
             if "validation" in schema:
                 if schema["validation"]["func_name"] in typeMap:
                     schema["subtype"] = typeMap[schema["validation"]["func_name"]]
+                    schema["test_params"] = {
+                        "valid": [data["types"][schema["subtype"]]["valid"]],
+                        "invalid": [data["types"][schema["subtype"]]["invalid"]]
+                    }
+                elif schema["validation"]["func_name"] == "StringInSlice" or schema["validation"]["func_name"] == "StringNotInSlice":
+                    schema["subtype"] = "string"
+                    schema["test_params"] = {
+                        "valid": [i for i in schema["validation"]["params"]],
+                        "invalid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10))],
+                    }
+                elif schema["validation"]["func_name"] == "IsCIDRNetwork":
+                    schema["subtype"] = "string"
+                    x = schema["validation"]["params"][0]
+                    y = schema["validation"]["params"][1]
+                    schema["test_params"] = {
+                        "valid": [x, y, (x+y)//2],
+                        "invalid": [x-1, y+1]
+                    }
                 else:
                     schema["subtype"] = "string"
             # set random value as per subtype
-                schema["test_params"] = {
-                "valid": [data["types"][schema["subtype"]]["valid"]],
-                "invalid": [data["types"][schema["subtype"]]["invalid"]]
-                }
+                # schema["test_params"] = {
+                # "valid": [data["types"][schema["subtype"]]["valid"]],
+                # "invalid": [data["types"][schema["subtype"]]["invalid"]]
+                # }
             else:
                 schema["subtype"] = "string"
             
@@ -167,29 +176,38 @@ def pre_process_for_provider():
     with open("./config/pre-provider.yml", 'r') as stream:
         data = yaml.safe_load(stream)
     data = generate_random_values(data)
+    new_data = {}
+    for key, _ in data.items():
+        if key == "types":
+            for k, v in data[key].items():
+                new_data[k] = {
+                    "valid": [data["types"][str(k)]["valid"]],
+                    "invalid": [data["types"][str(k)]["invalid"]]
+                }
+    data["types"] = new_data
     with open('./config/provider.yml', 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
 
 pre_process()
-# pre_process_for_provider()
+pre_process_for_provider()
 
-# config = yaml.full_load(open('./config/provider.yml'))
-# env = Environment(loader=FileSystemLoader('./templates'),
-#                   trim_blocks=True, lstrip_blocks=True)
-
-
-# env.filters["camelize"] = camelize
-# env.filters["pascalize"] = pascalize
-# env.filters["snakify"] = snakify
-# env.filters["is_list"] = is_list
-# env.filters["quote"] = quote
+config = yaml.full_load(open('./config/provider.yml'))
+env = Environment(loader=FileSystemLoader('./templates'),
+                  trim_blocks=True, lstrip_blocks=True)
 
 
-# template = env.get_template('provider_test.j2')
+env.filters["camelize"] = camelize
+env.filters["pascalize"] = pascalize
+env.filters["snakify"] = snakify
+env.filters["is_list"] = is_list
+env.filters["quote"] = quote
 
-# # to save the results
-# with open("target/provider_test_output.go", "w") as fh:
-#     fh.write(template.render(config))
+
+template = env.get_template('provider_test.j2')
+
+# to save the results
+with open("target/provider_test_output.go", "w") as fh:
+    fh.write(template.render(config))
 
 
 config = yaml.full_load(open('./config/resources/contract.yml'))
@@ -201,6 +219,7 @@ env.filters["camelize"] = camelize
 env.filters["pascalize"] = pascalize
 env.filters["snakify"] = snakify
 env.filters["is_list"] = is_list
+env.filters["quote"] = quote
 
 
 template = env.get_template('resource_test.j2')

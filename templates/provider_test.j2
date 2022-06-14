@@ -10,8 +10,8 @@ import (
 var Test = map[string]interface{}{
 	{% for type, value in types.items() %}
 		"{{type}}": map[string]interface{}{
-			"valid": {{ value.valid | quote}},
-			"invalid": {{value.invalid | quote}},
+			"valid": []interface{}{ {{ value.valid | map("tojson") | join(', ')}} },
+			"invalid": []interface{}{ {{ value.invalid | map("tojson") | join(', ')}} },
 		},
 	{% endfor %}
 }

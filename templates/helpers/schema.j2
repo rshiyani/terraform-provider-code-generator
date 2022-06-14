@@ -2,7 +2,6 @@
     "IsCIDR",
     "IsIPAddress",
     "IsIPv4Address",
-    "IsIPv4Range",
     "IsIPv6Address",
     "IsMACAddress",
     "IsPortNumber",
@@ -11,15 +10,9 @@
     "IsURLWithHTTPS",
     "IsURLWithHTTPorHTTPS",
     "IsUUID",
-    "ListOfUniqueStrings",
-    "NoZeroValues",
     "StringIsBase64",
-    "StringIsEmpty",
     "StringIsJSON",
-    "StringIsNotEmpty",
-    "StringIsNotWhiteSpace",
-    "StringIsValidRegExp",
-    "StringIsWhiteSpace"] %}
+    "StringIsValidRegExp"] %}
 
 {% macro genFuncName(name) %}
     {% set nameList = name.split('_') | map('capitalize') | join("") %}
@@ -45,8 +38,8 @@
 {% endmacro %}
 
 {% macro checkDefault(default) %}
-    {% if default is true  %}
-        Default: true,
+    {% if default is defined  %}
+        Default: {{default}},
     {% endif %}
 {% endmacro %}
 

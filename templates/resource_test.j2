@@ -1,6 +1,8 @@
 {% import './helpers/schema.j2' as schemaHelper %}
 package {{provider_name | lower}}
 
+{% set stringSubTypeList = ["base64","cidr","ipv4","ipv6","json","mac","regex","time","url-http","url-https","uuid"]%}
+
 var resource{{name | pascalize}}Test = map[string]interface{}{
 	{% for schema in schemas %}
 		{% if schema.type not in ["list","set","map"] and schema.test_params is defined%}
@@ -10,10 +12,29 @@ var resource{{name | pascalize}}Test = map[string]interface{}{
 					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
 				},
 			{% elif schema.type == "string" %}
+				{% if schema.subtype in stringSubTypeList %}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": Test[{{schema.subtype | quote}}].(map[string]interface{})["valid"].([]string),
+						"invalid": Test[{{schema.subtype | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+					},
+				{% elif schema.validation is defined %}
+					{% if schema.validation.func_name == "StringInSlice" or schema.validation.func_name == "StringNotInSlice" %}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": []string{ {{ schema.test_params.valid | map("tojson") | join(', ') }} },
+							"invalid": []string{ {{schema.test_params.invalid | map("tojson") | join(', ')}} },
+						},
+					{% elif schema.validation.func_name == "IsCIDRNetwork"%}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": []int{ {{ schema.test_params.valid | map("tojson") | join(', ')}} },
+							"invalid": []int{ {{schema.test_params.invalid | map("tojson") | join(', ')}} },
+						},
+					{% endif %}
+				{% else %}
 				"{{schema.attribute}}" : map[string]interface{}{
 					"valid": []string{ {{ schema.test_params.valid | map("tojson") | join(', ')}} },
 					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
 				},
+				{% endif %}
 			{% else %}
 				"{{schema.attribute}}" : map[string]interface{}{
 					"valid": []{{schema.type}}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
@@ -30,7 +51,7 @@ var resource{{name | pascalize}}Test = map[string]interface{}{
 {% macro printQuote(schema) %}
 	{%- if schema.type == "string" -%}
 		{%- if schema.subtype == "json" -%}
-		'
+		`
 		{%- else -%}
 		"
 		{%- endif -%}
@@ -39,9 +60,9 @@ var resource{{name | pascalize}}Test = map[string]interface{}{
 
 {% macro printStepsWithoutRequiredArguments() %}
 	{% for schema in schemas %}
-		{% if schema.required is true %}
+		{% if schema.required is true and schema.type not in ["list","set","map"]%}
 		{
-			Config: CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}(rName),
+			Config: CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}(),
 			ExpectError: regexp.MustCompile(`Missing required argument`),
 		},
 		{% endif %}
@@ -50,17 +71,71 @@ var resource{{name | pascalize}}Test = map[string]interface{}{
 
 {% macro printStepsForConfig() %}
 	{
-		Config: CreateAcc{{name | pascalize}}Config(rName),
+		Config: CreateAcc{{name | pascalize}}Config(),
 		Check: resource.ComposeTestCheckFunc(
 			testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_default),
 			{% for schema in schemas %}
-				{% if schema.type != "list" and schema.type != "set" and schema.type != "map" %}
-					resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", {{printQuote(schema)}}{# Add default value #}{{printQuote(schema)}}),
+				{% if schema.type not in ["list","set","map"] %}
+					{% if schema.required is true %}
+						{% if schema.type == "float" %}
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]float64)[0]),
+						{% else %}
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]{{schema.type}})[0]),
+						{% endif %}
+					{% else %}
+						{% if schema.type == "float" %}
+							{% if schema.default is defined %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", {{schema.default}}),
+							{% else %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", 0.0),
+							{% endif %}
+						{% elif schema.type == "int" %}
+							{% if schema.default is defined %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", {{schema.default}}),
+							{% else %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", 0),
+							{% endif %}
+						{% elif schema.type == "string" %}
+							{% if schema.default is defined %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "{{schema.default}}"),
+							{% else %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", ""),
+							{% endif %}
+						{% elif schema.type == "bool" %}
+							{% if schema.default is defined %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", {{schema.default}}),
+							{% else %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", false),
+							{% endif %}
+						{% else %}
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]{{schema.type}})[0]),
+						{% endif %}
+					{% endif %}			
 				{% endif %}
 			{% endfor %}
 		),
 	},
 {% endmacro %}
+
+
+{% macro printStepsForConfigWithOptional() %}
+	{
+		Config: CreateAcc{{name | pascalize}}ConfigWithOptional(),
+		Check: resource.ComposeTestCheckFunc(
+			testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_updated),
+			{% for schema in schemas %}
+				{% if schema.type not in ["list","set","map"] %}
+					{% if schema.type == "float" %}
+					resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]float64)[0]),
+					{% else %}
+					resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]{{schema.type}})[0]),
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		),
+	},
+{% endmacro %}
+
 
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T) {
 	var {{name | camelize}}_default models.{{name | pascalize}}
@@ -76,8 +151,9 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 		ProviderFactories: testAccProviders,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
 		Steps: []resource.TestStep{
-			{{printStepsWithoutRequiredArguments()}}
-			{{printStepsForConfig()}}
+			{{printStepsWithoutRequiredArguments()-}}
+			{{printStepsForConfig()-}}
+			{{printStepsForConfigWithOptional()-}}
 		},
 	})
 }
@@ -92,44 +168,70 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 
 {% macro printFunctionWithoutRequiredArguments() %}
 	{% for schema in schemas %}
-		{% if schema.required is true %}
-func CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}(rName string) string {
+		{% if schema.required is true and schema.type not in ["list","set","map"]%}
+func CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}() string {
 	return fmt.Sprintf(`
 		resource "{{provider_name | camelize}}_{{name | camelize}}" "test" {
 			{% set reqArgs = [] %}
 			{% for sch in schemas %}
 				{% if sch.required is true %}
-					{% if sch.attribute != schema.attribute %}
+					{% if sch.attribute != schema.attribute and sch.type not in ["list","set","map"] %}
 					{{sch.attribute}} = "%v"
 						{% if sch.type == "float" %}
-							{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]float64)[0]') or "" }}
+							{{- reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]float64)[0]') or "" -}}
 						{% else %}
-							{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]'+sch.type+')[0]') or "" }}
+							{{- reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]'+sch.type+')[0]') or "" -}}
 						{% endif %}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
 		}
-	`,{{reqArgs | join(', ')}})
+	`,{{reqArgs | join(',\n')}})
 }
 		{% endif %}
 	{% endfor %}
 {% endmacro %}
 
 {% macro printFunctionForConfig() %}
-func CreateAcc{{name | pascalize}}Config(rName string) string {
+func CreateAcc{{name | pascalize}}Config() string {
 	return fmt.Sprintf(`
 		resource  "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+			{% set reqArgs = [] %}
 			{% for schema in schemas %}
-				{% if schema.required is true %}
-					{{schema.attribute}} = {{printQuote(schema)}}%v{{printQuote(schema)}}
+				{% if schema.required is true and schema.type not in ["list","set","map"] %}
+					{{schema.attribute}} = "%v"
+					{% if schema.type == "float" %}
+							{{- reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]float64)[0]') or "" -}}
+						{% else %}
+							{{- reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]'+schema.type+')[0]') or "" -}}
+						{% endif %}
 				{% endif %}
 			{% endfor %}
 		}
-	`)
+	`,{{reqArgs | join(',\n')}})
 }
 {% endmacro %}
 
+{% macro printFunctionForConfigWithOptional() %}
+func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
+	return fmt.Sprintf(`
+		resource  "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+			{% set args = [] %}
+			{% for schema in schemas %}
+				{% if schema.type not in ["list","set","map"] %}
+					{{schema.attribute}} = "%v"
+					{% if schema.type == "float" %}
+							{{- args.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]float64)[0]') or "" -}}
+						{% else %}
+							{{- args.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]'+schema.type+')[0]') or "" -}}
+						{% endif %}
+				{% endif %}
+			{% endfor %}
+		}
+	`,{{args | join(',\n')}})
+}
+{% endmacro %}
 {{setRequiredAttrList()}}
 {{printFunctionWithoutRequiredArguments()}}
 {{printFunctionForConfig()}}
+{{printFunctionForConfigWithOptional()}}
