@@ -1,0 +1,171 @@
+base64:
+  invalid: a3+J1b%mFs//
+  valid: b2tjYThwc25pcg==
+cidr:
+  invalid: 294.281.295.288/3
+  valid: 198.45.35.129/9
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation
+ipv4:
+  invalid: 280.281.292.269
+  valid: 71.230.128.82
+ipv6:
+  invalid: invalidIPv6
+  valid: fb2d:2b35:b822:be17:b361:6691
+json:
+  invalid: '{ name : val'
+  valid: '{ "attribute" : "value" }'
+mac:
+  invalid: invalidMAC
+  valid: 52:af:5f:a6:77:24
+name: Tenant
+provider_name: Aci
+regex:
+  invalid: '[0-9)++'
+  valid: \b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b
+schemas:
+- attribute: name
+  description: name of Tenant
+  forcenew: true
+  required: true
+  subtype: string
+  type: string
+- attribute: annotation
+  description: annotation for Tenant
+  optional: true
+  type: string
+- attribute: name_alias
+  description: nameAlias for Tenant
+  optional: true
+  type: string
+- attribute: description
+  description: description for Tenant
+  optional: true
+  type: string
+- attribute: url_https
+  required: true
+  subtype: url-https
+  test_params:
+    invalid: hts:/mwr55uu54uidy92.com
+    valid: https://er388ujn1sa2dn2.com
+  type: string
+  validation:
+    func_name: IsURLWithHTTPS
+- attribute: url_http
+  required: true
+  subtype: url-http
+  test_params:
+    invalid: ht:/2egn4f7t90tfzhc.com
+    valid: http://clb80ylsgjrrf6d.com
+  type: string
+  validation:
+    func_name: IsURLWithHTTPorHTTPS
+- attribute: uuid
+  required: true
+  subtype: uuid
+  test_params:
+    invalid: invalid323Uuid12
+    valid: f56c3da5-e87a-11ec-a5f9-7c8ae19799de
+  type: string
+  validation:
+    func_name: IsUUID
+- attribute: base_64
+  required: true
+  subtype: base64
+  test_params:
+    invalid: a3+J1b%mFs//
+    valid: b2tjYThwc25pcg==
+  type: string
+  validation:
+    func_name: StringIsBase64
+- attribute: json
+  required: true
+  subtype: json
+  test_params:
+    invalid: '{ name : val'
+    valid: '{ "attribute" : "value" }'
+  type: string
+  validation:
+    func_name: StringIsJSON
+- attribute: reg_exp
+  required: true
+  subtype: regex
+  test_params:
+    invalid: '[0-9)++'
+    valid: \b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b
+  type: string
+  validation:
+    func_name: StringIsValidRegExp
+- attribute: gender
+  subtype: string
+  test_params:
+    invalid: 12345
+    valid: ufl4ow8f3q
+  type: string
+  validation:
+    func_name: StringInSlice
+    ignore_case: true
+    params:
+    - male
+    - female
+    - other
+- attribute: port_number
+  required: true
+  subtype: port
+  test_params:
+    invalid:
+    - 0
+    - 65536
+    valid:
+    - 1
+    - 53
+    - 65535
+  type: int
+  validation:
+    func_name: IsPortNumber
+- attribute: port_with_zero
+  required: true
+  subtype: port0
+  test_params:
+    invalid:
+    - -1
+    - 65536
+    valid:
+    - 0
+    - 1
+    - 53
+    - 65535
+  type: int
+  validation:
+    func_name: IsPortNumberOrZero
+- attribute: nuclear_code
+  description: Nuclear code
+  required: true
+  sensitive: true
+  subtype: string
+  test_params:
+    invalid: 12345
+    valid: ufl4ow8f3q
+  type: string
+  validation:
+    func_name: NotInYourList
+- attribute: test_score
+  computed: true
+  description: range
+  required: true
+  subtype: range
+  test_params:
+    invalid:
+    - 0
+    - 101
+    valid:
+    - 1
+    - 100
+    - 50
+  type: int
+  validation:
+    func_name: IntBetween
+    params:
+    - 1
+    - 100

@@ -17,47 +17,127 @@ func resourceAciContract() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"tenant_dn": &schema.Schema{
-				Type:        schema.TypeString,
-				Sensitive:   true,
-				Required:    true,
-				ForceNew:    true,
-				Description: "tenant DN",
-			},
-
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "contract name",
+				Description: "name",
+			},
+
+			"ipv4": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "IP-address v4",
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+			},
+
+			"ipv6": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "IP-address v6",
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv6Address),
+			},
+
+			"mac": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsMACAddress),
+			},
+
+			"cidr": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsCIDR),
+			},
+
+			"time": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsRFC3339Time),
+			},
+
+			"url_https": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsURLWithHTTPS),
+			},
+
+			"url_http": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsURLWithHTTPorHTTPS),
+			},
+
+			"uuid": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsUUID),
+			},
+
+			"base_64": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringIsBase64),
+			},
+
+			"json": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringIsJSON),
+			},
+
+			"reg_exp": &schema.Schema{
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringIsValidRegExp),
+			},
+
+			"gender": &schema.Schema{
+				Type: schema.TypeString,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{
-					"1",
-					"2",
-					"3",
-				}, false),
+					"male",
+					"female",
+					"other",
+				}, true),
 				),
 			},
 
-			"my_map": &schema.Schema{
-				Type:        schema.TypeMap,
+			"port_number": &schema.Schema{
+				Type:             schema.TypeInt,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsPortNumber),
+			},
+
+			"port_with_zero": &schema.Schema{
+				Type:             schema.TypeInt,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IsPortNumberOrZero),
+			},
+
+			"nuclear_code": &schema.Schema{
+				Type:        schema.TypeString,
 				Sensitive:   true,
 				Required:    true,
-				ForceNew:    true,
-				Description: "My map for testing",
-				// [ERROR]: StringinSLice may be a Typo or not in AutoGen List. Please refer docs once.
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
+				Description: "Nuclear code",
+				// [ERROR]: NotInYourList may be a Typo or not in AutoGen List. Please refer docs once.
+
 			},
 
-			"prio": &schema.Schema{
-				Type:        schema.TypeString,
+			"test_score": &schema.Schema{
+				Type:        schema.TypeInt,
+				Required:    true,
 				Computed:    true,
-				Optional:    true,
-				Description: "prio",
-				ValidateDiagFunc: validation.ToDiagFunc(
-					validation.IsCIDRNetwork(1, 2),
-				),
+				Description: "range",
+				// [ERROR]: IntBetween may be a Typo or not in AutoGen List. Please refer docs once.
+
+			},
+
+			"percentage": &schema.Schema{
+				Type:     schema.TypeFloat,
+				Required: true,
+				Computed: true,
+				// [ERROR]: FloatBetween may be a Typo or not in AutoGen List. Please refer docs once.
+
 			},
 
 			"filter": &schema.Schema{
@@ -77,7 +157,7 @@ func resourceAciContract() *schema.Resource {
 						"id": &schema.Schema{
 							Type:        schema.TypeString,
 							Computed:    true,
-							DefaultFunc: schema.EnvDefaultFunc("ID", nil),
+							DefaultFunc: schema.EnvDefaultFunc("FILTER_ID", nil),
 							Description: "id of filter",
 						},
 
@@ -101,7 +181,7 @@ func resourceAciContract() *schema.Resource {
 							MinItems:    1,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"casts": &schema.Schema{
+									"id_list": &schema.Schema{
 										Type:     schema.TypeSet,
 										Required: true,
 										Elem: &schema.Schema{
@@ -119,10 +199,10 @@ func resourceAciContract() *schema.Resource {
 										},
 									},
 
-									"id": &schema.Schema{
+									"ipv6": &schema.Schema{
 										Type:             schema.TypeString,
-										Computed:         true,
-										Description:      "id of filter entry",
+										Optional:         true,
+										Description:      "ipv6",
 										ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv6Address),
 									},
 

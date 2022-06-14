@@ -3,7 +3,6 @@ package aci
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -12,28 +11,100 @@ func dataSourceAciContract() *schema.Resource {
 		ReadContext: dataSourceAciContractRead,
 
 		Schema: map[string]*schema.Schema{
-			"tenant_dn": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "tenant DN",
-			},
-
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "contract name",
+				Description: "name",
 			},
 
-			"my_map": &schema.Schema{
-				Type:        schema.TypeMap,
-				Required:    true,
-				Description: "My map for testing",
-			},
-
-			"prio": &schema.Schema{
+			"ipv4": &schema.Schema{
 				Type:        schema.TypeString,
+				Required:    true,
+				Description: "IP-address v4",
+			},
+
+			"ipv6": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "IP-address v6",
+			},
+
+			"mac": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"cidr": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"time": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"url_https": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"url_http": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"uuid": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"base_64": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"json": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"reg_exp": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"gender": &schema.Schema{
+				Type: schema.TypeString,
+			},
+
+			"port_number": &schema.Schema{
+				Type:     schema.TypeInt,
+				Required: true,
+			},
+
+			"port_with_zero": &schema.Schema{
+				Type:     schema.TypeInt,
+				Required: true,
+			},
+
+			"nuclear_code": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Nuclear code",
+			},
+
+			"test_score": &schema.Schema{
+				Type:        schema.TypeInt,
+				Required:    true,
 				Computed:    true,
-				Description: "prio",
+				Description: "range",
+			},
+
+			"percentage": &schema.Schema{
+				Type:     schema.TypeFloat,
+				Required: true,
+				Computed: true,
 			},
 
 			"filter": &schema.Schema{
@@ -66,7 +137,7 @@ func dataSourceAciContract() *schema.Resource {
 							Description: "list of filter_entry",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"cast": &schema.Schema{
+									"id_list": &schema.Schema{
 										Type:     schema.TypeSet,
 										Required: true,
 										Elem: &schema.Schema{
@@ -80,10 +151,9 @@ func dataSourceAciContract() *schema.Resource {
 										Description: "name of filter entry",
 									},
 
-									"id": &schema.Schema{
+									"ipv6": &schema.Schema{
 										Type:        schema.TypeString,
-										Computed:    true,
-										Description: "id of filter entry",
+										Description: "ipv6",
 									},
 
 									"apply_to_frag": &schema.Schema{
@@ -105,11 +175,39 @@ func dataSourceAciContractRead(ctx context.Context, d *schema.ResourceData, m in
 	AciClient := m.(*client.Client)
 
 	ContractMap := models.Contract{
-		TenantDn: d.Get("tenantDn"),
-
 		Name: d.Get("name"),
 
-		MyMap: d.Get("myMap"),
+		Ipv4: d.Get("ipv4"),
+
+		Ipv6: d.Get("ipv6"),
+
+		Mac: d.Get("mac"),
+
+		Cidr: d.Get("cidr"),
+
+		Time: d.Get("time"),
+
+		UrlHttps: d.Get("urlHttps"),
+
+		UrlHttp: d.Get("urlHttp"),
+
+		Uuid: d.Get("uuid"),
+
+		Base64: d.Get("base64"),
+
+		Json: d.Get("json"),
+
+		RegExp: d.Get("regExp"),
+
+		PortNumber: d.Get("portNumber"),
+
+		PortWithZero: d.Get("portWithZero"),
+
+		NuclearCode: d.Get("nuclearCode"),
+
+		TestScore: d.Get("testScore"),
+
+		Percentage: d.Get("percentage"),
 	}
 
 	ContractId, err := getIdFromContractModel(&ContractMap)
