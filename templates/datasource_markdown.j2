@@ -1,0 +1,33 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+---
+subcategory: "{{name}}"
+layout: "{{provider_name | camelize}}"
+page_title: "{{provider_name | capitalize}}: {{provider_name | camelize}}_{{name | camelize}}"
+sidebar_current: "docs-{{provider_name | camelize}}-data-source-{{name | camelize}}"
+description: |-
+  Data source for {{provider_name | capitalize}} {{name}}
+---
+
+# {{provider_name | camelize}}_{{name | camelize}} #
+Data source for {{provider_name | capitalize}} {{name}}
+
+## Example Usage ##
+
+```hcl
+data "{{provider_name | camelize}}_{{name | camelize}}" "example" {
+{% for schema in schemas -%}
+    {{schemaHelper.getRequiredDataAttr(schema) }}
+{% endfor -%}
+}
+```
+## Argument Reference ##
+{% for schema in schemas -%}
+{{schemaHelper.getRequiredAttr(schema) }}
+{% endfor -%}
+
+
+
+## Attribute Reference
+{% for schema in schemas -%}
+{{schemaHelper.getOptionalAttr(schema) }}
+{% endfor -%}

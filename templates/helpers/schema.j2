@@ -205,3 +205,88 @@
         {{schema.attribute| pascalize}}:  d.Get("{{schema.attribute }}"),
     {% endif %}
 {% endmacro %}
+
+{% macro getOptionalAttr(schema) %}
+    {% if schema.required is not true and schema.type not in ["list","set","map"]  -%}
+        {% if schema.description -%}
+* `{{schema.attribute}}` - (Optional) {{schema.description}}.
+        {% else -%}
+* `{{schema.attribute}}` - (Optional) [TODO]: Write your Description here
+        {% endif -%}
+    {% endif -%}
+{% endmacro %}
+
+{% macro getRequiredAttr(schema) %}
+    {% if schema.required is true and schema.type not in ["list","set","map"]  %}
+        {% if schema.description %}
+* `{{schema.attribute}}` - (Required) {{schema.description}}.
+        {% else %}
+* `{{schema.attribute}}` - (Required) [TODO]: Write your Description here
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro getRequiredAttr(schema) %}
+    {% if schema.required is true and schema.type not in ["list","set","map"]  %}
+        {% if schema.description %}
+* `{{schema.attribute}}` - (Required) {{schema.description}}.
+        {% else %}
+* `{{schema.attribute}}` - (Required) [TODO]: Write your Description here
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro getResourceAttrMD(schema) %}
+    {% if schema.type not in ["list"]  %}
+        {% if schema.required %}
+            {% if schema.description %}
+* `{{schema.attribute}}` - (Required) {{schema.description}}.{% else %}
+* `{{schema.attribute}}` - (Required) [TODO]: Write your Description here{% endif%}
+        {% else %}
+            {% if schema.description %}
+* `{{schema.attribute}}` - (Optional) {{schema.description}}.
+            {% else %}
+* `{{schema.attribute}}` - (Optional) [TODO]: Write your Description here
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {% if schema.required %}
+            {% if schema.description %}
+* `{{schema.attribute}}` - (Required) {{schema.description}}.
+    {% for sch in schema.element.schema -%}
+        {{ getResourceAttrMD(sch) }}
+    {% endfor -%}
+            {% else %}
+* `{{schema.attribute}}` - (Required) [TODO]: Write your Description here
+    {% for sch in schema.element.schema -%}
+        {{ getResourceAttrMD(sch) }}
+    {% endfor -%}
+            {% endif%}
+        {% else %}
+            {% if schema.description %}
+* `{{schema.attribute}}` - (Optional) {{schema.description}}.
+    {% for sch in schema.element.schema -%}
+        {{ getResourceAttrMD(sch) }}
+    {% endfor -%}
+            {% else %}
+* `{{schema.attribute}}` - (Optional) [TODO]: Write your Description here
+    {% for sch in schema.element.schema -%}
+        {{ getResourceAttrMD(sch) }}
+    {% endfor -%}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+{% endmacro %}
+
+{% macro getRequiredDataAttr(schema) %}
+    {% if schema.required is true and schema.type not in ["list","set","map"]  %}
+        {{schema.attribute}} = "[TODO]: Write values here"
+    {% endif %}
+{% endmacro %}
+
+{% macro getRequiredResAttr(schema) %}
+    {% if schema.type not in ["list","set","map"]  %}
+        {{schema.attribute}} = "[TODO]: Write values here"
+    {% endif %}
+{% endmacro %}
