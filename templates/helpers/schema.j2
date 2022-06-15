@@ -212,6 +212,7 @@
     {% endif %}
 {% endmacro %}
 
+{# for datasource_test #}
 {% macro getTestAttr(schema) %}
     {% if schema.type not in ["map","list","set"] %}
         resource.TestCheckResourceAttrPair(dataSourceName, "{{schema.attribute}}", resourceName, "{{schema.attribute}}"),
@@ -220,6 +221,7 @@
     {% endif %}
 {% endmacro %}
 
+{# for datasource_test #}
 {% macro getRequiredDNFunc(name,schema) %}
     {% if schema.required is true and schema.type not in ["map","list","set"] %}
     {
@@ -229,12 +231,13 @@
     {% endif %}
 {% endmacro %}
 
+{# for datasource_test #}
 {% macro getRequiredDNFuncWithoutVar(provider_name,name,schemas) %}
 {% for schema in schemas %}
-func CreateAcc{{name | pascalize}}DSWithoutRequired{{schema.attribute | pascalize}}(rName string) string {
+func CreateAcc{{name | pascalize}}DSWithoutRequired{{schema.attribute | pascalize}}() string {
     fmt.Println("=== STEP  Basic: Testing {{name | pascalize}} data source creation without required {{schema.attribute | pascalize}}")
 	
-    resource := CreateAcc{{name | pascalize}}Config(rName)
+    resource := CreateAcc{{name | pascalize}}Config()
     resource += fmt.Sprintf(`
 	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
         {% set reqArgs = [] %}

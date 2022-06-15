@@ -34,6 +34,14 @@ schemas:
     invalid: 12345
     valid: ufl4ow8f3q
   type: string
+- attribute: annotation
+  description: annotation
+  optional: true
+  subtype: string
+  test_params:
+    invalid: 12345
+    valid: ufl4ow8f3q
+  type: string
 - attribute: ipv4
   description: IP-address v4
   required: true
