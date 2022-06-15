@@ -1,5 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
-package acctest
+package {{provider_name | camelize}}
 
 import(
     {% for import in imports  %}
@@ -65,22 +65,21 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}DataSource_Basic(t 
 				Config:      CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(randomParameter, randomValue),
 				ExpectError: regexp.MustCompile(`An argument named (.)+ is not expected here.`),
 			},
+			
+			{% for schema in schemas %}
+			    {{ schemaHelper.getRequiredInvalidFunc(name,schema) }}
+			{% endfor %}
 
-			{
-				Config:      CreateAcc{{name | pascalize}}DataSourceWithInvalidName(),
-				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
-			},
-
-			{
-				{% for schema in schemas %}
+			{% for schema in schemas %}
 				{% if schema.optional is true and schema.type == "string" %}
-				Config: CreateAcc{{name | pascalize}}UpdateConfigDataSource("{{schema.attribute}}", randomValue),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrPair(dataSourceName,"{{schema.attribute}}", resourceName,"{{schema.attribute}}"),
-					),
-					{% endif %}
-				{% endfor %}
-			},
+				{
+					Config: CreateAcc{{name | pascalize}}UpdateConfigDataSource("{{schema.attribute}}", randomValue),
+					Check: resource.ComposeTestCheckFunc(
+						resource.TestCheckResourceAttrPair(dataSourceName,"{{schema.attribute}}", resourceName,"{{schema.attribute}}"),
+						),
+				},	
+				{% endif %}
+			{% endfor %}
         },
 	})
 }
@@ -123,22 +122,7 @@ func CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(key, value s
 	return resource
 }
 
-
-func CreateAcc{{name | pascalize}}DataSourceWithInvalidName() string {
-	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source with invalid name")
-	resource := CreateAcc{{name | pascalize}}Config() //from resource_test
-	resource += fmt.Sprintf(`
-	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
-		{% for schema in schemas %}
-			{% if schema.required is true and schema.attribute != "name" %}
-			{{schema.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}
-			{% endif %}
-		{% endfor %}
-			name = "${ {{provider_name | camelize}}_{{name | camelize}}.test.name}abc"
-	}
-	`)
-	return resource
-}
+{{ schemaHelper.getDSFuncWithInvalidRequired(provider_name,name,schemas) }}
 
 
 func CreateAcc{{name | pascalize}}UpdatedConfigDataSource(key, value string) string {

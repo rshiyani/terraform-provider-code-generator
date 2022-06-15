@@ -139,6 +139,8 @@ func TestAccAciContractDataSource_Basic(t *testing.T) {
 
 					resource.TestCheckResourceAttrPair(dataSourceName, "annotation", resourceName, "annotation"),
 
+					resource.TestCheckResourceAttrPair(dataSourceName, "description", resourceName, "description"),
+
 					resource.TestCheckResourceAttrPair(dataSourceName, "ipv4", resourceName, "ipv4"),
 
 					resource.TestCheckResourceAttrPair(dataSourceName, "ipv6", resourceName, "ipv6"),
@@ -187,9 +189,95 @@ func TestAccAciContractDataSource_Basic(t *testing.T) {
 			},
 
 			{
+				Config:      CreateAccContractDataSourceWithInvalidIpv4(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidIpv6(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidMac(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidCidr(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidTime(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidUrlHttps(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidUrlHttp(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidUuid(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidBase64(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidJson(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidRegExp(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidPortNumber(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidPortWithZero(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidNuclearCode(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidTestScore(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
+				Config:      CreateAccContractDataSourceWithInvalidPercentage(),
+				ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+			},
+
+			{
 				Config: CreateAccContractUpdateConfigDataSource("annotation", randomValue),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrPair(dataSourceName, "annotation", resourceName, "annotation"),
+				),
+			},
+			{
+				Config: CreateAccContractUpdateConfigDataSource("description", randomValue),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrPair(dataSourceName, "description", resourceName, "description"),
 				),
 			},
 		},
@@ -239,6 +327,49 @@ func CreateAccContractDSWithoutRequiredName() string {
 }
 func CreateAccContractDSWithoutRequiredAnnotation() string {
 	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Annotation")
+
+	resource := CreateAccContractConfig()
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+        name = "%v"
+        ipv4 = "%v"
+        ipv6 = "%v"
+        mac = "%v"
+        cidr = "%v"
+        time = "%v"
+        url_https = "%v"
+        url_http = "%v"
+        uuid = "%v"
+        base_64 = "%v"
+        json = "%v"
+        reg_exp = "%v"
+        port_number = "%v"
+        port_with_zero = "%v"
+        nuclear_code = "%v"
+        test_score = "%v"
+        percentage = "%v"
+	}
+	`, resourceContractTest["name"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv4"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["ipv6"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["mac"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["cidr"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["time"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_https"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["url_http"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["uuid"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["base_64"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["json"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["reg_exp"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["port_with_zero"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["nuclear_code"].(map[string]interface{})["valid"].([]string)[0],
+		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]int)[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]float64)[0])
+	return resource
+}
+func CreateAccContractDSWithoutRequiredDescription() string {
+	fmt.Println("=== STEP  Basic: Testing Contract data source creation without required Description")
 
 	resource := CreateAccContractConfig()
 	resource += fmt.Sprintf(`
@@ -1081,27 +1212,443 @@ func CreateAccContractUpdatedConfigDataSourceRandomAttr(key, value string) strin
 }
 
 func CreateAccContractDataSourceWithInvalidName() string {
-	fmt.Println("=== STEP  Basic: testing Contract data source with invalid name")
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Name")
 	resource := CreateAccContractConfig() //from resource_test
 	resource += fmt.Sprintf(`
 	data "aci_contract" "test" {
-			ipv4 = aci_contract.test.ipv4
-			ipv6 = aci_contract.test.ipv6
-			mac = aci_contract.test.mac
-			cidr = aci_contract.test.cidr
-			time = aci_contract.test.time
-			url_https = aci_contract.test.url_https
-			url_http = aci_contract.test.url_http
-			uuid = aci_contract.test.uuid
-			base_64 = aci_contract.test.base_64
-			json = aci_contract.test.json
-			reg_exp = aci_contract.test.reg_exp
-			port_number = aci_contract.test.port_number
-			port_with_zero = aci_contract.test.port_with_zero
-			nuclear_code = aci_contract.test.nuclear_code
-			test_score = aci_contract.test.test_score
-			percentage = aci_contract.test.percentage
-			name = "${ aci_contract.test.name}abc"
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		name = "${ aci_contract.test.name}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidIpv4() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Ipv4")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		ipv4 = "${ aci_contract.test.ipv4}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidIpv6() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Ipv6")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		ipv6 = "${ aci_contract.test.ipv6}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidMac() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Mac")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		mac = "${ aci_contract.test.mac}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidCidr() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Cidr")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		cidr = "${ aci_contract.test.cidr}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidTime() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Time")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		time = "${ aci_contract.test.time}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidUrlHttps() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid UrlHttps")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		url_https = "${ aci_contract.test.url_https}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidUrlHttp() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid UrlHttp")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		url_http = "${ aci_contract.test.url_http}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidUuid() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Uuid")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		uuid = "${ aci_contract.test.uuid}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidBase64() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Base64")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		base_64 = "${ aci_contract.test.base_64}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidJson() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Json")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		json = "${ aci_contract.test.json}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidRegExp() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid RegExp")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		reg_exp = "${ aci_contract.test.reg_exp}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidPortNumber() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid PortNumber")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		port_number = "${ aci_contract.test.port_number}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidPortWithZero() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid PortWithZero")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		port_with_zero = "${ aci_contract.test.port_with_zero}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidNuclearCode() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid NuclearCode")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		test_score = aci_contract.test.test_score
+		percentage = aci_contract.test.percentage
+		nuclear_code = "${ aci_contract.test.nuclear_code}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidTestScore() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid TestScore")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		percentage = aci_contract.test.percentage
+		test_score = "${ aci_contract.test.test_score}abc"
+	}
+	`)
+	return resource
+}
+func CreateAccContractDataSourceWithInvalidPercentage() string {
+	fmt.Println("=== STEP  Basic: testing Contract data source with invalid Percentage")
+	resource := CreateAccContractConfig() //from resource_test
+	resource += fmt.Sprintf(`
+	data "aci_contract" "test" {
+		name = aci_contract.test.name
+		ipv4 = aci_contract.test.ipv4
+		ipv6 = aci_contract.test.ipv6
+		mac = aci_contract.test.mac
+		cidr = aci_contract.test.cidr
+		time = aci_contract.test.time
+		url_https = aci_contract.test.url_https
+		url_http = aci_contract.test.url_http
+		uuid = aci_contract.test.uuid
+		base_64 = aci_contract.test.base_64
+		json = aci_contract.test.json
+		reg_exp = aci_contract.test.reg_exp
+		port_number = aci_contract.test.port_number
+		port_with_zero = aci_contract.test.port_with_zero
+		nuclear_code = aci_contract.test.nuclear_code
+		test_score = aci_contract.test.test_score
+		percentage = "${ aci_contract.test.percentage}abc"
 	}
 	`)
 	return resource

@@ -225,7 +225,7 @@
 {% macro getRequiredDNFunc(name,schema) %}
     {% if schema.required is true and schema.type not in ["map","list","set"] %}
     {
-        Config:      CreateAcc{{name}}DSWithoutRequired{{schema.attribute | pascalize}}("{{schema.attribute}}"),
+        Config:      CreateAcc{{name| pascalize}}DSWithoutRequired{{schema.attribute | pascalize}}("{{schema.attribute}}"),
         ExpectError: regexp.MustCompile(`Missing required argument`),
     },
     {% endif %}
@@ -258,4 +258,34 @@ func CreateAcc{{name | pascalize}}DSWithoutRequired{{schema.attribute | pascaliz
 {% endfor %}
 {% endmacro %}
 
-                        
+{# for datasource_test #}
+{% macro getDSFuncWithInvalidRequired(provider_name,name,schemas) %}
+{% for schema in schemas %}
+{% if schema.required is true %}
+func CreateAcc{{name | pascalize}}DataSourceWithInvalid{{schema.attribute | pascalize}}() string {
+    fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source with invalid {{schema.attribute | pascalize}}")
+	resource := CreateAcc{{name | pascalize}}Config() //from resource_test
+	resource += fmt.Sprintf(`
+	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
+        {% for sch in schemas %}
+		{% if sch.required is true and sch.attribute != schema.attribute %}
+		{{sch.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{sch.attribute}}
+		{% endif %}
+		{% endfor %}
+		{{schema.attribute}} = "${ {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}}abc"
+	}
+	`)
+	return resource
+}
+{% endif %}
+{% endfor %}
+{% endmacro %}                        
+
+{% macro getRequiredInvalidFunc(name,schema) %}
+{% if schema.required is true%}
+{
+    Config:      CreateAcc{{name | pascalize}}DataSourceWithInvalid{{schema.attribute | pascalize}}(),
+    ExpectError: regexp.MustCompile(`(.)+ Object may not exists`),
+},
+{% endif%}
+{% endmacro%}
