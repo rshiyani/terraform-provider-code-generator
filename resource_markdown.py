@@ -13,5 +13,5 @@ env.filters["snakify"] = snakify
 template = env.get_template('resource_markdown.j2')
 
 # to save the results
-with open("./target/resource.html.markdown", "w") as fh:
+with open("./output/resource.html.markdown", "w") as fh:
     fh.write(template.render(config))

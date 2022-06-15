@@ -13,5 +13,5 @@ env.filters["snakify"] = snakify
 template = env.get_template('resource.j2')
 
 # to save the results
-with open("target/output.go", "w") as fh:
+with open("output/output.go", "w") as fh:
     fh.write(template.render(config))

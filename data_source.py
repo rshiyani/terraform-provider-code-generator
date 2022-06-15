@@ -13,5 +13,5 @@ env.filters["snakify"] = snakify
 template = env.get_template('datasource.j2')
 
 # to save the results
-with open("target/datasource.go", "w") as fh:
+with open("output/datasource.go", "w") as fh:
     fh.write(template.render(config))
