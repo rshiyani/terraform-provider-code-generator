@@ -49,9 +49,9 @@ schemas:
   subtype: ipv4
   test_params:
     invalid:
-    - 272.296.264.277
+    - 296.257.262.296
     valid:
-    - 211.242.42.76
+    - 36.191.150.65
   type: string
   validation:
     func_name: IsIPv4Address
@@ -96,7 +96,7 @@ schemas:
   subtype: string
   test_params:
     invalid:
-    - nqa0pvxzrh
+    - j3d9d0yum6
     valid:
     - parth
     - aarsh
@@ -136,37 +136,37 @@ schemas:
 types:
   base64:
     invalid: a3+J1b%mFs//
-    valid: d3lic3M5d3F3eg==
+    valid: YzUwaXE1ZXF3dQ==
   cidr:
-    invalid: 283.271.279.300/24
-    valid: 224.3.222.219/17
+    invalid: 262.292.259.272/19
+    valid: 91.225.67.140/9
   ipv4:
-    invalid: 272.296.264.277
-    valid: 211.242.42.76
+    invalid: 296.257.262.296
+    valid: 36.191.150.65
   ipv6:
     invalid: invalidIPv6
-    valid: cd49:cc6e:2d7b:3073:33e6:41b2
+    valid: 1091:17a3:8f36:8a7d:c266:ffb2
   json:
     invalid: 'json({ name : val)'
     valid: 'json({ "attribute" : "value" })'
   mac:
     invalid: invalidMAC
-    valid: 9c:aa:8f:12:83:5c
+    valid: f2:1f:5e:24:c4:16
   regex:
     invalid: '[0-9)++'
     valid: (?m)^[0-9]{2}$
   string:
     invalid: 12345
-    valid: sfdcuye0gr
+    valid: fueer86f3p
   time:
-    invalid: '2022-06-14 18:52:46.924161'
-    valid: '2022-06-14T13:22:46.924161+00:00'
+    invalid: '2022-06-15 17:41:01.375236'
+    valid: '2022-06-15T12:11:01.375236+00:00'
   url-http:
-    invalid: ht:/qskkk0ewxbf326y.com
-    valid: http://su7ph1aoecp0cs1.com
+    invalid: ht:/rp0g6xzwu9i8znb.com
+    valid: http://kge853m9atuyfy9.com
   url-https:
-    invalid: hts:/ym80ze8uag4drts.com
-    valid: https://er9p02yp76vfw8h.com
+    invalid: hts:/spbreezfrhckubr.com
+    valid: https://etvjx4f52be5i16.com
   uuid:
     invalid: invalid323Uuid12
-    valid: 14b75b11-ebe5-11ec-a851-7c8ae1943087
+    valid: 38d27a2f-eca4-11ec-87c5-7c8ae1943087

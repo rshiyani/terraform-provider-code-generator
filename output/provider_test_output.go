@@ -8,19 +8,19 @@ import (
 
 var Test = map[string]interface{}{
 		"base64": map[string]interface{}{
-			"valid": []interface{}{ "aWdrcXNhYTMwMA==" },
+			"valid": []interface{}{ "cHJtNWIwaHVlaw==" },
 			"invalid": []interface{}{ "a3+J1b%mFs//" },
 		},
 		"cidr": map[string]interface{}{
-			"valid": []interface{}{ "191.223.38.116/16" },
-			"invalid": []interface{}{ "290.272.261.290/18" },
+			"valid": []interface{}{ "19.152.40.31/20" },
+			"invalid": []interface{}{ "277.268.279.265/29" },
 		},
 		"ipv4": map[string]interface{}{
-			"valid": []interface{}{ "26.224.23.179" },
-			"invalid": []interface{}{ "263.266.257.296" },
+			"valid": []interface{}{ "238.52.197.160" },
+			"invalid": []interface{}{ "275.297.295.284" },
 		},
 		"ipv6": map[string]interface{}{
-			"valid": []interface{}{ "c2ba:8207:1c3e:5f9f:97e9:d921" },
+			"valid": []interface{}{ "9a50:82d5:e85f:e33c:da27:ce4d" },
 			"invalid": []interface{}{ "invalidIPv6" },
 		},
 		"json": map[string]interface{}{
@@ -28,7 +28,7 @@ var Test = map[string]interface{}{
 			"invalid": []interface{}{ "json({ name : val)" },
 		},
 		"mac": map[string]interface{}{
-			"valid": []interface{}{ "6d:9f:78:69:c2:27" },
+			"valid": []interface{}{ "b1:3b:93:74:3c:79" },
 			"invalid": []interface{}{ "invalidMAC" },
 		},
 		"regex": map[string]interface{}{
@@ -36,23 +36,23 @@ var Test = map[string]interface{}{
 			"invalid": []interface{}{ "[0-9)++" },
 		},
 		"string": map[string]interface{}{
-			"valid": []interface{}{ "lbs1g9r4cy" },
+			"valid": []interface{}{ "n8udrsczga" },
 			"invalid": []interface{}{ 12345 },
 		},
 		"time": map[string]interface{}{
-			"valid": []interface{}{ "2022-06-14T13:22:46.949170+00:00" },
-			"invalid": []interface{}{ "2022-06-14 18:52:46.949170" },
+			"valid": []interface{}{ "2022-06-15T05:03:17.275769+00:00" },
+			"invalid": []interface{}{ "2022-06-15 10:33:17.275769" },
 		},
 		"url-http": map[string]interface{}{
-			"valid": []interface{}{ "http://nyll6x8izll0pmy.com" },
-			"invalid": []interface{}{ "ht:/ucjj3eauy2djxix.com" },
+			"valid": []interface{}{ "http://87aterv456pm5fx.com" },
+			"invalid": []interface{}{ "ht:/5uwx9x0grkim642.com" },
 		},
 		"url-https": map[string]interface{}{
-			"valid": []interface{}{ "https://ols3bp4h8mw9zur.com" },
-			"invalid": []interface{}{ "hts:/fndlnh16wlwou33.com" },
+			"valid": []interface{}{ "https://mw360o1q8h8282j.com" },
+			"invalid": []interface{}{ "hts:/uu08asw6d10w6ie.com" },
 		},
 		"uuid": map[string]interface{}{
-			"valid": []interface{}{ "14bb2bf8-ebe5-11ec-afe4-7c8ae1943087" },
+			"valid": []interface{}{ "77d3acbe-ec68-11ec-9279-7c8ae1943087" },
 			"invalid": []interface{}{ "invalid323Uuid12" },
 		},
 }

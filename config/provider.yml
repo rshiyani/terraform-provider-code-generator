@@ -36,22 +36,22 @@ types:
     invalid:
     - a3+J1b%mFs//
     valid:
-    - aWdrcXNhYTMwMA==
+    - cHJtNWIwaHVlaw==
   cidr:
     invalid:
-    - 290.272.261.290/18
+    - 277.268.279.265/29
     valid:
-    - 191.223.38.116/16
+    - 19.152.40.31/20
   ipv4:
     invalid:
-    - 263.266.257.296
+    - 275.297.295.284
     valid:
-    - 26.224.23.179
+    - 238.52.197.160
   ipv6:
     invalid:
     - invalidIPv6
     valid:
-    - c2ba:8207:1c3e:5f9f:97e9:d921
+    - 9a50:82d5:e85f:e33c:da27:ce4d
   json:
     invalid:
     - 'json({ name : val)'
@@ -61,7 +61,7 @@ types:
     invalid:
     - invalidMAC
     valid:
-    - 6d:9f:78:69:c2:27
+    - b1:3b:93:74:3c:79
   regex:
     invalid:
     - '[0-9)++'
@@ -71,24 +71,24 @@ types:
     invalid:
     - 12345
     valid:
-    - lbs1g9r4cy
+    - n8udrsczga
   time:
     invalid:
-    - '2022-06-14 18:52:46.949170'
+    - '2022-06-15 10:33:17.275769'
     valid:
-    - '2022-06-14T13:22:46.949170+00:00'
+    - '2022-06-15T05:03:17.275769+00:00'
   url-http:
     invalid:
-    - ht:/ucjj3eauy2djxix.com
+    - ht:/5uwx9x0grkim642.com
     valid:
-    - http://nyll6x8izll0pmy.com
+    - http://87aterv456pm5fx.com
   url-https:
     invalid:
-    - hts:/fndlnh16wlwou33.com
+    - hts:/uu08asw6d10w6ie.com
     valid:
-    - https://ols3bp4h8mw9zur.com
+    - https://mw360o1q8h8282j.com
   uuid:
     invalid:
     - invalid323Uuid12
     valid:
-    - 14bb2bf8-ebe5-11ec-afe4-7c8ae1943087
+    - 77d3acbe-ec68-11ec-9279-7c8ae1943087

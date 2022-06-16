@@ -70,7 +70,7 @@ def generate_random_values(data):
 
 
 def pre_process():
-    with open("./config/resources/pre-contract.yml", 'r') as stream:
+    with open("./config/resources/movie.yml", 'r') as stream:
         data = yaml.safe_load(stream)
     data = generate_random_values(data)
     # print(data)
@@ -169,7 +169,7 @@ def pre_process():
         #         "valid": ["true"],
         #         "invalid": ["truee"]
         #     }
-    with open('./config/resources/contract.yml', 'w') as outfile:
+    with open('./config/resources/new_movie.yml', 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
 
 def pre_process_for_provider():
@@ -189,28 +189,28 @@ def pre_process_for_provider():
         yaml.dump(data, outfile, default_flow_style=False)
 
 pre_process()
-pre_process_for_provider()
+# pre_process_for_provider()
 
-config = yaml.full_load(open('./config/provider.yml'))
-env = Environment(loader=FileSystemLoader('./templates'),
-                  trim_blocks=True, lstrip_blocks=True)
-
-
-env.filters["camelize"] = camelize
-env.filters["pascalize"] = pascalize
-env.filters["snakify"] = snakify
-env.filters["is_list"] = is_list
-env.filters["quote"] = quote
+# config = yaml.full_load(open('./config/provider.yml'))
+# env = Environment(loader=FileSystemLoader('./templates'),
+#                   trim_blocks=True, lstrip_blocks=True)
 
 
-template = env.get_template('provider_test.j2')
+# env.filters["camelize"] = camelize
+# env.filters["pascalize"] = pascalize
+# env.filters["snakify"] = snakify
+# env.filters["is_list"] = is_list
+# env.filters["quote"] = quote
 
-# to save the results
-with open("target/provider_test_output.go", "w") as fh:
-    fh.write(template.render(config))
+
+# template = env.get_template('provider_test.j2')
+
+# # to save the results
+# with open("output/provider_test_output.go", "w") as fh:
+#     fh.write(template.render(config))
 
 
-config = yaml.full_load(open('./config/resources/contract.yml'))
+config = yaml.full_load(open('./config/resources/new_movie.yml'))
 env = Environment(loader=FileSystemLoader('./templates'),
                   trim_blocks=True, lstrip_blocks=True)
 
@@ -225,5 +225,5 @@ env.filters["quote"] = quote
 template = env.get_template('resource_test.j2')
 
 # to save the results
-with open("target/output.go", "w") as fh:
+with open("output/movie_output.go", "w") as fh:
     fh.write(template.render(config))

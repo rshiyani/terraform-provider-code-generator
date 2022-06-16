@@ -1,0 +1,134 @@
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation
+name: movie
+provider_name: Movies
+schemas:
+- attribute: title
+  description: Title of the Movie
+  forcenew: true
+  required: true
+  subtype: string
+  test_params:
+    invalid:
+    - 234
+    - 987
+    valid:
+    - Hello
+    - World
+  type: string
+- attribute: isbn
+  description: ISBN of the Movie
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 234
+    - 987
+    valid:
+    - Hello
+    - World
+  type: string
+- attribute: genre
+  default: thriller
+  description: Genre of the movie
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 6noqck58mm
+    valid:
+    - thriller
+    - action
+    - horror
+    - fiction
+    - comedy
+  type: string
+  validation:
+    func_name: StringInSlice
+    ignore_case: false
+    params:
+    - thriller
+    - action
+    - horror
+    - fiction
+    - comedy
+- attribute: director
+  description: Director of the Movie
+  element:
+    schema:
+    - attribute: firstname
+      description: Firstname of the Director
+      required: true
+      type: string
+    - attribute: lastname
+      description: Lastname of the Director
+      optional: true
+      type: string
+    type: resource
+  max_items: 1
+  optional: true
+  type: list
+- attribute: rating
+  element:
+    schema:
+    - attribute: rater
+      description: Rater that provide rating
+      required: true
+      type: string
+    - attribute: rating
+      default: 1
+      optional: true
+      type: float
+      validation:
+        func_name: FloatBetween
+        params:
+        - 1
+        - 10
+    type: resource
+  optional: true
+  type: list
+- attribute: cast
+  element:
+    schema:
+      type: string
+    type: schema
+  optional: true
+  type: set
+types:
+  base64:
+    invalid: a3+J1b%mFs//
+    valid: c2lqZ3NtZ29nOQ==
+  cidr:
+    invalid: 292.298.267.291/5
+    valid: 238.107.188.178/4
+  ipv4:
+    invalid: 276.295.294.278
+    valid: 106.29.98.69
+  ipv6:
+    invalid: invalidIPv6
+    valid: 5bdc:2eea:33f7:dfd5:a82a:1bf4
+  json:
+    invalid: 'json({ name : val)'
+    valid: 'json({ "attribute" : "value" })'
+  mac:
+    invalid: invalidMAC
+    valid: 19:13:e9:8d:e4:83
+  regex:
+    invalid: '[0-9)++'
+    valid: (?m)^[0-9]{2}$
+  string:
+    invalid: 12345
+    valid: b3wvevjgxs
+  time:
+    invalid: '2022-06-16 11:39:41.284231'
+    valid: '2022-06-16T06:09:41.284231+00:00'
+  url-http:
+    invalid: ht:/0bxi8ve402rue0o.com
+    valid: http://dohy0bgi39q8mr1.com
+  url-https:
+    invalid: hts:/ovrsys2t09kn0xa.com
+    valid: https://l3s1d5nra112jya.com
+  uuid:
+    invalid: invalid323Uuid12
+    valid: e8e4df4a-ed3a-11ec-a6eb-7c8ae1943087
