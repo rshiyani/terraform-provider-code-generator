@@ -2,22 +2,39 @@
 package {{provider_name | camelize}}
 
 {% set stringSubTypeList = ["base64","cidr","ipv4","ipv6","json","mac","regex","time","url-http","url-https","uuid"]%}
+{% set requiredList = [] %}
+
+{% set count = [] %}
+{% for schema in schemas %}
+	{% if schema.required is true and schema.depends_on is not defined %}
+		{% set _ = count.append(1) %}
+	{% endif %}
+{% endfor %}
+
+const {{name | camelize}}SelfRequiredCount = {{count | length}}
 
 var resource{{name | pascalize}}Test = map[string]interface{}{
 	{% for schema in schemas %}
-		{% if schema.type not in ["list","set","map"] and schema.test_params is defined%}
+		{% if schema.type not in ["list","set","map"]%}
 			{% if schema.type == "float" %}
-				"{{schema.attribute}}" : map[string]interface{}{
-					"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
-					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
-				},
+				{% if schema.depends_on is defined and schema.depends_on.attribute_name != "id"%}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["valid"].([]interface{}),
+						"invalid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+					},
+				{% elif schema.test_params is defined %}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+						"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+					},
+				{% endif %}	
 			{% elif schema.type == "string" %}
-				{% if schema.subtype in stringSubTypeList %}
+				{% if schema.test_params is defined and schema.subtype in stringSubTypeList %}
 					"{{schema.attribute}}" : map[string]interface{}{
 						"valid": Test[{{schema.subtype | quote}}].(map[string]interface{})["valid"].([]interface{}),
 						"invalid": Test[{{schema.subtype | quote}}].(map[string]interface{})["invalid"].([]interface{}),
 					},
-				{% elif schema.validation is defined %}
+				{% elif schema.test_params is defined and schema.validation is defined %}
 					{% if schema.validation.func_name == "StringInSlice" or schema.validation.func_name == "StringNotInSlice" %}
 						"{{schema.attribute}}" : map[string]interface{}{
 							"valid": []interface{}{ {{ schema.test_params.valid | map("tojson") | join(', ') }} },
@@ -30,31 +47,45 @@ var resource{{name | pascalize}}Test = map[string]interface{}{
 						},
 					{% endif %}
 				{% else %}
-				"{{schema.attribute}}" : map[string]interface{}{
-					"valid": []interface{}{ {{ schema.test_params.valid | map("tojson") | join(', ')}} },
-					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
-				},
+					{% if schema.depends_on is defined  and schema.depends_on.attribute_name != "id"%}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["valid"].([]interface{}),
+							"invalid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+						},
+					{% elif schema.test_params is defined %}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+							"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+						},
+					{% endif %}
 				{% endif %}
 			{% else %}
-				"{{schema.attribute}}" : map[string]interface{}{
-					"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
-					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
-				},
+				{% if schema.depends_on is defined  and schema.depends_on.attribute_name != "id"%}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["valid"].([]interface{}),
+						"invalid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+					},
+				{% elif schema.test_params is defined %}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+						"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+					},
+				{% endif %}
 			{% endif %}
 		{% endif %}
 	{% endfor %}
 	
-}	
+}
 
-{% macro printQuote(schema) %}
-	{%- if schema.type == "string" -%}
-		{%- if schema.subtype == "json" -%}
-		`
-		{%- else -%}
-		"
-		{%- endif -%}
-	{%- endif -%}
+{% macro getRequiredList() %}
+	{% for schema in schemas %}
+		{% if schema.required is true %}
+			{{ requiredList.append(schema) or "" }}
+		{% endif %}
+	{% endfor %}
 {% endmacro %}
+
+{{getRequiredList()}}
 
 {% macro printStepsWithoutRequiredArguments() %}
 	{% for schema in schemas %}
@@ -75,32 +106,43 @@ var resource{{name | pascalize}}Test = map[string]interface{}{
 			{% for schema in schemas %}
 				{% if schema.type not in ["list","set","map"] %}
 					{% if schema.required is true %}
-						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0])),					
-					{% else %}
+						{% if schema.depends_on is defined and schema.depends_on.attribute_name == "id" %}
+							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v",
+							func() string {
+								id, err := getIdFrom{{name | pascalize}}Model(&{{name | camelize}}_default)
+								if err != nil{
+									return ""
+								}
+								return id
+							}())),
+						{% else %}
+							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0])),					
+						{% endif %}
+					{%- else %}
 						{% if schema.type == "float" %}
 							{% if schema.default is defined %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "{{schema.default}}"),
-							{% else %}
+							{%- else %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "0.0"),
-							{% endif %}
+							{%- endif %}
 						{% elif schema.type == "int" %}
 							{% if schema.default is defined %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "{{schema.default}}"),
-							{% else %}
+							{%- else %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "0"),
-							{% endif %}
+							{%- endif %}
 						{% elif schema.type == "string" %}
 							{% if schema.default is defined %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "{{schema.default}}"),
-							{% else %}
+							{%- else %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", ""),
-							{% endif %}
+							{%- endif %}
 						{% elif schema.type == "bool" %}
 							{% if schema.default is defined %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "{{schema.default}}"),
-							{% else %}
+							{%- else %}
 								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", "false"),
-							{% endif %}
+							{%- endif %}
 						{% else %}
 						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0])),
 						{% endif %}
@@ -118,11 +160,94 @@ var resource{{name | pascalize}}Test = map[string]interface{}{
 			testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_updated),
 			{% for schema in schemas %}
 				{% if schema.type not in ["list","set","map"] %}
-					resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0])),
+					{% if schema.depends_on is defined and schema.depends_on.attribute_name == "id" %}
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v",
+						func() string {
+							id, err := getIdFrom{{name | pascalize}}Model(&{{name | camelize}}_updated)
+							if err != nil{
+								return ""
+							}
+							return id
+						}())), // Function to get ID based on the model provided
+					{% else %}
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0])),					
+					{% endif %}
 				{% endif %}
 			{% endfor %}
 		),
 	},
+{% endmacro %}
+
+{% macro printStepsToUpdateRequiredArguments() %}
+	{% for schema in schemas %}
+		{% if schema.required is true %}
+			{% if schema.depends_on is defined %}
+				{
+					Config: CreateAcc{{name | pascalize}}UpdateParentRequiredArgument{{schema.attribute | pascalize}}(),
+					Check: resource.ComposeTestCheckFunc(
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_updated),
+						{% if schema.depends_on.attribute_name == "id" %}
+							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v",
+							func() string {
+								id, err := getIdFrom{{name | pascalize}}Model(&{{name | camelize}}_updated)
+								if err != nil{
+									return ""
+								}
+								return id
+							}())), // Function to get ID based on the model provided
+						{% else %}
+							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute | snakify}}"].(map[string]interface{})["valid"].([]interface{})[1])),
+						{% endif %}
+						{# {% for req in requiredList %}
+							{% if req.depends_on is defined and req.depends_on.attribute_name == "id" %}		
+							{% else %}
+								{% if req.attribute == schema.attribute %}
+									resource.TestCheckResourceAttr(resourceName, "{{req.attribute}}", fmt.Sprintf("%v", resource{{req.depends_on.resource_name | pascalize}}Test["{{req.depends_on.attribute_name | snakify}}"].(map[string]interface{})["valid"].([]interface{})[1])),
+								{% else %}
+									{% if req.depends_on is defined %}
+										resource.TestCheckResourceAttr(resourceName, "{{req.attribute}}", fmt.Sprintf("%v", resource{{req.depends_on.resource_name | pascalize}}Test["{{req.depends_on.attribute_name | snakify}}"].(map[string]interface{})["valid"].([]interface{})[0])),
+									{% else %}
+										resource.TestCheckResourceAttr(resourceName, "{{req.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{req.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0])),
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endfor %} #}
+						func (model1, model2 *models.{{name | pascalize}}) resource.TestCheckFunc {
+							// Check if {{schema.depends_on.resource_name | pascalize}} have some independent required field
+							if {{schema.depends_on.resource_name | camelize}}SelfRequiredCount > 0{
+								return testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual(model1, model2)
+							}
+							return testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdEqual(model1, model2)
+						}({{name | camelize}}_default, {{name | camelize}}_updated),
+					),
+				},
+			{% else %}
+				{
+					Config: CreateAcc{{name | pascalize}}UpdateRequiredArgument{{schema.attribute | pascalize}}(),
+					Check: resource.ComposeTestCheckFunc(
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_updated),
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[1])),
+						{# {% for req in requiredList %}
+							{% if req.depends_on is defined and req.depends_on.attribute_name == "id" %}		
+							{% else %}
+								{% if req.attribute == schema.attribute %}
+									resource.TestCheckResourceAttr(resourceName, "{{req.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{req.attribute}}"].(map[string]interface{})["valid"].([]interface{})[1])),
+								{% else %}
+									{% if req.depends_on is defined %}
+										resource.TestCheckResourceAttr(resourceName, "{{req.attribute}}", fmt.Sprintf("%v", resource{{req.depends_on.resource_name | pascalize}}Test["{{req.depends_on.attribute_name | snakify}}"].(map[string]interface{})["valid"].([]interface{})[0])),
+									{% else %}
+										resource.TestCheckResourceAttr(resourceName, "{{req.attribute}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{req.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0])),
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endfor %} #}
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual(&{{name | camelize}}_default, &{{name | camelize}}_updated),
+					),
+				},
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	
 {% endmacro %}
 
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T) {
@@ -134,7 +259,7 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 	// rName := makeTestVariable(acctest.RandString(5))
 	// rOther := makeTestVariable(acctest.RandString(5))
 	
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
@@ -150,10 +275,12 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 			{
 				Config: CreateAcc{{name | pascalize}}Config(),
 			},
+			{{printStepsToUpdateRequiredArguments()-}}
 		},
 	})
 }
 
+// Returns the []TestSteps consisiting of Updation of optional attributes
 func generateStepForUpdatedAttr(resourceName string,{{name | camelize}}_default,{{name | camelize}}_updated *models.{{name | pascalize}}) []resource.TestStep{
 	testSteps := make([]resource.TestStep, 0, 1)
 	var valid []interface{}
@@ -193,7 +320,7 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Update(t *testing.
 	// rName := makeTestVariable(acctest.RandString(5))
 	// rOther := makeTestVariable(acctest.RandString(5))
 	
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
@@ -217,7 +344,7 @@ func CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}() stri
 				{% if sch.required is true %}
 					{% if sch.attribute != schema.attribute and sch.type not in ["list","set","map"] %}
 					{{sch.attribute}} = "%v"
-					{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+					{{- reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
@@ -230,25 +357,35 @@ func CreateAcc{{name | pascalize}}Without{{schema.attribute | pascalize}}() stri
 
 {% macro printFunctionForConfig() %}
 func CreateAcc{{name | pascalize}}Config() string {
-	var resource string
-	{% if depends_on is defined %}
-	resource = CreateAcc{{depends_on.resource_name | pascalize}}Config()
+	{# var resource string
+	{% for schema in schemas %}
+		{% if schema.depends_on is defined %}
+		str += CreateAcc{{schema.depends_on.resource_name | pascalize}}Config()
+		if not Contains(str, "resource {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}){
+			resource += str
+		}
+		{% endif %}
+	{% endfor %}
+	{% if schema.depends_on is defined %}
+	resource = CreateAcc{{schema.depends_on.resource_name | pascalize}}Config()
 	{% endif %}
 	resource += fmt.Sprintf(`
 		resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
 			{% set reqArgs = [] %}
 			{% for schema in schemas %}
 				{% if schema.required is true and schema.type not in ["list","set","map"] %}
-					{% if depends_on is defined and schema.attribute == depends_on.attribute_name %}
-						{{schema.attribute}} = {{provider_name | camelize}}_{{depends_on.resource_name | snakify}}.test.id
+					{% if schema.depends_on is defined%}
+						{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
 					{% else %}
 						{{schema.attribute}} = "%v"
-						{{ reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+						{{- reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
 		}
 	`,{{reqArgs | join(',\n')}})
+	return resource #}
+	resource := create{{name | pascalize}}Config(getParent{{name | pascalize}}())
 	return resource
 }
 {% endmacro %}
@@ -256,19 +393,21 @@ func CreateAcc{{name | pascalize}}Config() string {
 {% macro printFunctionForConfigWithOptional() %}
 func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 	var resource string
-	{% if depends_on is defined %}
-	resource = CreateAcc{{depends_on.resource_name | pascalize}}Config()
-	{% endif %}
+	{% for schema in schemas %}
+		{% if schema.depends_on is defined %}
+		resource = CreateAcc{{schema.depends_on.resource_name | pascalize}}Config()
+		{% endif %}
+	{% endfor %}
 	resource += fmt.Sprintf(`
 		resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
 			{% set args = [] %}
 			{% for schema in schemas %}
 				{% if schema.type not in ["list","set","map"] %}
-					{% if depends_on is defined and schema.attribute == depends_on.attribute_name %}
-						{{schema.attribute}} = {{provider_name | camelize}}_{{depends_on.resource_name | snakify}}.test.id
+					{% if schema.depends_on is defined %}
+						{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
 					{% else %}
 						{{schema.attribute}} = "%v"
-						{{ args.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+						{{- args.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
@@ -281,19 +420,21 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 {% macro printFunctionForUpdatedAttr() %}
 func CreateAcc{{name | pascalize}}UpdatedAttr(attr string, value interface{}) string{
 	var resource string
-	{% if depends_on is defined %}
-	resource = CreateAcc{{depends_on.resource_name | pascalize}}Config()
-	{% endif %}
+	{% for schema in schemas %}
+		{% if schema.depends_on is defined %}
+		resource = CreateAcc{{schema.depends_on.resource_name | pascalize}}Config()
+		{% endif %}
+	{% endfor %}
 	resource += fmt.Sprintf(`
 		resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
 			{% set reqArgs = [] %}
 			{% for schema in schemas %}
 				{% if schema.required is true and schema.type not in ["list","set","map"] %}
-					{% if depends_on is defined and schema.attribute == depends_on.attribute_name %}
-						{{schema.attribute}} = {{provider_name | camelize}}_{{depends_on.resource_name | snakify}}.test.id
+					{% if schema.depends_on is defined %}
+						{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
 					{% else %}
 						{{schema.attribute}} = "%v"
-						{{ reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+						{{- reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
@@ -302,6 +443,82 @@ func CreateAcc{{name | pascalize}}UpdatedAttr(attr string, value interface{}) st
 	`,{{reqArgs | join(',\n')}},attr, value)
 	return resource
 }
+{% endmacro %}
+
+{% macro printFunctionToUpdateRequiredArguments() %}
+{% for schema in schemas %}
+	{% if schema.required is true and schema.depends_on is not defined %}
+		func CreateAcc{{name | pascalize}}UpdateRequiredArgument{{schema.attribute | pascalize}}() string{
+			t := []string{}
+			{% for sch in schemas %}
+				{% if sch.depends_on is defined %}
+					t = append(t, getParent{{sch.depends_on.resource_name | pascalize}}()...)
+				{% endif %}
+			{% endfor %}
+			t = append(t, fmt.Sprintf(`
+					resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+						{% set reqArgs = [] %}
+						{% for sch in schemas %}
+							{% if sch.required is true and sch.type not in ["list","set","map"] %}
+								{% if sch.depends_on is defined %}
+									{{sch.attribute}} = {{provider_name | camelize}}_{{sch.depends_on.resource_name | snakify}}.test.{{sch.depends_on.attribute_name}}
+								{% else %}
+									{% if sch.attribute == schema.attribute %}
+										{{sch.attribute}} = "%v"
+										{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]interface{})[1]') or "" }}
+									{% else %}
+										{{sch.attribute}} = "%v"
+										{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+					}
+				`,{{reqArgs | join(',\n')}}))
+			resource := create{{name | pascalize}}Config(t)
+			return resource
+		}
+	{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% macro printFunctionToUpdateParentRequiredArguments() %}
+{% for schema in schemas %}
+	{% if schema.required is true and schema.depends_on is defined%}
+		func CreateAcc{{name | pascalize}}UpdateParentRequiredArgument{{schema.attribute | pascalize}}() string{
+			t := []string{}
+			{% for sch in schemas %}
+				{% if sch.depends_on is defined and sch.depends_on.attribute_name == schema.depends_on.attribute_name%}
+					t = append(t, getUpdatedParent{{sch.depends_on.resource_name | pascalize}}()...)
+				{% elif sch.depends_on is defined %}
+					t = append(t, getParent{{sch.depends_on.resource_name | pascalize}}()...)
+				{% endif %}
+			{% endfor %}
+			t = append(t, fmt.Sprintf(`
+					resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+						{% set reqArgs = [] %}
+						{% for sch in schemas %}
+							{% if sch.required is true and sch.type not in ["list","set","map"] %}
+								{% if sch.depends_on is defined %}
+									{{sch.attribute}} = {{provider_name | camelize}}_{{sch.depends_on.resource_name | snakify}}.test.{{sch.depends_on.attribute_name}}
+								{% else %}
+									{% if sch.attribute == schema.attribute %}
+										{{sch.attribute}} = "%v"
+										{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]interface{})[1]') or "" }}
+									{% else %}
+										{{sch.attribute}} = "%v"
+										{{ reqArgs.append('resource'+name | pascalize+'Test["'+sch.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+					}
+				`,{{reqArgs | join(',\n')}}))
+			resource := create{{name | pascalize}}Config(t)
+			return resource
+		}
+	{% endif %}
+{% endfor %}
 {% endmacro %}
 
 {% macro printFunctionTestAccResourceExists() %}
@@ -329,8 +546,35 @@ func testAccCheckMoviesMovieDestroy(s *terraform.State) error {
 {% macro printFunctionForIdEqual()%}
 func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdEqual({{name | camelize}}1, {{name | camelize}}2 *models.{{name | pascalize}}) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if {{name | camelize}}1.ID != {{name | camelize}}2.ID {
+		Id1, err := getIdFrom{{name | pascalize}}Model({{name | camelize}}1)
+		if err != nil {
+			return err
+		}
+		Id2, err := getIdFrom{{name | pascalize}}Model({{name | camelize}}2)
+		if err != nil {
+			return err
+		}
+		if Id1 != Id2 {
 			return fmt.Errorf("{{name | pascalize}} IDs are not equal")
+		}
+		return nil
+	}
+}
+{% endmacro %}
+
+{% macro printFunctionForIdNotEqual()%}
+func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{name | camelize}}1, {{name | camelize}}2 *models.{{name | pascalize}}) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		Id1, err := getIdFrom{{name | pascalize}}Model({{name | camelize}}1)
+		if err != nil {
+			return err
+		}
+		Id2, err := getIdFrom{{name | pascalize}}Model({{name | camelize}}2)
+		if err != nil {
+			return err
+		}
+		if Id1 == Id2 {
+			return fmt.Errorf("{{name | pascalize}} IDs are equal")
 		}
 		return nil
 	}
@@ -341,6 +585,88 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdEqual({{name
 {{printFunctionForConfig()}}
 {{printFunctionForConfigWithOptional()}}
 {{printFunctionForUpdatedAttr()}}
+{{printFunctionToUpdateRequiredArguments()}}
+{{printFunctionToUpdateParentRequiredArguments()}}
 {{printFunctionTestAccResourceExists()}}
 {{printFunctionTestAccResourceDestroy()}}
 {{printFunctionForIdEqual()}}
+{{printFunctionForIdNotEqual()}}
+
+func getUpdatedParent{{name | pascalize}}()  []string{
+	t := []string{}
+	{% for schema in schemas %}
+		{% if schema.depends_on is defined %}
+			t = append(t, getParent{{schema.depends_on.resource_name | pascalize}}()...)
+		{% endif %}
+	{% endfor %}
+	t = append(t, {{name | camelize}}UpdatedParentBlock())
+	return t
+}
+
+func {{name | camelize}}UpdatedParentBlock() string{
+	return fmt.Sprintf(`
+	resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+		{% set reqArgs = [] %}
+		{% set flag = {'status': True} %}
+		{% for schema in schemas %}
+				{% if schema.required is true and schema.type not in ["list","set","map"] %}
+					{% if schema.depends_on is defined %}
+						{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
+					{% else %}
+						{{schema.attribute}} = "%v"
+						{% if flag.status %}
+							{{ reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[1]') or "" }}
+							{% if flag.update({'status': False}) %} {% endif %}
+						{% else %}
+							{{ reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+						{% endif %}
+					{% endif %}
+				{% endif %}
+		{% endfor %}
+	}
+`,{{reqArgs | join(',\n')}})
+}
+
+func getParent{{name | pascalize}}()  []string{
+	t := []string{}
+	{% for schema in schemas %}
+		{% if schema.depends_on is defined %}
+			t = append(t, getParent{{schema.depends_on.resource_name | pascalize}}()...)
+		{% endif %}
+	{% endfor %}
+	t = append(t, {{name | camelize}}Block())
+	return t
+}
+
+func {{name | camelize}}Block() string{
+	return fmt.Sprintf(`
+	resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+		{% set reqArgs = [] %}
+		{% for schema in schemas %}
+			{% if schema.required is true and schema.type not in ["list","set","map"] %}
+				{% if schema.depends_on is defined%}
+					{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
+				{% else %}
+					{{schema.attribute}} = "%v"
+					{{ reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+	}
+`,{{reqArgs | join(',\n')}})
+}
+
+// To eliminate duplicate resource block from slice of resource blocks
+func create{{name | pascalize}}Config(configSlice []string) string {
+	keys := make(map[string]bool)
+	str := "" 
+
+	for _, entry := range configSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			str += entry
+		}
+	}
+
+	return str
+}

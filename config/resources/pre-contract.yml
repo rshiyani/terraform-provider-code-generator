@@ -10,26 +10,18 @@ schemas:
     required: true
     forcenew: true
     description: "name of someone"
-    test_params:
-      valid:
-        - "Hello"
-        - "World"
-      invalid:
-        - 234
-        - 987
+    depends_on:
+      resource_name: "tenant"
+      attribute_name: "id"
 
-  - attribute: "id"
+  - attribute: "temp"
     type: "int"
     required: true
     forcenew: true
-    description: "id of someone"
-    test_params:
-      valid:
-        - 234
-        - 987
-      invalid:
-        - "Hello"
-        - "World"
+    description: "temp of some resource"
+    depends_on:
+      resource_name: "application_profile"
+      attribute_name: "application_dn"
 
   - attribute: "weight"
     type: "float"

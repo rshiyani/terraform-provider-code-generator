@@ -70,7 +70,7 @@ def generate_random_values(data):
 
 
 def pre_process():
-    with open("./config/resources/movie.yml", 'r') as stream:
+    with open("./config/resources/pre-contract.yml", 'r') as stream:
         data = yaml.safe_load(stream)
     data = generate_random_values(data)
     # print(data)
@@ -169,7 +169,7 @@ def pre_process():
         #         "valid": ["true"],
         #         "invalid": ["truee"]
         #     }
-    with open('./config/resources/new_movie.yml', 'w') as outfile:
+    with open('./config/resources/contract.yml', 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
 
 def pre_process_for_provider():
@@ -210,7 +210,7 @@ pre_process()
 #     fh.write(template.render(config))
 
 
-config = yaml.full_load(open('./config/resources/new_movie.yml'))
+config = yaml.full_load(open('./config/resources/contract.yml'))
 env = Environment(loader=FileSystemLoader('./templates'),
                   trim_blocks=True, lstrip_blocks=True)
 
@@ -225,5 +225,5 @@ env.filters["quote"] = quote
 template = env.get_template('resource_test.j2')
 
 # to save the results
-with open("output/movie_output.go", "w") as fh:
+with open("output/output.go", "w") as fh:
     fh.write(template.render(config))
