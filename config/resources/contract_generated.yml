@@ -1,0 +1,581 @@
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation
+name: Contract
+provider_name: Aci
+schemas:
+- attribute: name
+  depends_on:
+    attribute_name:
+    - id
+    resource_name: tenant
+  description: name of someone
+  forcenew: true
+  required: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    valid:
+    - e64142xyxl
+    - gt4igcun0o
+    - 6kpuhtkf5y
+    - zgpkcq2t5w
+    - mxekbaxp0u
+  type: string
+- attribute: temp
+  depends_on:
+    attribute_name:
+    - application_dn
+    resource_name: application_profile
+  description: temp of some resource
+  forcenew: true
+  required: true
+  subtype: int
+  test_params:
+    invalid:
+    - random
+    - 10.023
+    valid:
+    - 684
+    - -708
+    - 415
+    - -342
+    - -356
+  type: int
+- attribute: weight
+  description: weight of someone
+  forcenew: true
+  required: true
+  subtype: float
+  test_params:
+    invalid:
+    - random
+    - 10
+    valid:
+    - -97.98930471462685
+    - 163.1833847711053
+    - 28.38634022582533
+    - 99.19214666776175
+    - -3.7950847208787444
+  type: float
+- attribute: ipv4_for
+  description: IP-address v4
+  required: true
+  subtype: ipv4
+  test_params:
+    invalid: &id001
+    - 284.297.291.283
+    valid: &id002
+    - 140.213.70.124
+    - 140.213.170.61
+    - 140.213.23.42
+    - 140.213.178.198
+    - 140.213.126.255
+    - 140.213.24.218
+    - 140.213.254.226
+    - 140.213.110.10
+    - 140.213.166.188
+    - 140.213.149.132
+    - 140.213.167.179
+    - 140.213.99.188
+    - 140.213.205.126
+    - 140.213.75.14
+    - 140.213.136.25
+  type: string
+  validation:
+    func_name: IsIPv4Address
+- attribute: port_number
+  optional: true
+  subtype: port
+  test_params:
+    invalid:
+    - 0
+    - 65536
+    valid:
+    - 1
+    - 65535
+    - 6127
+    - 56107
+    - 2327
+    - 42801
+    - 46371
+    - 23929
+    - 40817
+    - 63397
+    - 4899
+    - 14962
+    - 63035
+    - 40263
+    - 4075
+  type: int
+  validation:
+    func_name: IsPortNumber
+- attribute: test_score
+  computed: true
+  description: range
+  optional: true
+  subtype: range
+  test_params:
+    invalid:
+    - 0
+    - 101
+    valid:
+    - 1
+    - 100
+    - 50
+    - 7
+    - 45
+    - 42
+    - 98
+    - 42
+    - 49
+    - 47
+    - 6
+    - 94
+    - 7
+    - 54
+    - 73
+  type: int
+  validation:
+    func_name: IntBetween
+    params:
+    - 1
+    - 100
+- attribute: string_in_some_names
+  computed: true
+  default: parth
+  description: string in valid list
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 3npllak04l
+    valid:
+    - parth
+    - aarsh
+    - arjun
+    - alfatah
+    - krunal
+  type: string
+  validation:
+    func_name: StringInSlice
+    ignore_case: true
+    params:
+    - parth
+    - aarsh
+    - arjun
+    - alfatah
+    - krunal
+- attribute: valid_cidr
+  computed: true
+  description: cidr network
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - -1
+    - 33
+    valid:
+    - 0
+    - 32
+    - 16
+    - 6
+    - 29
+    - 20
+    - 16
+    - 13
+    - 6
+    - 7
+    - 25
+    - 22
+    - 17
+    - 22
+    - 30
+  type: string
+  validation:
+    func_name: IsCIDRNetwork
+    ignore_case: true
+    params:
+    - 0
+    - 32
+- attribute: percentage
+  computed: true
+  optional: true
+  subtype: range
+  test_params:
+    invalid:
+    - -1
+    - 101
+    valid:
+    - 0
+    - 100
+    - 50.0
+    - 11.515536049074903
+    - 17.433330898926098
+    - 3.2804641632253593
+    - 58.93643040105934
+    - 13.17540857218283
+    - 44.075584561467785
+    - 9.590478663554332
+    - 3.6907867278564823
+    - 8.173093034377672
+    - 6.414365094603028
+    - 31.65650829681244
+    - 0.0
+    - 25.204629565742028
+  type: float
+  validation:
+    func_name: FloatBetween
+    params:
+    - 0
+    - 100
+- attribute: testingmap
+  computed: true
+  element:
+    schema:
+      type: int
+    type: schema
+  optional: true
+  subtype: map
+  test_params:
+    invalid:
+    - random
+    - 10.023
+    valid:
+    - -514
+    - 804
+    - 557
+    - -423
+    - -193
+  type: map
+- attribute: filter
+  computed: true
+  description: filter list
+  element:
+    schema:
+    - attribute: filter_name
+      description: name of filter
+      required: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        valid:
+        - lkem2khaa3
+        - 3u5xeo6v54
+        - iov58oh3k9
+        - fmf0r2ftyd
+        - e9fg2652j9
+      type: string
+    - attribute: id
+      computed: true
+      default_func: true
+      description: id of filter
+      envvar: FILTER_ID
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        valid:
+        - c77ifrm9o2
+        - p6v11hf9ye
+        - xalvvnvyop
+        - 87byfc1wih
+        - pphoe0vsm9
+      type: string
+    - attribute: description
+      computed: true
+      default_func: true
+      description: description of filter
+      optional: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        valid:
+        - fyqxihiygb
+        - 75rm4bh6br
+        - noqamt4pfd
+        - smfb6rceos
+        - 5fb1uw6dc7
+      type: string
+    - attribute: filter_entry
+      computed: true
+      description: list of filter_entry
+      element:
+        schema:
+        - attribute: id_list
+          element:
+            schema:
+              type: string
+            type: schema
+          required: true
+          test_params:
+            invalid:
+            - 10
+            - 12.43
+            valid:
+            - h72vnwzjg0
+            - ega9h97hqp
+            - s9gc2h0cm5
+            - o2uby5kcia
+            - tsoigwdvbg
+          type: set
+        - attribute: filter_entry_name
+          description: name of filter entry
+          diff_suppress: true
+          required: true
+          subtype: string
+          test_params:
+            invalid:
+            - 10
+            - 12.43
+            valid:
+            - n7aq0oxmqh
+            - elnujyfy01
+            - vvfwpkuqgk
+            - 3k14w988uy
+            - lb08j39xdb
+          type: string
+        - attribute: ipv6
+          description: ipv6
+          optional: true
+          subtype: ipv6
+          test_params:
+            invalid: &id003
+            - invalidIPv6
+            valid: &id004
+            - 2001:db8::34f4:0:0:f39d
+            - 2001:db8::34f4:0:0:f3d2
+            - 2001:db8::34f4:0:0:f361
+            - 2001:db8::34f4:0:0:f36b
+            - 2001:db8::34f4:0:0:f396
+            - 2001:db8::34f4:0:0:f344
+            - 2001:db8::34f4:0:0:f3b5
+            - 2001:db8::34f4:0:0:f3df
+            - 2001:db8::34f4:0:0:f339
+            - 2001:db8::34f4:0:0:f387
+            - 2001:db8::34f4:0:0:f319
+            - 2001:db8::34f4:0:0:f3fd
+            - 2001:db8::34f4:0:0:f397
+            - 2001:db8::34f4:0:0:f34b
+            - 2001:db8::34f4:0:0:f360
+          type: string
+          validation:
+            func_name: IsIPv6Address
+        - attribute: apply_to_frag
+          computed: true
+          description: apply to fragment
+          optional: true
+          subtype: string
+          test_params:
+            invalid:
+            - a6vuh3u485
+            valid:
+            - 'yes'
+            - 'no'
+          type: string
+          validation:
+            func_name: StringInSlice
+            ignore_case: 'false'
+            params:
+            - 'yes'
+            - 'no'
+        type: resource
+      max_items: 4
+      min_items: 1
+      optional: true
+      type: list
+    type: resource
+  max_items: 10
+  required: true
+  type: list
+types:
+  base64:
+    invalid:
+    - a3+J1b%mFs//
+    valid:
+    - Zjk3YXlzMnFubQ==
+    - M25kMWNjZzYwYg==
+    - bDIyNGF3YXgxeg==
+    - eXd1d3htdTF5bg==
+    - aDg0bms4NDNlaA==
+    - NXcwMnN4dHN0ZA==
+    - ZzQxeWN1ZXYyNw==
+    - c3Vjc2lzN2t1cg==
+    - aGd1ZWMxc2ZxOA==
+    - MW40cW5rb2Z1NA==
+    - cHc1M2w4cHZ0dQ==
+    - ZmF0b3h0MHJpZg==
+    - OHVuMmNxbTIzcg==
+    - cjM0NGloa21xZA==
+    - dTdzb243Zjh2eA==
+  cidr:
+    invalid:
+    - 286.273.285.280/11
+    valid:
+    - 140.213.0.0/20
+    - 140.213.64.0/20
+    - 140.213.48.0/20
+    - 140.213.208.0/20
+    - 140.213.96.0/20
+    - 140.213.32.0/20
+    - 140.213.128.0/20
+    - 140.213.224.0/20
+    - 140.213.112.0/20
+    - 140.213.176.0/20
+    - 140.213.240.0/20
+    - 140.213.144.0/20
+    - 140.213.16.0/20
+    - 140.213.80.0/20
+    - 140.213.192.0/20
+  ipv4:
+    invalid: *id001
+    valid: *id002
+  ipv6:
+    invalid: *id003
+    valid: *id004
+  json:
+    invalid:
+    - 'json({ name : val)'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+    - 'json({ "attribute" : "value4" })'
+    - 'json({ "attribute" : "value5" })'
+    - 'json({ "attribute" : "value6" })'
+    - 'json({ "attribute" : "value7" })'
+    - 'json({ "attribute" : "value8" })'
+    - 'json({ "attribute" : "value9" })'
+    - 'json({ "attribute" : "value10" })'
+    - 'json({ "attribute" : "value11" })'
+    - 'json({ "attribute" : "value12" })'
+    - 'json({ "attribute" : "value13" })'
+    - 'json({ "attribute" : "value14" })'
+  mac:
+    invalid:
+    - invalidMAC
+    valid:
+    - 56:9b:48:11:fa:86
+    - 4e:b2:26:86:d8:ce
+    - 0f:ed:f0:cc:b7:c8
+    - 25:f1:ac:98:21:f2
+    - 40:a1:45:c0:05:de
+    - 27:0b:5f:4d:8a:ba
+    - b1:75:05:64:9d:ab
+    - c7:d4:03:90:98:32
+    - e4:f1:9c:37:bc:48
+    - 58:53:44:da:d8:b9
+    - 84:27:ab:f4:a3:0c
+    - f7:d9:4b:16:db:01
+    - ab:b9:ee:0a:05:ed
+    - 8e:34:b9:a1:06:56
+    - 58:9b:2d:37:eb:0e
+  regex:
+    invalid:
+    - '[0-9)++'
+    valid:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+  string:
+    invalid:
+    - 12345
+    valid:
+    - d87qtucv7h
+    - zocwzurnuu
+    - dcsvjmod0k
+    - o2ko444vfy
+    - vyya6xvm4i
+    - vgx1igskjp
+    - yy52p4s61j
+    - 7ddw4lonti
+    - s3wfjrtacg
+    - q3t864cqdc
+    - x1jc4shzb7
+    - 4ra105pp0d
+    - so56vzsd8i
+    - cjctoi9hzk
+    - 1poe78kqoz
+  time:
+    invalid:
+    - '2022-06-24 18:19:44.592350'
+    valid:
+    - '2022-06-24T12:49:44.592350+00:00'
+    - '2022-07-17T12:49:44.592350+00:00'
+    - '2022-08-09T12:49:44.592350+00:00'
+    - '2022-09-01T12:49:44.592350+00:00'
+    - '2022-09-24T12:49:44.592350+00:00'
+    - '2022-10-17T12:49:44.592350+00:00'
+    - '2022-11-09T12:49:44.592350+00:00'
+    - '2022-12-02T12:49:44.592350+00:00'
+    - '2022-12-25T12:49:44.592350+00:00'
+    - '2023-01-17T12:49:44.592350+00:00'
+    - '2023-02-09T12:49:44.592350+00:00'
+    - '2023-03-04T12:49:44.592350+00:00'
+    - '2023-03-27T12:49:44.592350+00:00'
+    - '2023-04-19T12:49:44.592350+00:00'
+    - '2023-05-12T12:49:44.592350+00:00'
+  url-http:
+    invalid:
+    - ht:/rwxn6o0y8d5dwl9.com
+    valid:
+    - http://54gq5r5zkf1lpxy.com
+    - http://97pw0fl5zdzs2os.com
+    - http://0t9k6254mejp8hw.com
+    - http://r2imffs8h8hap52.com
+    - http://tj2b7plkcnk8cg6.com
+    - http://3i9ufahy8nomluo.com
+    - http://elv752zhzji3z72.com
+    - http://wlnz3dchyyw02fe.com
+    - http://2bir3tujnjqqjm8.com
+    - http://4fcjjvr2wb2eol4.com
+    - http://h71czf2i8s5m0pp.com
+    - http://l8foc6u49svgu5e.com
+    - http://sf8g7kcc9sp5alz.com
+    - http://ny3vjkob51rn45c.com
+    - http://roxzo7nkx2wuhgx.com
+  url-https:
+    invalid:
+    - hts:/u8nlmwnvbjrgqua.com
+    valid:
+    - https://9u2npr3umj8bwxk.com
+    - https://srna4bmacglgixp.com
+    - https://9dk6rt9xof1xohs.com
+    - https://8pqd5c7cxa1dbgg.com
+    - https://f2roholejl3cqu4.com
+    - https://4ngsridn928obff.com
+    - https://fd214vvgxj6ddya.com
+    - https://knlwnvg9bs6f296.com
+    - https://784c3a4pdo71hl4.com
+    - https://5cj28s053htp0sz.com
+    - https://3j4t74t93dvf1u8.com
+    - https://paztqs2l7laxtfz.com
+    - https://jjl51mnoub71u89.com
+    - https://41p62fvn34lqlsw.com
+    - https://a8x12vabz3dnyy9.com
+  uuid:
+    invalid:
+    - invalid323Uuid12
+    valid:
+    - 1f4906b5-f3bc-11ec-9399-7c8ae196ee3b
+    - 1f491a3e-f3bc-11ec-8bbb-7c8ae196ee3b
+    - 1f491a3f-f3bc-11ec-8054-7c8ae196ee3b
+    - 1f491a40-f3bc-11ec-9ff0-7c8ae196ee3b
+    - 1f491a41-f3bc-11ec-a10a-7c8ae196ee3b
+    - 1f491a42-f3bc-11ec-8574-7c8ae196ee3b
+    - 1f491a43-f3bc-11ec-80a1-7c8ae196ee3b
+    - 1f491a44-f3bc-11ec-a32d-7c8ae196ee3b
+    - 1f491a45-f3bc-11ec-88d7-7c8ae196ee3b
+    - 1f491a46-f3bc-11ec-810e-7c8ae196ee3b
+    - 1f491a47-f3bc-11ec-a303-7c8ae196ee3b
+    - 1f491a48-f3bc-11ec-a66e-7c8ae196ee3b
+    - 1f491a49-f3bc-11ec-b990-7c8ae196ee3b
+    - 1f491a4a-f3bc-11ec-a1ba-7c8ae196ee3b
+    - 1f491a4b-f3bc-11ec-a041-7c8ae196ee3b

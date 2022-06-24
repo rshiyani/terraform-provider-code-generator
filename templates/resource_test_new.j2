@@ -1,0 +1,141 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package {{provider_name | camelize}}
+
+{% macro mapValidInvalid(schema) %}
+"{{schema.attribute}}" : map[string]interface{}{
+	"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+	"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+},
+{% endmacro %}
+{#
+{% macro generateDependencyReference(schema) %}
+	{% set str = "resource{{schema.depends_on.resource_name | pascalize}}Test" %}
+	{% for sch in schema.depends_on.attribute_name %}
+		{% set str = str + '[sch | quote]' %}
+		{% if loop.depth != schema.depends_on.attribute_name | length %}
+		{% set str = str + ".(map[string]interface{})[sch | quote]" %}
+		{% endif %}
+	{% endfor %}
+	{{str}}
+{% endmacro %}
+
+{% macro mapDependsOn(schema) %}
+"{{schema.attribute}}" : map[string]interface{}{
+	"valid": {{generateDependencyReference(schema)}}
+},
+{% endmacro %}
+#}
+
+{% macro mapResourceValidInvalid(schema) %}
+"{{schema.attribute}}" : map[string]interface{}{
+	{% for sch in schema.element.schema %}
+		{% if sch.depends_on is not defined and sch.type in ["float", "int", "string","bool"] %}
+			{{mapValidInvalid(sch)}}
+		{% elif sch.depends_on is not defined and sch.type in ["list", "set"] %}
+			{% if sch.element.type == "resource" %}
+				{{mapResourceValidInvalid(sch)}}
+			{% endif %}
+		{# {% elif sch.depends_on is defined %}
+			{{mapDependsOn(sch)}}#}
+		{% endif %}
+	{% endfor %}
+},
+{% endmacro %}
+
+var resource{{name | pascalize}}Test = map[string]interface{}{
+	{% for schema in schemas %}
+		{% if schema.depends_on is not defined and schema.type in ["float", "int", "string","bool"] %}
+			{{mapValidInvalid(schema)}}
+		{% elif schema.depends_on is not defined and schema.type in ["list", "set"] %}
+			{% if schema.element.type == "resource" %}
+					{{mapResourceValidInvalid(schema)}}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+}
+
+
+{#
+var resource{{name | pascalize}}Test = map[string]interface{}{
+	{% for schema in schemas %}
+		{% if schema.type not in ["list","set"]%}
+			{% if schema.type == "float" %}
+				{% if schema.depends_on is defined and schema.depends_on.attribute_name | last != "id"%}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["valid"].([]interface{}),
+						"invalid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+					},
+				{% elif schema.test_params is defined %}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+						"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+					},
+				{% endif %}	
+			{% elif schema.type == "string" %}
+				{% if schema.test_params is defined and schema.subtype in stringSubTypeList %}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": Test[{{schema.subtype | quote}}].(map[string]interface{})["valid"].([]interface{}),
+						"invalid": Test[{{schema.subtype | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+					},
+				{% elif schema.test_params is defined and schema.validation is defined %}
+					{% if schema.validation.func_name == "StringInSlice" or schema.validation.func_name == "StringNotInSlice" %}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": []interface{}{ {{ schema.test_params.valid | map("tojson") | join(', ') }} },
+							"invalid": []interface{}{ {{schema.test_params.invalid | map("tojson") | join(', ')}} },
+						},
+					{% elif schema.validation.func_name == "IsCIDRNetwork"%}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": []interface{}{ {{ schema.test_params.valid | map("tojson") | join(', ')}} },
+							"invalid": []interface{}{ {{schema.test_params.invalid | map("tojson") | join(', ')}} },
+						},
+					{% endif %}
+				{% else %}
+					{% if schema.depends_on is defined  and schema.depends_on.attribute_name | last != "id"%}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["valid"].([]interface{}),
+							"invalid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+						},
+					{% elif schema.test_params is defined %}
+						"{{schema.attribute}}" : map[string]interface{}{
+							"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+							"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+						},
+					{% endif %}
+				{% endif %}
+            {% elif schema.type == "map" %}
+                {% if schema.test_params is defined %}
+                "{{schema.attribute}}" : map[string]interface{}{
+                    "valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+                    "invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+                },
+                {% endif %}
+			{% else %}
+				{% if schema.depends_on is defined  and schema.depends_on.attribute_name | last != "id"%}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["valid"].([]interface{}),
+						"invalid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+					},
+				{% elif schema.test_params is defined %}
+					"{{schema.attribute}}" : map[string]interface{}{
+						"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+						"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+					},
+				{% endif %}
+			{% endif %}
+        {% elif schema.type == "list" %}
+            {% if schema.depends_on is defined and schema.depends_on.attribute_name | last != "id"%}
+				"{{schema.attribute}}" : map[string]interface{}{
+					"valid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["valid"].([]interface{}),
+					"invalid": resource{{schema.depends_on.resource_name | pascalize}}Test[{{schema.depends_on.attribute_name | quote}}].(map[string]interface{})["invalid"].([]interface{}),
+				},
+			{% elif schema.test_params is defined %}
+				"{{schema.attribute}}" : map[string]interface{}{
+					"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
+					"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
+				},
+			{% endif %}	
+        {% elif schema.type == "set" %}
+
+        {% endif %}
+	{% endfor %}
+} #}
