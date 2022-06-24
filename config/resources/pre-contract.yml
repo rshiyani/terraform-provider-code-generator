@@ -204,16 +204,16 @@ schemas:
         - 0
         - 32
       ignore_case: true
-  # - attribute: "percentage"
-  #   type: "float"
-  #   # required: true
-  #   optional: true
-  #   computed: true
-  #   validation:
-  #     func_name: "FloatBetween"
-  #     params:
-  #       - 0
-  #       - 100
+  - attribute: "percentage"
+    type: "float"
+    # required: true
+    optional: true
+    computed: true
+    validation:
+      func_name: "FloatBetween"
+      params:
+        - 0
+        - 100
 
   # - attribute: "filter"
   #   type: "list"

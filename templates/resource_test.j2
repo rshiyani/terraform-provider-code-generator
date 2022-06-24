@@ -4,14 +4,16 @@ package {{provider_name | camelize}}
 {% set stringSubTypeList = ["base64","cidr","ipv4","ipv6","json","mac","regex","time","url-http","url-https","uuid"]%}
 {% set requiredList = [] %}
 
-{% set count = [] %}
+{% set reqCount = [] %}
 {% for schema in schemas %}
 	{% if schema.required is true and schema.depends_on is not defined %}
-		{% set _ = count.append(1) %}
+		{% set _ = reqCount.append(1) %}
 	{% endif %}
 {% endfor %}
 
-const {{name | camelize}}SelfRequiredCount = {{count | length}}
+{% set requiredAttributeForMultipleCreate = {'attr': ""} %}
+
+const {{name | camelize}}SelfRequiredCount = {{reqCount | length}}
 
 var resource{{name | pascalize}}Test = map[string]interface{}{
 	{% for schema in schemas %}
@@ -287,6 +289,12 @@ func generateStepForUpdatedAttr(resourceName string,{{name | camelize}}_default,
 	{% for schema in schemas %}
 		{% if schema.optional is true and schema.type not in ["list", "map", "set" ]%}
 			valid = resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})
+			{% if schema.type == "string" and schema.validation is defined and schema.validation.func_name == "StringInSlice" %}
+			{% else %}
+			if len(valid)>5{
+				valid = valid[:5]
+			}
+			{% endif %}
 			for _, value := range valid {
 				v := fmt.Sprintf("%v", value)
 				testSteps = append(testSteps,resource.TestStep{
@@ -302,14 +310,6 @@ func generateStepForUpdatedAttr(resourceName string,{{name | camelize}}_default,
 	{% endfor %}
 	return testSteps
 }
-
-{% macro printStepsForUpdatedAttr() %}
-	{% for schema in schemas %}
-		{% if schema.optional is true and schema.type not in ["list", "map", "set" ]%}
-			generateStepForUpdatedAttr("{{schema.attribute}}"),	
-		{% endif %}
-	{% endfor %}
-{% endmacro %}
 
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Update(t *testing.T) {
 	var {{name | camelize}}_default models.{{name | pascalize}}
@@ -330,6 +330,67 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Update(t *testing.
 				Check: testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_default),
 			},
 		},generateStepForUpdatedAttr(resourceName, &{{name | camelize}}_default, &{{name | camelize}}_updated)...),
+	})
+}
+
+// Returns the []TestSteps consisiting of Updation of optional attributes with invalid value
+func generateNegativeStepForUpdatedAttr(resourceName string) []resource.TestStep{
+	testSteps := make([]resource.TestStep, 0, 1)
+	var invalid []interface{}
+	{% for schema in schemas %}
+		{% if schema.optional is true and schema.type not in ["list", "map", "set" ]%}
+			invalid = resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["invalid"].([]interface{})
+			for _, value := range invalid {
+				testSteps = append(testSteps,resource.TestStep{
+					Config: CreateAcc{{name | pascalize}}UpdatedAttr("{{schema.attribute}}",value),
+					{% if schema.validation is defined %}
+						ExpectError: regexp.MustCompile(expectErrorMap["{{schema.validation.func_name}}"]),
+					{% else %}
+						ExpectError: regexp.MustCompile(""),
+					{% endif %}
+				})
+			} 
+		{% endif %}
+	{% endfor %}
+	return testSteps
+}
+
+
+func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_NegativeCases(t *testing.T) {
+	resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
+	
+	// [TODO]: Add makeTestVariable() to utils.go file
+	// rName := makeTestVariable(acctest.RandString(5))
+	// rOther := makeTestVariable(acctest.RandString(5))
+	
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
+		Steps: append([]resource.TestStep{
+			{
+				Config: CreateAcc{{name | pascalize}}Config(),
+			},
+		},generateNegativeStepForUpdatedAttr(resourceName)...),
+	})
+}
+
+func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_MultipleCreateDelete(t *testing.T) {
+	resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
+	
+	// [TODO]: Add makeTestVariable() to utils.go file
+	// rName := makeTestVariable(acctest.RandString(5))
+	// rOther := makeTestVariable(acctest.RandString(5))
+	
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
+		Steps: []resource.TestStep{
+			{
+				Config: CreateAcc{{name | pascalize}}MultipleConfig(),
+			},
+		},
 	})
 }
 
@@ -521,6 +582,127 @@ func CreateAcc{{name | pascalize}}UpdatedAttr(attr string, value interface{}) st
 {% endfor %}
 {% endmacro %}
 
+func generateMultipleValuesFor{{name | pascalize}}() ([]interface{}) {	
+	{% set flag = {'status': True} %}
+	{% for schema in schemas %}
+		{% if flag.status == True and (schema.required is true and schema.depends_on is not defined) %}
+			{% if schema.type == "string" and schema.validation is not defined %}
+				stringList := []interface{}{}
+				for i := 0; i < 15; i++{
+					stringList = append(stringList, resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0].(string) + strconv.Itoa(i))
+				}
+				{% if flag.update({'status': False}) %} {% endif %}
+				{% if requiredAttributeForMultipleCreate.update({'attr': schema.attribute}) %} {% endif %}
+				return stringList
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	{% if flag.status == True %}
+		{% for schema in schemas %}
+			{% if flag.status == True and (schema.required is true and schema.depends_on is not defined) %}
+				{% if schema.type == "int" and schema.validation is not defined %}
+					intList := []interface{}{}
+					for i := 0; i < 15; i++{
+						intList = append(intList, resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0].(int) + i)
+					}
+					{% if flag.update({'status': False}) %} {% endif %}
+					{% if requiredAttributeForMultipleCreate.update({'attr': schema.attribute}) %} {% endif %}
+					return intList
+				{% endif %}
+			{% endif %}
+		{% endfor %}	
+	{% endif %}
+	{% if flag.status == True %}
+		{% for schema in schemas %}	
+			{% if flag.status == True and (schema.required is true and schema.depends_on is not defined) %}		
+					{% if schema.type == "float" and schema.validation is not defined %}
+					floatList := []interface{}{}
+					for i := 0; i < 15; i++{
+						floatList = append(floatList, resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[0].(float64) + float64(i))
+					}
+					{% if flag.update({'status': False}) %} {% endif %}
+					{% if requiredAttributeForMultipleCreate.update({'attr': schema.attribute}) %} {% endif %}
+					return floatList
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+	{% endif %}	
+}
+
+{% macro printFunctionForMultipleConfig() %}
+func CreateAcc{{name | pascalize}}MultipleConfig() string {
+	{# var resource string
+	{% for schema in schemas %}
+		{% if schema.depends_on is defined %}
+		str += CreateAcc{{schema.depends_on.resource_name | pascalize}}Config()
+		if not Contains(str, "resource {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}){
+			resource += str
+		}
+		{% endif %}
+	{% endfor %}
+	{% if schema.depends_on is defined %}
+	resource = CreateAcc{{schema.depends_on.resource_name | pascalize}}Config()
+	{% endif %}
+	resource += fmt.Sprintf(`
+		resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+			{% set reqArgs = [] %}
+			{% for schema in schemas %}
+				{% if schema.required is true and schema.type not in ["list","set","map"] %}
+					{% if schema.depends_on is defined%}
+						{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
+					{% else %}
+						{{schema.attribute}} = "%v"
+						{{- reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		}
+	`,{{reqArgs | join(',\n')}})
+	return resource #}
+	temp := getParent{{name | pascalize}}()
+	temp = temp[:len(temp)-1]
+	resourceSelf := ""
+	{% if reqCount == 0 %}
+		resourceSelf += fmt.Sprint(`
+			resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+				{% for schema in schemas %}
+					{% if schema.required is true and schema.type not in ["list","set","map"] and schema.depends_on is defined%}
+						{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
+					{% endif %}
+				{% endfor %}
+			}
+		`)
+	{% else %}
+		multipleValues := generateMultipleValuesFor{{name | pascalize}}()
+		for i := 0; i < len(multipleValues); i++ {
+			resourceSelf += fmt.Sprintf(`
+				resource  "{{provider_name | camelize}}_{{name | snakify}}" "test{{i}}" {
+					{% set reqArgs = [] %}
+					{% for schema in schemas %}
+						{% if schema.required is true and schema.type not in ["list","set","map"] %}
+							{% if schema.depends_on is defined%}
+								{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name}}
+							{% else %}
+								{% if schema.attribute == requiredAttributeForMultipleCreate.attr %}
+									{{schema.attribute}} = "%v"
+									{{- reqArgs.append('multipleValues[i]') or "" }}
+								{% else %}
+									{{schema.attribute}} = "%v"
+									{{- reqArgs.append('resource'+name | pascalize+'Test["'+schema.attribute+'"].(map[string]interface{})["valid"].([]interface{})[0]') or "" }}
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				}
+			`,{{reqArgs | join(',\n')}})
+		}
+	{% endif %}
+	temp = append(temp, resourceSelf)
+	resource := create{{name | pascalize}}Config(temp)
+	return resource
+}
+{% endmacro %}
+
 {% macro printFunctionTestAccResourceExists() %}
 func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(name string, {{name | camelize}} *models.{{name | pascalize}}) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
@@ -587,6 +769,7 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{n
 {{printFunctionForUpdatedAttr()}}
 {{printFunctionToUpdateRequiredArguments()}}
 {{printFunctionToUpdateParentRequiredArguments()}}
+{{printFunctionForMultipleConfig()}}
 {{printFunctionTestAccResourceExists()}}
 {{printFunctionTestAccResourceDestroy()}}
 {{printFunctionForIdEqual()}}
@@ -669,4 +852,4 @@ func create{{name | pascalize}}Config(configSlice []string) string {
 	}
 
 	return str
-}
+} 

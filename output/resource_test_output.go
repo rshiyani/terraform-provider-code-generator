@@ -23,20 +23,24 @@ var resourceContractTest = map[string]interface{}{
 		"invalid": Test["ipv4"].(map[string]interface{})["invalid"].([]interface{}),
 	},
 	"port_number": map[string]interface{}{
-		"valid":   []interface{}{1, 53, 65535},
+		"valid":   []interface{}{1, 65535, 30637, 52137, 62133, 40460, 53468, 52765, 5034, 58167, 7397, 28502, 56676, 27251, 35484},
 		"invalid": []interface{}{0, 65536},
 	},
 	"test_score": map[string]interface{}{
-		"valid":   []interface{}{1, 100, 50},
+		"valid":   []interface{}{1, 100, 50, 40, 3, 16, 95, 90, 62, 58, 24, 24, 22, 25, 82},
 		"invalid": []interface{}{0, 101},
 	},
 	"string_in_some_names": map[string]interface{}{
 		"valid":   []interface{}{"parth", "aarsh", "arjun", "alfatah", "krunal"},
-		"invalid": []interface{}{"6xxqoku5qi"},
+		"invalid": []interface{}{"u33k72qm8t"},
 	},
 	"valid_cidr": map[string]interface{}{
-		"valid":   []interface{}{0, 32, 16},
+		"valid":   []interface{}{0, 32, 16, 4, 10, 4, 20, 13, 16, 18, 24, 24, 20, 4, 9},
 		"invalid": []interface{}{-1, 33},
+	},
+	"percentage": map[string]interface{}{
+		"valid":   []interface{}{0, 100, 50.0, 14.033137755364818, 6.993780223040222, 2.9203280929406663, 21.547708502050828, 50.2359145965084, 13.361869096962774, 4.469945701564934, 12.930184752408087, 33.96841001866133, 11.64590013419436, 4.3538370683605825, 2.9472607837015485, 4.33179361881934},
+		"invalid": []interface{}{-1, 101},
 	},
 }
 
@@ -93,6 +97,7 @@ func TestAccAciContract_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "test_score", "0"),
 					resource.TestCheckResourceAttr(resourceName, "string_in_some_names", "parth"),
 					resource.TestCheckResourceAttr(resourceName, "valid_cidr", ""),
+					resource.TestCheckResourceAttr(resourceName, "percentage", "0.0"),
 				),
 			},
 			{
@@ -114,6 +119,7 @@ func TestAccAciContract_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "test_score", fmt.Sprintf("%v", resourceContractTest["test_score"].(map[string]interface{})["valid"].([]interface{})[0])),
 					resource.TestCheckResourceAttr(resourceName, "string_in_some_names", fmt.Sprintf("%v", resourceContractTest["string_in_some_names"].(map[string]interface{})["valid"].([]interface{})[0])),
 					resource.TestCheckResourceAttr(resourceName, "valid_cidr", fmt.Sprintf("%v", resourceContractTest["valid_cidr"].(map[string]interface{})["valid"].([]interface{})[0])),
+					resource.TestCheckResourceAttr(resourceName, "percentage", fmt.Sprintf("%v", resourceContractTest["percentage"].(map[string]interface{})["valid"].([]interface{})[0])),
 				),
 			},
 			{
@@ -184,6 +190,9 @@ func generateStepForUpdatedAttr(resourceName string, contract_default, contract_
 	testSteps := make([]resource.TestStep, 0, 1)
 	var valid []interface{}
 	valid = resourceContractTest["port_number"].(map[string]interface{})["valid"].([]interface{})
+	if len(valid) > 5 {
+		valid = valid[:5]
+	}
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
@@ -196,6 +205,9 @@ func generateStepForUpdatedAttr(resourceName string, contract_default, contract_
 		})
 	}
 	valid = resourceContractTest["test_score"].(map[string]interface{})["valid"].([]interface{})
+	if len(valid) > 5 {
+		valid = valid[:5]
+	}
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
@@ -220,6 +232,9 @@ func generateStepForUpdatedAttr(resourceName string, contract_default, contract_
 		})
 	}
 	valid = resourceContractTest["valid_cidr"].(map[string]interface{})["valid"].([]interface{})
+	if len(valid) > 5 {
+		valid = valid[:5]
+	}
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
@@ -227,6 +242,21 @@ func generateStepForUpdatedAttr(resourceName string, contract_default, contract_
 			Check: resource.ComposeTestCheckFunc(
 				testAccCheckAciContractExists(resourceName, contract_updated),
 				resource.TestCheckResourceAttr(resourceName, "valid_cidr", v),
+				testAccCheckAciContractIdEqual(contract_default, contract_updated),
+			),
+		})
+	}
+	valid = resourceContractTest["percentage"].(map[string]interface{})["valid"].([]interface{})
+	if len(valid) > 5 {
+		valid = valid[:5]
+	}
+	for _, value := range valid {
+		v := fmt.Sprintf("%v", value)
+		testSteps = append(testSteps, resource.TestStep{
+			Config: CreateAccContractUpdatedAttr("percentage", value),
+			Check: resource.ComposeTestCheckFunc(
+				testAccCheckAciContractExists(resourceName, contract_updated),
+				resource.TestCheckResourceAttr(resourceName, "percentage", v),
 				testAccCheckAciContractIdEqual(contract_default, contract_updated),
 			),
 		})
@@ -254,6 +284,96 @@ func TestAccAciContract_Update(t *testing.T) {
 			},
 		}, generateStepForUpdatedAttr(resourceName, &contract_default, &contract_updated)...),
 	})
+}
+
+// Returns the []TestSteps consisiting of Updation of optional attributes with invalid value
+func generateNegativeStepForUpdatedAttr(resourceName string) []resource.TestStep {
+	testSteps := make([]resource.TestStep, 0, 1)
+	var invalid []interface{}
+	invalid = resourceContractTest["port_number"].(map[string]interface{})["invalid"].([]interface{})
+	for _, value := range invalid {
+		testSteps = append(testSteps, resource.TestStep{
+			Config:      CreateAccContractUpdatedAttr("port_number", value),
+			ExpectError: regexp.MustCompile(expectErrorMap["IsPortNumber"]),
+		})
+	}
+	invalid = resourceContractTest["test_score"].(map[string]interface{})["invalid"].([]interface{})
+	for _, value := range invalid {
+		testSteps = append(testSteps, resource.TestStep{
+			Config:      CreateAccContractUpdatedAttr("test_score", value),
+			ExpectError: regexp.MustCompile(expectErrorMap["IntBetween"]),
+		})
+	}
+	invalid = resourceContractTest["string_in_some_names"].(map[string]interface{})["invalid"].([]interface{})
+	for _, value := range invalid {
+		testSteps = append(testSteps, resource.TestStep{
+			Config:      CreateAccContractUpdatedAttr("string_in_some_names", value),
+			ExpectError: regexp.MustCompile(expectErrorMap["StringInSlice"]),
+		})
+	}
+	invalid = resourceContractTest["valid_cidr"].(map[string]interface{})["invalid"].([]interface{})
+	for _, value := range invalid {
+		testSteps = append(testSteps, resource.TestStep{
+			Config:      CreateAccContractUpdatedAttr("valid_cidr", value),
+			ExpectError: regexp.MustCompile(expectErrorMap["IsCIDRNetwork"]),
+		})
+	}
+	invalid = resourceContractTest["percentage"].(map[string]interface{})["invalid"].([]interface{})
+	for _, value := range invalid {
+		testSteps = append(testSteps, resource.TestStep{
+			Config:      CreateAccContractUpdatedAttr("percentage", value),
+			ExpectError: regexp.MustCompile(expectErrorMap["FloatBetween"]),
+		})
+	}
+	return testSteps
+}
+
+func TestAccAciContract_NegativeCases(t *testing.T) {
+	resourceName := "aci_contract.test"
+
+	// [TODO]: Add makeTestVariable() to utils.go file
+	// rName := makeTestVariable(acctest.RandString(5))
+	// rOther := makeTestVariable(acctest.RandString(5))
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckAciContractDestroy,
+		Steps: append([]resource.TestStep{
+			{
+				Config: CreateAccContractConfig(),
+			},
+		}, generateNegativeStepForUpdatedAttr(resourceName)...),
+	})
+}
+
+func TestAccAciContract_MultipleCreateDelete(t *testing.T) {
+	resourceName := "aci_contract.test"
+
+	// [TODO]: Add makeTestVariable() to utils.go file
+	// rName := makeTestVariable(acctest.RandString(5))
+	// rOther := makeTestVariable(acctest.RandString(5))
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckAciContractDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: CreateAccContractMultipleConfig(),
+			},
+		},
+	})
+}
+
+func generateMultipleValuesForContract() []interface{} {
+
+	floatList := []interface{}{}
+	for i := 0; i < 15; i++ {
+		floatList = append(floatList, resourceContractTest["weight"].(map[string]interface{})["valid"].([]interface{})[0].(float64)+float64(i))
+	}
+	return floatList
+
 }
 
 func CreateAccContractWithoutName() string {
@@ -320,13 +440,15 @@ func CreateAccContractConfigWithOptional() string {
 						test_score = "%v"
 						string_in_some_names = "%v"
 						valid_cidr = "%v"
+						percentage = "%v"
 		}
 	`, resourceContractTest["weight"].(map[string]interface{})["valid"].([]interface{})[0],
 		resourceContractTest["ipv4_for"].(map[string]interface{})["valid"].([]interface{})[0],
 		resourceContractTest["port_number"].(map[string]interface{})["valid"].([]interface{})[0],
 		resourceContractTest["test_score"].(map[string]interface{})["valid"].([]interface{})[0],
 		resourceContractTest["string_in_some_names"].(map[string]interface{})["valid"].([]interface{})[0],
-		resourceContractTest["valid_cidr"].(map[string]interface{})["valid"].([]interface{})[0])
+		resourceContractTest["valid_cidr"].(map[string]interface{})["valid"].([]interface{})[0],
+		resourceContractTest["percentage"].(map[string]interface{})["valid"].([]interface{})[0])
 	return resource
 }
 
@@ -418,6 +540,27 @@ func CreateAccContractUpdateParentRequiredArgumentTemp() string {
 				`, resourceContractTest["weight"].(map[string]interface{})["valid"].([]interface{})[0],
 		resourceContractTest["ipv4_for"].(map[string]interface{})["valid"].([]interface{})[0]))
 	resource := createContractConfig(t)
+	return resource
+}
+
+func CreateAccContractMultipleConfig() string {
+	temp := getParentContract()
+	temp = temp[:len(temp)-1]
+	resourceSelf := ""
+	multipleValues := generateMultipleValuesForContract()
+	for i := 0; i < len(multipleValues); i++ {
+		resourceSelf += fmt.Sprintf(`
+				resource  "aci_contract" "test" {
+								name = aci_tenant.test.id
+								temp = aci_application_profile.test.application_dn
+									weight = "%v"
+									ipv4_for = "%v"
+				}
+			`, multipleValues[i],
+			resourceContractTest["ipv4_for"].(map[string]interface{})["valid"].([]interface{})[0])
+	}
+	temp = append(temp, resourceSelf)
+	resource := createContractConfig(temp)
 	return resource
 }
 

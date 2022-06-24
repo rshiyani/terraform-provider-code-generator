@@ -41,9 +41,25 @@ schemas:
   subtype: ipv4
   test_params:
     invalid:
-    - 294.290.292.266
+    - &id001
+      - 267.284.268.270
     valid:
-    - 79.205.173.76
+    - &id002
+      - 152.13.47.110
+      - 152.13.59.52
+      - 152.13.156.55
+      - 152.13.113.185
+      - 152.13.212.55
+      - 152.13.145.139
+      - 152.13.100.166
+      - 152.13.127.178
+      - 152.13.246.153
+      - 152.13.135.242
+      - 152.13.114.192
+      - 152.13.224.32
+      - 152.13.251.215
+      - 152.13.18.17
+      - 152.13.202.117
   type: string
   validation:
     func_name: IsIPv4Address
@@ -56,8 +72,20 @@ schemas:
     - 65536
     valid:
     - 1
-    - 53
     - 65535
+    - 30637
+    - 52137
+    - 62133
+    - 40460
+    - 53468
+    - 52765
+    - 5034
+    - 58167
+    - 7397
+    - 28502
+    - 56676
+    - 27251
+    - 35484
   type: int
   validation:
     func_name: IsPortNumber
@@ -74,6 +102,18 @@ schemas:
     - 1
     - 100
     - 50
+    - 40
+    - 3
+    - 16
+    - 95
+    - 90
+    - 62
+    - 58
+    - 24
+    - 24
+    - 22
+    - 25
+    - 82
   type: int
   validation:
     func_name: IntBetween
@@ -88,7 +128,7 @@ schemas:
   subtype: string
   test_params:
     invalid:
-    - 6xxqoku5qi
+    - u33k72qm8t
     valid:
     - parth
     - aarsh
@@ -118,6 +158,18 @@ schemas:
     - 0
     - 32
     - 16
+    - 4
+    - 10
+    - 4
+    - 20
+    - 13
+    - 16
+    - 18
+    - 24
+    - 24
+    - 20
+    - 4
+    - 9
   type: string
   validation:
     func_name: IsCIDRNetwork
@@ -125,40 +177,234 @@ schemas:
     params:
     - 0
     - 32
+- attribute: percentage
+  computed: true
+  optional: true
+  subtype: range
+  test_params:
+    invalid:
+    - -1
+    - 101
+    valid:
+    - 0
+    - 100
+    - 50.0
+    - 14.033137755364818
+    - 6.993780223040222
+    - 2.9203280929406663
+    - 21.547708502050828
+    - 50.2359145965084
+    - 13.361869096962774
+    - 4.469945701564934
+    - 12.930184752408087
+    - 33.96841001866133
+    - 11.64590013419436
+    - 4.3538370683605825
+    - 2.9472607837015485
+    - 4.33179361881934
+  type: float
+  validation:
+    func_name: FloatBetween
+    params:
+    - 0
+    - 100
 types:
   base64:
-    invalid: a3+J1b%mFs//
-    valid: bGQ1NjNheG15MA==
+    invalid:
+    - a3+J1b%mFs//
+    valid:
+    - Nm0xcjlmZDk1ag==
+    - M2Fxb2lxa21zeQ==
+    - MDQ2bDJwcDd2dg==
+    - Y3MxYmxsaDE4Yg==
+    - a2puaXlqOWh1eA==
+    - NGRtY3psc25veg==
+    - MWxmYzdqOHRwdg==
+    - anB2dHNvZTFsNw==
+    - MmNmN3NhOWZqMw==
+    - MzdzeXFnZHFyZQ==
+    - ZXZld256N3Fjaw==
+    - aHN0OHlkeDF4bw==
+    - Z3RleWFhNDA5bw==
+    - M2s3bXU4bmI3NQ==
+    - amQ2Nm56N29pcw==
   cidr:
-    invalid: 268.279.298.279/20
-    valid: 177.182.221.39/9
+    invalid:
+    - 275.265.300.284/0
+    valid:
+    - 152.13.192.0/20
+    - 152.13.160.0/20
+    - 152.13.144.0/20
+    - 152.13.176.0/20
+    - 152.13.128.0/20
+    - 152.13.16.0/20
+    - 152.13.0.0/20
+    - 152.13.64.0/20
+    - 152.13.112.0/20
+    - 152.13.48.0/20
+    - 152.13.208.0/20
+    - 152.13.96.0/20
+    - 152.13.80.0/20
+    - 152.13.240.0/20
+    - 152.13.224.0/20
   ipv4:
-    invalid: 294.290.292.266
-    valid: 79.205.173.76
+    invalid: *id001
+    valid: *id002
   ipv6:
-    invalid: invalidIPv6
-    valid: 193d:bd49:4521:c2d4:b82b:586d
+    invalid:
+    - invalidIPv6
+    valid:
+    - 2001:db8::34f4:0:0:f323
+    - 2001:db8::34f4:0:0:f3f6
+    - 2001:db8::34f4:0:0:f308
+    - 2001:db8::34f4:0:0:f398
+    - 2001:db8::34f4:0:0:f3e7
+    - 2001:db8::34f4:0:0:f3bd
+    - 2001:db8::34f4:0:0:f363
+    - 2001:db8::34f4:0:0:f3d4
+    - 2001:db8::34f4:0:0:f3ac
+    - 2001:db8::34f4:0:0:f3bf
+    - 2001:db8::34f4:0:0:f392
+    - 2001:db8::34f4:0:0:f3b8
+    - 2001:db8::34f4:0:0:f3e9
+    - 2001:db8::34f4:0:0:f391
+    - 2001:db8::34f4:0:0:f34c
   json:
-    invalid: 'json({ name : val)'
-    valid: 'json({ "attribute" : "value" })'
+    invalid:
+    - 'json({ name : val)'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+    - 'json({ "attribute" : "value4" })'
+    - 'json({ "attribute" : "value5" })'
+    - 'json({ "attribute" : "value6" })'
+    - 'json({ "attribute" : "value7" })'
+    - 'json({ "attribute" : "value8" })'
+    - 'json({ "attribute" : "value9" })'
+    - 'json({ "attribute" : "value10" })'
+    - 'json({ "attribute" : "value11" })'
+    - 'json({ "attribute" : "value12" })'
+    - 'json({ "attribute" : "value13" })'
+    - 'json({ "attribute" : "value14" })'
   mac:
-    invalid: invalidMAC
-    valid: 4d:c2:27:ad:b6:90
+    invalid:
+    - invalidMAC
+    valid:
+    - c1:04:26:1b:12:ed
+    - f2:c1:4a:04:42:b1
+    - 2c:a2:6c:61:47:2a
+    - df:a6:9d:0a:34:be
+    - ea:c5:c6:3c:e2:82
+    - a9:79:96:7c:74:f2
+    - 59:8a:c9:52:30:14
+    - 18:e5:2e:5d:9f:e8
+    - 5f:4b:34:67:24:1e
+    - 7a:ed:b1:23:31:fb
+    - 64:8d:dd:e8:9f:de
+    - 02:52:d6:de:b5:7e
+    - bf:b7:cb:38:88:8c
+    - 5c:3a:51:ca:b2:6d
+    - c3:0d:bd:cf:88:91
   regex:
-    invalid: '[0-9)++'
-    valid: (?m)^[0-9]{2}$
+    invalid:
+    - '[0-9)++'
+    valid:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
   string:
-    invalid: 12345
-    valid: 753klrtgtp
+    invalid:
+    - 12345
+    valid:
+    - g88n3oqbqj
+    - tolgbl6cji
+    - zy5uc3pxng
+    - 2qepxea8rj
+    - ba5fok8f50
+    - 4xpvs1tj1k
+    - m92ostmada
+    - yf2v8ntwx0
+    - 4sj7wdabay
+    - lemnv2vw09
+    - tv24rzxwkt
+    - n87j5z8k2z
+    - qzodull0ln
+    - 97ng3x496x
+    - dmxbjtkxj8
   time:
-    invalid: '2022-06-22 11:21:56.004440'
-    valid: '2022-06-22T05:51:56.004440+00:00'
+    invalid:
+    - '2022-06-24 11:57:04.495440'
+    valid:
+    - '2022-06-24T06:27:04.495440+00:00'
+    - '2022-07-17T06:27:04.495440+00:00'
+    - '2022-08-09T06:27:04.495440+00:00'
+    - '2022-09-01T06:27:04.495440+00:00'
+    - '2022-09-24T06:27:04.495440+00:00'
+    - '2022-10-17T06:27:04.495440+00:00'
+    - '2022-11-09T06:27:04.495440+00:00'
+    - '2022-12-02T06:27:04.495440+00:00'
+    - '2022-12-25T06:27:04.495440+00:00'
+    - '2023-01-17T06:27:04.495440+00:00'
+    - '2023-02-09T06:27:04.495440+00:00'
+    - '2023-03-04T06:27:04.495440+00:00'
+    - '2023-03-27T06:27:04.495440+00:00'
+    - '2023-04-19T06:27:04.495440+00:00'
+    - '2023-05-12T06:27:04.495440+00:00'
   url-http:
-    invalid: ht:/obs8axwed1nowbp.com
-    valid: http://lcj8wxfzwbp2l23.com
+    invalid:
+    - ht:/0315okjo6iond9t.com
+    valid:
+    - http://8uuieqr8wetmxdu.com
+    - http://c3swb439612qcso.com
+    - http://tffb68rh6kp82mt.com
+    - http://5j4wje73phyi65o.com
+    - http://rgp382dehij8oxc.com
+    - http://rh5n2okg4snpwa4.com
+    - http://mn17h7ov9bty6x0.com
+    - http://tvoa5x8d6njivvs.com
+    - http://o8uftlw14ui27q9.com
+    - http://lb9298nnny6x6jv.com
+    - http://e6q2jqpqas2i22p.com
+    - http://46dsjshk6ut2bs9.com
+    - http://5c70r4p3fjmje5p.com
+    - http://w6ug4vuvb99y7jc.com
+    - http://y90kan0yfgmygxn.com
   url-https:
-    invalid: hts:/w7puffz8tcby9qx.com
-    valid: https://0k7w9r404xztqk4.com
+    invalid:
+    - hts:/srqpjrsdqx0r8x7.com
+    valid:
+    - https://dsr4hc9m6t4to2w.com
+    - https://kc0akirnr78dv68.com
+    - https://43pwe2yn264quu6.com
+    - https://l9m7xw1fvgxy2zj.com
+    - https://3van08l8f70hlqx.com
+    - https://al1nun28x2f9xba.com
+    - https://22eb70xlb1uthkp.com
+    - https://bxddw0nuen8x82w.com
+    - https://5sg4tc60qk058hi.com
+    - https://7livgalz635r0dn.com
+    - https://ze1pkzegcwk06rt.com
+    - https://vc68vm4wuw74tu8.com
+    - https://so4nijjwswqv3rl.com
+    - https://2ybcbzj7ibwpcuv.com
+    - https://tgxiiqaqp8v9b0q.com
   uuid:
-    invalid: invalid323Uuid12
-    valid: 6c6a9379-f1ef-11ec-885d-7c8ae1943087
+    invalid:
+    - invalid323Uuid12
+    valid:
+    - aa004524-f386-11ec-b172-7c8ae1943087
+    - aa00a45a-f386-11ec-843b-7c8ae1943087
+    - aa00a45b-f386-11ec-84db-7c8ae1943087
+    - aa00a45c-f386-11ec-9c57-7c8ae1943087
+    - aa00a45d-f386-11ec-b0c1-7c8ae1943087
+    - aa00a45e-f386-11ec-99dd-7c8ae1943087
+    - aa00a45f-f386-11ec-9fc4-7c8ae1943087
+    - aa00a460-f386-11ec-8175-7c8ae1943087
+    - aa00a461-f386-11ec-b284-7c8ae1943087
+    - aa00a462-f386-11ec-a9a6-7c8ae1943087
+    - aa00a463-f386-11ec-ac98-7c8ae1943087
+    - aa00a464-f386-11ec-9f44-7c8ae1943087
+    - aa00a465-f386-11ec-9b2a-7c8ae1943087
+    - aa00a466-f386-11ec-813f-7c8ae1943087
+    - aa00a467-f386-11ec-b5e0-7c8ae1943087
