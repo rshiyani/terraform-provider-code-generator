@@ -79,7 +79,7 @@ schemas:
             params:
               - 1
               - 10
-  - attribute: cast
+  - attribute: casts
     type: set
     optional: true
     element:

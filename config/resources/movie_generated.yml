@@ -11,11 +11,29 @@ schemas:
   subtype: string
   test_params:
     invalid:
-    - 234
-    - 987
+    - 10
+    - 12.43
+    multiple_valids:
+    - 4hbf3g8sxy
+    - tut6dapo5u
+    - 9yq2lgdyr4
+    - hvs9mgofqk
+    - a0gmw21ew0
+    - p0jha77q04
+    - fcult3pm7h
+    - aapnjilj5z
+    - qj8t2qs55d
+    - lu16hhpnjy
+    - o3qn0w0aon
+    - c7ub96j4ei
+    - 3kkejlb1yq
+    - soeggflaqw
+    - mco7hi55b0
     valid:
-    - Hello
-    - World
+    - vbvkya3vsg
+    - 9iehqbcdrv
+    - 8idealbkf6
+    - fuv1bhddwu
   type: string
 - attribute: isbn
   description: ISBN of the Movie
@@ -23,11 +41,29 @@ schemas:
   subtype: string
   test_params:
     invalid:
-    - 234
-    - 987
+    - 10
+    - 12.43
+    multiple_valids:
+    - ll9jzly47y
+    - t15xho82cp
+    - sxw828301s
+    - rgrylzoond
+    - 9subrhercd
+    - ngah9m3lzs
+    - n9ehzpfovw
+    - f28i2ui8hr
+    - o2ze8wrfi6
+    - dmqq44xtn6
+    - driipok60m
+    - 0sqarhx8e8
+    - c5urd4lhtf
+    - 2dat3u8eoz
+    - oylfa9daky
     valid:
-    - Hello
-    - World
+    - z32oulitlm
+    - 5rfssn40h8
+    - aic6dybmzx
+    - tbjs2ame5u
   type: string
 - attribute: genre
   default: thriller
@@ -36,7 +72,13 @@ schemas:
   subtype: string
   test_params:
     invalid:
-    - 6noqck58mm
+    - o809dvhufs
+    multiple_valids:
+    - thriller
+    - action
+    - horror
+    - fiction
+    - comedy
     valid:
     - thriller
     - action
@@ -60,10 +102,62 @@ schemas:
     - attribute: firstname
       description: Firstname of the Director
       required: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - thp13e1ugc
+        - gsnvfyw9bp
+        - c3xha3v7uh
+        - 8u2icvammd
+        - j6mn92hn50
+        - peh1irv6qg
+        - j0rvqmnujf
+        - 53b4rxnr2o
+        - t7wtf6hj8c
+        - stbapyy6uu
+        - c067um67ww
+        - 0etrmf1t0t
+        - xxn4ofr0p3
+        - xii3dz12j4
+        - h4ifvdcjhw
+        valid:
+        - x4vd98uk9u
+        - vshhpr6q18
+        - 0pigrxe91w
+        - h7q13ynq6v
       type: string
     - attribute: lastname
       description: Lastname of the Director
       optional: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - cbigmhaicu
+        - y16ld7jejm
+        - mxguprde7w
+        - 9oqz5cbo8w
+        - dvg7vb8chz
+        - gqvb60ompv
+        - m8ab5p2z2f
+        - hrdxvvt8im
+        - zhniwy9yvq
+        - 9ysrbke95j
+        - 1bnptme3i6
+        - twaig5gbo2
+        - 3oh1mick5k
+        - 1lcb2a61gm
+        - 9ew7c8ahjz
+        valid:
+        - xovmbidf2l
+        - 61n3gjeudf
+        - yhf5jc9r9r
+        - sik8tgvgc5
       type: string
     type: resource
   max_items: 1
@@ -75,10 +169,63 @@ schemas:
     - attribute: rater
       description: Rater that provide rating
       required: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - me4r9iexkd
+        - 43eok4yhwa
+        - wz9rfync9b
+        - ivtvc0ebsw
+        - bjf1bnm2r1
+        - p99tayuo9t
+        - 829pt7mcmm
+        - qghqoepdbw
+        - pmbdr6jwkw
+        - l5be5uhmk7
+        - f09tgbi23t
+        - gwccfojfou
+        - 5dy8r5x20i
+        - 7u2jekv5zx
+        - bp347iyjzo
+        valid:
+        - ck4sgdzp1w
+        - 8hq29l5gty
+        - 256vmerao4
+        - jf2azvvv7h
       type: string
     - attribute: rating
       default: 1
       optional: true
+      subtype: range
+      test_params:
+        invalid:
+        - 0
+        - 11
+        multiple_valids:
+        - 1
+        - 10
+        - 5.5
+        - 3.174301559329265
+        - 8.892181032038001
+        - 8.24323838199817
+        - 3.5181805873711003
+        - 2.17512747389724
+        - 0.5905618292823178
+        - 3.1503029577958293
+        - 5.11668969951022
+        - 1.6350536644529146
+        - 4.62859243654065
+        - 5.273096347874486
+        - 6.846825400916802
+        - 3.343338407209677
+        valid:
+        - 1
+        - 10
+        - 5.5
+        - 2.396175269348564
       type: float
       validation:
         func_name: FloatBetween
@@ -88,47 +235,310 @@ schemas:
     type: resource
   optional: true
   type: list
-- attribute: cast
+- attribute: casts
   element:
     schema:
       type: string
     type: schema
   optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - y2rb2k7qys
+    - s57rpahbpb
+    - kwftvnyi7n
+    - srhvxa2btv
+    - 6u8qrt31wt
+    - 6bn9pr2mab
+    - vvc0aahokj
+    - gkjmo1b28p
+    - iwukqx31yb
+    - k2gwh5v20c
+    - pthz413bc6
+    - 6eq64txau5
+    - 6raeg9uq2y
+    - eequslnsyo
+    - su5giei2ju
+    valid:
+    - 6k5ultiw2b
+    - o7izo3w65j
+    - x8jd1h83hk
+    - 9ermin10zn
   type: set
 types:
   base64:
-    invalid: a3+J1b%mFs//
-    valid: c2lqZ3NtZ29nOQ==
+    invalid:
+    - a3+J1b%mFs//
+    multiple_valids:
+    - ZzRoaXc4aHE1OA==
+    - bWVhZmg0ZnI1YQ==
+    - bWh3NHUxdDRnaw==
+    - a2l3NXllamI3eg==
+    - dWE1Yjh3M3RleQ==
+    - eHBuNXo2aGZwcw==
+    - dno0cGNzZTVlcQ==
+    - MXN0bGtra2pqbA==
+    - a3BuaTMxeTFzcA==
+    - djAxcmdvOHluOA==
+    - am0yaTN1c3RxNQ==
+    - NGZsZXFrajNjcg==
+    - c2N1dm5mM21qNA==
+    - Mm54Y2kxZDZlaA==
+    - ZXhybDFwcG4xOA==
+    valid:
+    - bzJ4c3J4YnlwNQ==
+    - OW5idHVwaDhyag==
+    - cmhtemd3dTZ1aw==
+    - M2NwYmg0dnFvbg==
   cidr:
-    invalid: 292.298.267.291/5
-    valid: 238.107.188.178/4
+    invalid:
+    - 289.265.263.293/0
+    multiple_valids:
+    - 112.49.0.0/20
+    - 112.49.224.0/20
+    - 112.49.48.0/20
+    - 112.49.176.0/20
+    - 112.49.160.0/20
+    - 112.49.96.0/20
+    - 112.49.112.0/20
+    - 112.49.64.0/20
+    - 112.49.144.0/20
+    - 112.49.80.0/20
+    - 112.49.208.0/20
+    - 112.49.240.0/20
+    - 112.49.32.0/20
+    - 112.49.128.0/20
+    - 112.49.16.0/20
+    valid:
+    - 112.49.0.0/20
+    - 112.49.224.0/20
+    - 112.49.48.0/20
+    - 112.49.176.0/20
   ipv4:
-    invalid: 276.295.294.278
-    valid: 106.29.98.69
+    invalid:
+    - 259.261.297.264
+    multiple_valids:
+    - 112.49.72.161
+    - 112.49.126.200
+    - 112.49.73.39
+    - 112.49.248.127
+    - 112.49.175.10
+    - 112.49.242.48
+    - 112.49.196.64
+    - 112.49.89.192
+    - 112.49.37.35
+    - 112.49.139.28
+    - 112.49.191.22
+    - 112.49.57.71
+    - 112.49.239.120
+    - 112.49.199.204
+    - 112.49.190.22
+    valid:
+    - 112.49.72.161
+    - 112.49.126.200
+    - 112.49.73.39
+    - 112.49.248.127
   ipv6:
-    invalid: invalidIPv6
-    valid: 5bdc:2eea:33f7:dfd5:a82a:1bf4
+    invalid:
+    - invalidIPv6
+    multiple_valids:
+    - 2001:db8::34f4:0:0:f32a
+    - 2001:db8::34f4:0:0:f3f7
+    - 2001:db8::34f4:0:0:f312
+    - 2001:db8::34f4:0:0:f375
+    - 2001:db8::34f4:0:0:f36f
+    - 2001:db8::34f4:0:0:f308
+    - 2001:db8::34f4:0:0:f38d
+    - 2001:db8::34f4:0:0:f343
+    - 2001:db8::34f4:0:0:f3bd
+    - 2001:db8::34f4:0:0:f3ff
+    - 2001:db8::34f4:0:0:f386
+    - 2001:db8::34f4:0:0:f30b
+    - 2001:db8::34f4:0:0:f33a
+    - 2001:db8::34f4:0:0:f3cc
+    - 2001:db8::34f4:0:0:f31a
+    valid:
+    - 2001:db8::34f4:0:0:f32a
+    - 2001:db8::34f4:0:0:f3f7
+    - 2001:db8::34f4:0:0:f312
+    - 2001:db8::34f4:0:0:f375
   json:
-    invalid: 'json({ name : val)'
-    valid: 'json({ "attribute" : "value" })'
+    invalid:
+    - 'json({ name : val)'
+    multiple_valids:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+    - 'json({ "attribute" : "value4" })'
+    - 'json({ "attribute" : "value5" })'
+    - 'json({ "attribute" : "value6" })'
+    - 'json({ "attribute" : "value7" })'
+    - 'json({ "attribute" : "value8" })'
+    - 'json({ "attribute" : "value9" })'
+    - 'json({ "attribute" : "value10" })'
+    - 'json({ "attribute" : "value11" })'
+    - 'json({ "attribute" : "value12" })'
+    - 'json({ "attribute" : "value13" })'
+    - 'json({ "attribute" : "value14" })'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
   mac:
-    invalid: invalidMAC
-    valid: 19:13:e9:8d:e4:83
+    invalid:
+    - invalidMAC
+    multiple_valids:
+    - 34:1f:b1:65:a4:bd
+    - 6c:54:19:7f:49:eb
+    - 24:3d:be:28:d5:30
+    - 9b:cd:4d:0c:fe:ef
+    - 56:d1:16:7f:4b:86
+    - da:07:75:70:72:1d
+    - 48:48:bf:b0:2a:c0
+    - 56:37:87:3c:31:80
+    - 84:8b:40:23:85:63
+    - 4a:4e:ba:55:bc:6d
+    - 87:f8:a7:ec:7a:da
+    - d9:4b:af:be:14:72
+    - 40:2e:9f:3d:68:f1
+    - 68:b4:c5:3b:6e:05
+    - e8:69:2c:4b:4b:3e
+    valid:
+    - 77:43:33:b4:f8:c0
+    - dd:48:f6:13:63:d6
+    - 97:e9:92:69:dc:2f
+    - 51:35:9f:31:f0:44
   regex:
-    invalid: '[0-9)++'
-    valid: (?m)^[0-9]{2}$
+    invalid:
+    - '[0-9)++'
+    multiple_valids:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+    valid:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
   string:
-    invalid: 12345
-    valid: b3wvevjgxs
+    invalid:
+    - 12345
+    multiple_valids:
+    - ryoinc5qas
+    - ckpc2a2mj4
+    - fvk76a5ldq
+    - gdrhud6x7a
+    - 1px39srj9u
+    - wkv5vcss5e
+    - czeskif8jt
+    - i4wmq01n67
+    - hr5xplnn51
+    - gk9eunoy5y
+    - ow6xbe8i28
+    - dx7bbfoi12
+    - zlvay6tyhn
+    - tfxcamerfe
+    - 54stojlxf1
+    valid:
+    - 04mx8lagsl
+    - 6k0lk09us0
+    - ubzzqbnvop
+    - 3w8kxp85fp
   time:
-    invalid: '2022-06-16 11:39:41.284231'
-    valid: '2022-06-16T06:09:41.284231+00:00'
+    invalid:
+    - '2022-06-29 10:33:20.204341'
+    multiple_valids:
+    - '2022-06-29T05:03:20.204341+00:00'
+    - '2022-07-22T05:03:20.204341+00:00'
+    - '2022-08-14T05:03:20.204341+00:00'
+    - '2022-09-06T05:03:20.204341+00:00'
+    - '2022-09-29T05:03:20.204341+00:00'
+    - '2022-10-22T05:03:20.204341+00:00'
+    - '2022-11-14T05:03:20.204341+00:00'
+    - '2022-12-07T05:03:20.204341+00:00'
+    - '2022-12-30T05:03:20.204341+00:00'
+    - '2023-01-22T05:03:20.204341+00:00'
+    - '2023-02-14T05:03:20.204341+00:00'
+    - '2023-03-09T05:03:20.204341+00:00'
+    - '2023-04-01T05:03:20.204341+00:00'
+    - '2023-04-24T05:03:20.204341+00:00'
+    - '2023-05-17T05:03:20.204341+00:00'
+    valid:
+    - '2022-06-29T05:03:20.204341+00:00'
+    - '2022-07-22T05:03:20.204341+00:00'
+    - '2022-08-14T05:03:20.204341+00:00'
+    - '2022-09-06T05:03:20.204341+00:00'
   url-http:
-    invalid: ht:/0bxi8ve402rue0o.com
-    valid: http://dohy0bgi39q8mr1.com
+    invalid:
+    - ht:/fkow5bsvbh5v73n.com
+    multiple_valids:
+    - http://0lvbo4h1b1tye37.com
+    - http://y2yojlxsvdtawy6.com
+    - http://ekr8ijkj2me3qvu.com
+    - http://ohtkh6kjipoq2al.com
+    - http://do0gxco2puixh1e.com
+    - http://hgwd3tc8cu61psi.com
+    - http://7u872f77c3e4iof.com
+    - http://3n2yjzk3yyqzxxf.com
+    - http://3ftvdmuzlr5j0c2.com
+    - http://nk5e1bpbavfichk.com
+    - http://65ore461y4jncge.com
+    - http://q13dqae1e1vgffi.com
+    - http://nwwkduenwx5p90z.com
+    - http://7hkk8ffarq8p7y7.com
+    - http://iq18lyx3dfr5fou.com
+    valid:
+    - http://ojvyjlj5j595a3e.com
+    - http://7of8yakv6v57sai.com
+    - http://5uu9vlsfvu2aahu.com
+    - http://ibk5ssw3h4mp3c0.com
   url-https:
-    invalid: hts:/ovrsys2t09kn0xa.com
-    valid: https://l3s1d5nra112jya.com
+    invalid:
+    - hts:/y1ir0rgnp1f8jj2.com
+    multiple_valids:
+    - https://6jkne8zaf4rypsv.com
+    - https://92pl74ofklsh2kl.com
+    - https://5thsbvxz9c1xec9.com
+    - https://5k9g5xkohluq0pe.com
+    - https://lpnvxdxwuk5xht6.com
+    - https://kvdmzn1klhdp7bp.com
+    - https://yl9guds30zellk3.com
+    - https://qduw7jmwn0dslyx.com
+    - https://aj5eb3zbbj2euom.com
+    - https://7tuuicms5esux7l.com
+    - https://foa8uop1z0wri8e.com
+    - https://csfun8mrac4x7qv.com
+    - https://c6b4myk2r9f6ev5.com
+    - https://25eonw4c0p3vfbr.com
+    - https://iraeg53r6goujt0.com
+    valid:
+    - https://eqf0ezuvr9b991p.com
+    - https://nh2qfb3ttthim98.com
+    - https://fjs4tgzp7ooexri.com
+    - https://uw420whxm24jto3.com
   uuid:
-    invalid: invalid323Uuid12
-    valid: e8e4df4a-ed3a-11ec-a6eb-7c8ae1943087
+    invalid:
+    - invalid323Uuid12
+    multiple_valids:
+    - cb5b0a1a-f768-11ec-9901-7c8ae1979a87
+    - cb5b0a1b-f768-11ec-ae08-7c8ae1979a87
+    - cb5b0a1c-f768-11ec-8102-7c8ae1979a87
+    - cb5b0a1d-f768-11ec-949d-7c8ae1979a87
+    - cb5b0a1e-f768-11ec-a26e-7c8ae1979a87
+    - cb5b0a1f-f768-11ec-86ea-7c8ae1979a87
+    - cb5b0a20-f768-11ec-8eed-7c8ae1979a87
+    - cb5b0a21-f768-11ec-ab2c-7c8ae1979a87
+    - cb5b0a22-f768-11ec-9b2d-7c8ae1979a87
+    - cb5b0a23-f768-11ec-af20-7c8ae1979a87
+    - cb5b0a24-f768-11ec-9a41-7c8ae1979a87
+    - cb5b0a25-f768-11ec-90ce-7c8ae1979a87
+    - cb5b0a26-f768-11ec-b2d1-7c8ae1979a87
+    - cb5b0a27-f768-11ec-8a08-7c8ae1979a87
+    - cb5b0a28-f768-11ec-80be-7c8ae1979a87
+    valid:
+    - cb5b0a16-f768-11ec-843b-7c8ae1979a87
+    - cb5b0a17-f768-11ec-b8e9-7c8ae1979a87
+    - cb5b0a18-f768-11ec-9d3a-7c8ae1979a87
+    - cb5b0a19-f768-11ec-8826-7c8ae1979a87

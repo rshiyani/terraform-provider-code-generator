@@ -7,7 +7,9 @@ schemas:
 - attribute: name
   depends_on:
     attribute_name:
-    - id
+    - filter
+    - filter_entry
+    - name
     resource_name: tenant
   description: name of someone
   forcenew: true
@@ -17,12 +19,27 @@ schemas:
     invalid:
     - 10
     - 12.43
+    multiple_valids:
+    - smr1avunoq
+    - q3sl11q8t6
+    - spysatatjm
+    - sx0jluog06
+    - w4wmvy587s
+    - so3yh6zw09
+    - n5e032xu1c
+    - wqfs1mgf9y
+    - pltz5tsvj4
+    - kl30pt3xs3
+    - dl0fhfjkce
+    - fphdulnrvq
+    - s45iya9odx
+    - wyw21vd6p5
+    - yx2ihkylzl
     valid:
-    - e64142xyxl
-    - gt4igcun0o
-    - 6kpuhtkf5y
-    - zgpkcq2t5w
-    - mxekbaxp0u
+    - ib57k6k0ob
+    - sy3kn34px9
+    - 5g0oxhd0dd
+    - fg6fhq52uw
   type: string
 - attribute: temp
   depends_on:
@@ -37,12 +54,27 @@ schemas:
     invalid:
     - random
     - 10.023
+    multiple_valids:
+    - -1000
+    - 301
+    - -188
+    - -475
+    - -232
+    - -201
+    - 408
+    - -850
+    - 167
+    - -217
+    - -438
+    - -860
+    - -69
+    - 238
+    - 280
     valid:
-    - 684
-    - -708
-    - 415
-    - -342
-    - -356
+    - -943
+    - -863
+    - -615
+    - -440
   type: int
 - attribute: weight
   description: weight of someone
@@ -53,12 +85,27 @@ schemas:
     invalid:
     - random
     - 10
+    multiple_valids:
+    - -0.42853307801350426
+    - 188.67339266292572
+    - 39.462590117803934
+    - -639.7643873528164
+    - -145.8702448802587
+    - -306.2923820171308
+    - -336.4600235502115
+    - 643.6038105074292
+    - 152.81087148216577
+    - -230.13598768146088
+    - -273.86151467246873
+    - -123.17694977239557
+    - -467.7534722258367
+    - 175.6709677092868
+    - 103.03241124207479
     valid:
-    - -97.98930471462685
-    - 163.1833847711053
-    - 28.38634022582533
-    - 99.19214666776175
-    - -3.7950847208787444
+    - -232.95313868437975
+    - -96.95418868143406
+    - -100.53403174895872
+    - -153.46931907789437
   type: float
 - attribute: ipv4_for
   description: IP-address v4
@@ -66,23 +113,28 @@ schemas:
   subtype: ipv4
   test_params:
     invalid: &id001
-    - 284.297.291.283
-    valid: &id002
-    - 140.213.70.124
-    - 140.213.170.61
-    - 140.213.23.42
-    - 140.213.178.198
-    - 140.213.126.255
-    - 140.213.24.218
-    - 140.213.254.226
-    - 140.213.110.10
-    - 140.213.166.188
-    - 140.213.149.132
-    - 140.213.167.179
-    - 140.213.99.188
-    - 140.213.205.126
-    - 140.213.75.14
-    - 140.213.136.25
+    - 267.277.281.286
+    multiple_valids: &id002
+    - 208.41.80.53
+    - 208.41.0.131
+    - 208.41.32.130
+    - 208.41.58.15
+    - 208.41.181.61
+    - 208.41.151.152
+    - 208.41.213.168
+    - 208.41.229.158
+    - 208.41.18.205
+    - 208.41.208.140
+    - 208.41.137.0
+    - 208.41.205.210
+    - 208.41.210.121
+    - 208.41.41.108
+    - 208.41.104.207
+    valid: &id003
+    - 208.41.80.53
+    - 208.41.0.131
+    - 208.41.32.130
+    - 208.41.58.15
   type: string
   validation:
     func_name: IsIPv4Address
@@ -93,25 +145,67 @@ schemas:
     invalid:
     - 0
     - 65536
+    multiple_valids:
+    - 1
+    - 65535
+    - 2092
+    - 27356
+    - 5698
+    - 21721
+    - 8200
+    - 3654
+    - 4679
+    - 63781
+    - 52123
+    - 39407
+    - 22047
+    - 60818
+    - 45608
     valid:
     - 1
     - 65535
-    - 6127
-    - 56107
-    - 2327
-    - 42801
-    - 46371
-    - 23929
-    - 40817
-    - 63397
-    - 4899
-    - 14962
-    - 63035
-    - 40263
-    - 4075
+    - 39319
+    - 62959
   type: int
   validation:
     func_name: IsPortNumber
+- attribute: temp_schema_list
+  element:
+    schema:
+      default:
+      - Hello
+      - '10.3442'
+      - '2'
+      type: string
+    type: schema
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - asnyiktdiu
+    - yx8vp6ia82
+    - wru6clk9fy
+    - d4pwld83iw
+    - 77xo07fv5l
+    - emybd0cxzz
+    - u375ju5b9i
+    - 0lhwadcoij
+    - k6j0iu02ys
+    - 8habasmzem
+    - zhcos7tk1u
+    - crs09ihmnx
+    - rdown2p67y
+    - okb4ngk7hh
+    - hfzkc3s3jm
+    valid:
+    - l0ce6bicqr
+    - t6tqfxypan
+    - jn79uvss2k
+    - 9axw2vh42x
+  type: set
 - attribute: test_score
   computed: true
   description: range
@@ -121,22 +215,27 @@ schemas:
     invalid:
     - 0
     - 101
+    multiple_valids:
+    - 1
+    - 100
+    - 50
+    - 30
+    - 37
+    - 36
+    - 66
+    - 53
+    - 37
+    - 77
+    - 46
+    - 3
+    - 24
+    - 29
+    - 35
     valid:
     - 1
     - 100
     - 50
-    - 7
-    - 45
-    - 42
-    - 98
-    - 42
-    - 49
-    - 47
-    - 6
-    - 94
-    - 7
-    - 54
-    - 73
+    - 48
   type: int
   validation:
     func_name: IntBetween
@@ -151,7 +250,13 @@ schemas:
   subtype: string
   test_params:
     invalid:
-    - 3npllak04l
+    - wnoe5v1ltx
+    multiple_valids:
+    - parth
+    - aarsh
+    - arjun
+    - alfatah
+    - krunal
     valid:
     - parth
     - aarsh
@@ -177,22 +282,27 @@ schemas:
     invalid:
     - -1
     - 33
+    multiple_valids:
+    - 0
+    - 32
+    - 16
+    - 30
+    - 10
+    - 5
+    - 12
+    - 29
+    - 21
+    - 28
+    - 15
+    - 31
+    - 5
+    - 20
+    - 4
     valid:
     - 0
     - 32
     - 16
-    - 6
-    - 29
-    - 20
-    - 16
-    - 13
-    - 6
-    - 7
-    - 25
-    - 22
-    - 17
-    - 22
-    - 30
+    - 21
   type: string
   validation:
     func_name: IsCIDRNetwork
@@ -208,23 +318,27 @@ schemas:
     invalid:
     - -1
     - 101
+    multiple_valids:
+    - 0
+    - 100
+    - 50.0
+    - 31.39012924699733
+    - 14.552797639146688
+    - 7.683031514319582
+    - 53.339113566464306
+    - 39.74839659807847
+    - 23.870415037284626
+    - 55.48580085505294
+    - 11.85264443892742
+    - 0.4145263169945834
+    - 7.358523616848771
+    - 13.811146447944788
+    - 0.5287296784194194
     valid:
     - 0
     - 100
     - 50.0
-    - 11.515536049074903
-    - 17.433330898926098
-    - 3.2804641632253593
-    - 58.93643040105934
-    - 13.17540857218283
-    - 44.075584561467785
-    - 9.590478663554332
-    - 3.6907867278564823
-    - 8.173093034377672
-    - 6.414365094603028
-    - 31.65650829681244
-    - 0.0
-    - 25.204629565742028
+    - 79.25895836369423
   type: float
   validation:
     func_name: FloatBetween
@@ -243,12 +357,27 @@ schemas:
     invalid:
     - random
     - 10.023
+    multiple_valids:
+    - 656
+    - 943
+    - 387
+    - 905
+    - 344
+    - -10
+    - 505
+    - -279
+    - 198
+    - -398
+    - 419
+    - -913
+    - -752
+    - 762
+    - -761
     valid:
-    - -514
-    - 804
-    - 557
-    - -423
-    - -193
+    - -319
+    - 717
+    - 845
+    - -48
   type: map
 - attribute: filter
   computed: true
@@ -263,12 +392,27 @@ schemas:
         invalid:
         - 10
         - 12.43
+        multiple_valids:
+        - 1h01rgdbbx
+        - v58fxfrfm8
+        - q6rni9yuym
+        - 1x1v7dxk42
+        - hhaj7zxaw2
+        - 32hfmysi97
+        - lozdc6ypd2
+        - xd6ppmyhkv
+        - 3mnd78x97k
+        - 33adg17a8f
+        - nyoeb5k53z
+        - ah905i61rq
+        - kwxvs3hxcs
+        - fng6v8h2kp
+        - c0u70qto06
         valid:
-        - lkem2khaa3
-        - 3u5xeo6v54
-        - iov58oh3k9
-        - fmf0r2ftyd
-        - e9fg2652j9
+        - b3m2rks0pa
+        - bqw0fnv2dv
+        - yufofii005
+        - ha8b0w39ad
       type: string
     - attribute: id
       computed: true
@@ -280,12 +424,27 @@ schemas:
         invalid:
         - 10
         - 12.43
+        multiple_valids:
+        - 4uvcqkruvk
+        - b5o5spxgpn
+        - ie91zbt1cw
+        - osv52f820q
+        - g2vzz1p6eu
+        - o7s2k423gg
+        - eriri4lsyd
+        - hkit2zsq8p
+        - dhayvod9q2
+        - 4uxwe0x7ew
+        - kmer14xvrm
+        - jza9r5g1ob
+        - ngbvi7prne
+        - l4x8cwvluo
+        - zqh27hs388
         valid:
-        - c77ifrm9o2
-        - p6v11hf9ye
-        - xalvvnvyop
-        - 87byfc1wih
-        - pphoe0vsm9
+        - cwtl9jl5dl
+        - 3tbpki57j1
+        - d1wzbikz34
+        - w0np8ipbbu
       type: string
     - attribute: description
       computed: true
@@ -297,12 +456,27 @@ schemas:
         invalid:
         - 10
         - 12.43
+        multiple_valids:
+        - qi53fweqwu
+        - ts9zdkcbyo
+        - 40t9y82ayz
+        - zwrf9hk7hy
+        - ko6w9t6f6u
+        - v331lkxda6
+        - kosn4ija6z
+        - o4ocssfhms
+        - igzxcvrw63
+        - axxbablnz8
+        - pdu9vvsdmv
+        - wm6eodb6ao
+        - 8cjbquxov8
+        - hsm9ictzxj
+        - 30irtvxhya
         valid:
-        - fyqxihiygb
-        - 75rm4bh6br
-        - noqamt4pfd
-        - smfb6rceos
-        - 5fb1uw6dc7
+        - grfar7akjm
+        - eokmc4yxw6
+        - qxh9uctivj
+        - p4b065xhj6
       type: string
     - attribute: filter_entry
       computed: true
@@ -315,16 +489,32 @@ schemas:
               type: string
             type: schema
           required: true
+          subtype: string
           test_params:
             invalid:
             - 10
             - 12.43
+            multiple_valids:
+            - opdbinmxur
+            - 2tkx0a814s
+            - 3fs5uz5we7
+            - ehnt8cb4au
+            - ua4w2wvr13
+            - 7fyfg0elw4
+            - d7vkf7r0q4
+            - xdn60l052r
+            - tzr6xjb1jz
+            - xggvme6hxk
+            - v06m4ycnf9
+            - yeddvm3tsp
+            - j6ix7djs2x
+            - nnwkzr16rl
+            - 8bz45hazhp
             valid:
-            - h72vnwzjg0
-            - ega9h97hqp
-            - s9gc2h0cm5
-            - o2uby5kcia
-            - tsoigwdvbg
+            - zgcpqsjbf8
+            - wieiuvwpva
+            - 2f856ubhuu
+            - xu2p664hzr
           type: set
         - attribute: filter_entry_name
           description: name of filter entry
@@ -335,36 +525,56 @@ schemas:
             invalid:
             - 10
             - 12.43
+            multiple_valids:
+            - 445slsb139
+            - e7eu9kgm66
+            - rfw3w2tm9k
+            - p90iv52bcd
+            - jdzu2qy85w
+            - 4ln6f8jk8j
+            - 0pj0wqp06y
+            - nchmd5nfvl
+            - a5a5eawook
+            - mybpoib260
+            - hkgz532dcn
+            - 1u0vu7cqlw
+            - v6mhd9wwtl
+            - cfdewt4rfp
+            - lw3wydup37
             valid:
-            - n7aq0oxmqh
-            - elnujyfy01
-            - vvfwpkuqgk
-            - 3k14w988uy
-            - lb08j39xdb
+            - dj1fbp5hek
+            - v7jdigiz0x
+            - dnarfr2byc
+            - soppt6a4nc
           type: string
         - attribute: ipv6
           description: ipv6
           optional: true
           subtype: ipv6
           test_params:
-            invalid: &id003
+            invalid: &id004
             - invalidIPv6
-            valid: &id004
-            - 2001:db8::34f4:0:0:f39d
-            - 2001:db8::34f4:0:0:f3d2
-            - 2001:db8::34f4:0:0:f361
-            - 2001:db8::34f4:0:0:f36b
-            - 2001:db8::34f4:0:0:f396
-            - 2001:db8::34f4:0:0:f344
-            - 2001:db8::34f4:0:0:f3b5
-            - 2001:db8::34f4:0:0:f3df
-            - 2001:db8::34f4:0:0:f339
-            - 2001:db8::34f4:0:0:f387
-            - 2001:db8::34f4:0:0:f319
-            - 2001:db8::34f4:0:0:f3fd
-            - 2001:db8::34f4:0:0:f397
-            - 2001:db8::34f4:0:0:f34b
-            - 2001:db8::34f4:0:0:f360
+            multiple_valids: &id005
+            - 2001:db8::34f4:0:0:f3d4
+            - 2001:db8::34f4:0:0:f363
+            - 2001:db8::34f4:0:0:f317
+            - 2001:db8::34f4:0:0:f304
+            - 2001:db8::34f4:0:0:f329
+            - 2001:db8::34f4:0:0:f30b
+            - 2001:db8::34f4:0:0:f3e4
+            - 2001:db8::34f4:0:0:f35d
+            - 2001:db8::34f4:0:0:f362
+            - 2001:db8::34f4:0:0:f335
+            - 2001:db8::34f4:0:0:f3aa
+            - 2001:db8::34f4:0:0:f3a9
+            - 2001:db8::34f4:0:0:f3d7
+            - 2001:db8::34f4:0:0:f35b
+            - 2001:db8::34f4:0:0:f349
+            valid: &id006
+            - 2001:db8::34f4:0:0:f3d4
+            - 2001:db8::34f4:0:0:f363
+            - 2001:db8::34f4:0:0:f317
+            - 2001:db8::34f4:0:0:f304
           type: string
           validation:
             func_name: IsIPv6Address
@@ -375,17 +585,56 @@ schemas:
           subtype: string
           test_params:
             invalid:
-            - a6vuh3u485
-            valid:
             - 'yes'
             - 'no'
+            multiple_valids:
+            - 57yjrpnc2o
+            - 865i9yrqjb
+            - 2p6q5rit52
+            - zshbeqoh3h
+            - tc07o5w9it
+            - kfbu25w9or
+            - cvdblfr6vb
+            - gmbo567a5l
+            - 2sarz43gry
+            - 8dk1qnq3cq
+            - xhe12vre6h
+            - fd0wuk6l0v
+            - mucg7teqse
+            - yjq8wrizns
+            - y475ody7ir
+            valid:
+            - gqdrd01uu3
+            - qkbx6thckg
+            - qz6bk4akah
+            - 26fa61kfo6
           type: string
           validation:
-            func_name: StringInSlice
+            func_name: StringNotInSlice
             ignore_case: 'false'
             params:
             - 'yes'
             - 'no'
+        - attribute: apply_to_frag_liist_schema
+          computed: true
+          description: apply to fragment
+          element:
+            schema:
+              type: bool
+            type: schema
+          optional: true
+          subtype: bool
+          test_params:
+            invalid:
+            - random
+            - 10
+            multiple_valids:
+            - true
+            - false
+            valid:
+            - true
+            - false
+          type: list
         type: resource
       max_items: 4
       min_items: 1
@@ -393,57 +642,69 @@ schemas:
       type: list
     type: resource
   max_items: 10
-  required: true
+  optional: true
   type: list
 types:
   base64:
     invalid:
     - a3+J1b%mFs//
+    multiple_valids:
+    - dnh4YngxNHI0Yg==
+    - YnV3aW8xMTh1NA==
+    - YTNsenVyM3Bncg==
+    - ODl4YzRkNHFqNA==
+    - MjRoZTJhY3AzcQ==
+    - NnBwbGM4OHAwMA==
+    - bDJvaXd4eXdsNg==
+    - b2FzeXBzMzY2Zg==
+    - eDZ5N2F5YjVlYw==
+    - dGd5Y2RnNXR1ZQ==
+    - M29qdG40YXg2aQ==
+    - MGpvc3pkamc4MA==
+    - eTlreXBwYTEzMQ==
+    - aXk3MTdjd3J3dA==
+    - MmZ2dXgyMHQ1ag==
     valid:
-    - Zjk3YXlzMnFubQ==
-    - M25kMWNjZzYwYg==
-    - bDIyNGF3YXgxeg==
-    - eXd1d3htdTF5bg==
-    - aDg0bms4NDNlaA==
-    - NXcwMnN4dHN0ZA==
-    - ZzQxeWN1ZXYyNw==
-    - c3Vjc2lzN2t1cg==
-    - aGd1ZWMxc2ZxOA==
-    - MW40cW5rb2Z1NA==
-    - cHc1M2w4cHZ0dQ==
-    - ZmF0b3h0MHJpZg==
-    - OHVuMmNxbTIzcg==
-    - cjM0NGloa21xZA==
-    - dTdzb243Zjh2eA==
+    - Ynp5ZjVyenlmdQ==
+    - ZmlhOGVremR3Zw==
+    - a3NkM3JmNHVyNw==
+    - aG1xMTBwYzFjdQ==
   cidr:
     invalid:
-    - 286.273.285.280/11
+    - 268.290.266.297/28
+    multiple_valids:
+    - 208.41.112.0/20
+    - 208.41.144.0/20
+    - 208.41.160.0/20
+    - 208.41.224.0/20
+    - 208.41.48.0/20
+    - 208.41.240.0/20
+    - 208.41.176.0/20
+    - 208.41.80.0/20
+    - 208.41.0.0/20
+    - 208.41.32.0/20
+    - 208.41.64.0/20
+    - 208.41.96.0/20
+    - 208.41.192.0/20
+    - 208.41.16.0/20
+    - 208.41.128.0/20
     valid:
-    - 140.213.0.0/20
-    - 140.213.64.0/20
-    - 140.213.48.0/20
-    - 140.213.208.0/20
-    - 140.213.96.0/20
-    - 140.213.32.0/20
-    - 140.213.128.0/20
-    - 140.213.224.0/20
-    - 140.213.112.0/20
-    - 140.213.176.0/20
-    - 140.213.240.0/20
-    - 140.213.144.0/20
-    - 140.213.16.0/20
-    - 140.213.80.0/20
-    - 140.213.192.0/20
+    - 208.41.112.0/20
+    - 208.41.144.0/20
+    - 208.41.160.0/20
+    - 208.41.224.0/20
   ipv4:
     invalid: *id001
-    valid: *id002
+    multiple_valids: *id002
+    valid: *id003
   ipv6:
-    invalid: *id003
-    valid: *id004
+    invalid: *id004
+    multiple_valids: *id005
+    valid: *id006
   json:
     invalid:
     - 'json({ name : val)'
-    valid:
+    multiple_valids:
     - 'json({ "attribute" : "value0" })'
     - 'json({ "attribute" : "value1" })'
     - 'json({ "attribute" : "value2" })'
@@ -459,123 +720,161 @@ types:
     - 'json({ "attribute" : "value12" })'
     - 'json({ "attribute" : "value13" })'
     - 'json({ "attribute" : "value14" })'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
   mac:
     invalid:
     - invalidMAC
+    multiple_valids:
+    - 0d:54:6b:8d:94:be
+    - 49:aa:6e:08:d0:7e
+    - 7f:5d:b0:10:9c:dc
+    - da:2c:42:27:af:04
+    - 48:6e:62:32:fa:99
+    - 04:89:77:9b:64:7d
+    - df:5b:b7:e3:a3:eb
+    - cf:05:1c:b4:a3:6d
+    - b5:b8:42:d6:11:51
+    - f2:a5:12:05:83:52
+    - 79:56:d8:d9:e8:48
+    - bc:ec:f0:21:e3:f3
+    - 05:e8:73:05:6d:0e
+    - 78:b7:66:d9:3b:ea
+    - 72:54:da:d9:e6:4e
     valid:
-    - 56:9b:48:11:fa:86
-    - 4e:b2:26:86:d8:ce
-    - 0f:ed:f0:cc:b7:c8
-    - 25:f1:ac:98:21:f2
-    - 40:a1:45:c0:05:de
-    - 27:0b:5f:4d:8a:ba
-    - b1:75:05:64:9d:ab
-    - c7:d4:03:90:98:32
-    - e4:f1:9c:37:bc:48
-    - 58:53:44:da:d8:b9
-    - 84:27:ab:f4:a3:0c
-    - f7:d9:4b:16:db:01
-    - ab:b9:ee:0a:05:ed
-    - 8e:34:b9:a1:06:56
-    - 58:9b:2d:37:eb:0e
+    - 46:63:fa:d6:37:9b
+    - 29:11:b4:19:94:5a
+    - 2f:12:d4:47:43:13
+    - 14:2d:a0:3c:52:a7
   regex:
     invalid:
     - '[0-9)++'
+    multiple_valids:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
     valid:
     - (?m)^[0-9]{2}$
     - ^(\$)(\d)+
   string:
     invalid:
     - 12345
+    multiple_valids:
+    - shdp0ui7tu
+    - xpqkhw5hug
+    - 3r5pa3hg0h
+    - jvmenvi832
+    - ei9h88qltm
+    - s6woc3wljo
+    - nk89cqogre
+    - cppsr01z11
+    - 5492pi0weg
+    - par2qyby43
+    - hmwthn90w9
+    - vvjm65rtjg
+    - jrly1nvews
+    - byfmbrrn36
+    - c1gq2mn5p7
     valid:
-    - d87qtucv7h
-    - zocwzurnuu
-    - dcsvjmod0k
-    - o2ko444vfy
-    - vyya6xvm4i
-    - vgx1igskjp
-    - yy52p4s61j
-    - 7ddw4lonti
-    - s3wfjrtacg
-    - q3t864cqdc
-    - x1jc4shzb7
-    - 4ra105pp0d
-    - so56vzsd8i
-    - cjctoi9hzk
-    - 1poe78kqoz
+    - 6x0i6m7s38
+    - wtfvka8zu3
+    - mnjg5rr1s1
+    - s1mgkyj5j7
   time:
     invalid:
-    - '2022-06-24 18:19:44.592350'
+    - '2022-06-29 18:09:34.703210'
+    multiple_valids:
+    - '2022-06-29T12:39:34.703210+00:00'
+    - '2022-07-22T12:39:34.703210+00:00'
+    - '2022-08-14T12:39:34.703210+00:00'
+    - '2022-09-06T12:39:34.703210+00:00'
+    - '2022-09-29T12:39:34.703210+00:00'
+    - '2022-10-22T12:39:34.703210+00:00'
+    - '2022-11-14T12:39:34.703210+00:00'
+    - '2022-12-07T12:39:34.703210+00:00'
+    - '2022-12-30T12:39:34.703210+00:00'
+    - '2023-01-22T12:39:34.703210+00:00'
+    - '2023-02-14T12:39:34.703210+00:00'
+    - '2023-03-09T12:39:34.703210+00:00'
+    - '2023-04-01T12:39:34.703210+00:00'
+    - '2023-04-24T12:39:34.703210+00:00'
+    - '2023-05-17T12:39:34.703210+00:00'
     valid:
-    - '2022-06-24T12:49:44.592350+00:00'
-    - '2022-07-17T12:49:44.592350+00:00'
-    - '2022-08-09T12:49:44.592350+00:00'
-    - '2022-09-01T12:49:44.592350+00:00'
-    - '2022-09-24T12:49:44.592350+00:00'
-    - '2022-10-17T12:49:44.592350+00:00'
-    - '2022-11-09T12:49:44.592350+00:00'
-    - '2022-12-02T12:49:44.592350+00:00'
-    - '2022-12-25T12:49:44.592350+00:00'
-    - '2023-01-17T12:49:44.592350+00:00'
-    - '2023-02-09T12:49:44.592350+00:00'
-    - '2023-03-04T12:49:44.592350+00:00'
-    - '2023-03-27T12:49:44.592350+00:00'
-    - '2023-04-19T12:49:44.592350+00:00'
-    - '2023-05-12T12:49:44.592350+00:00'
+    - '2022-06-29T12:39:34.703210+00:00'
+    - '2022-07-22T12:39:34.703210+00:00'
+    - '2022-08-14T12:39:34.703210+00:00'
+    - '2022-09-06T12:39:34.703210+00:00'
   url-http:
     invalid:
-    - ht:/rwxn6o0y8d5dwl9.com
+    - ht:/5m5e2ehz0mlt8wn.com
+    multiple_valids:
+    - http://i318zxkvpnbmxal.com
+    - http://pj6g2q2drhxtfae.com
+    - http://7mgjst34wj084l5.com
+    - http://7s0nmke71ob5a3c.com
+    - http://yewl2bcs54i0pbu.com
+    - http://3sza856qkivmy94.com
+    - http://izw5p5kbzqr6oy7.com
+    - http://b5xo3iwesng1b1w.com
+    - http://2znr5z76yvckpan.com
+    - http://oirid2dawg0jo8c.com
+    - http://90qz0npy0p1qslg.com
+    - http://2i3mytbafj2u9la.com
+    - http://y8v44woh8k85r1z.com
+    - http://leg3d7jum61yj1s.com
+    - http://9fn6uyns4sboywo.com
     valid:
-    - http://54gq5r5zkf1lpxy.com
-    - http://97pw0fl5zdzs2os.com
-    - http://0t9k6254mejp8hw.com
-    - http://r2imffs8h8hap52.com
-    - http://tj2b7plkcnk8cg6.com
-    - http://3i9ufahy8nomluo.com
-    - http://elv752zhzji3z72.com
-    - http://wlnz3dchyyw02fe.com
-    - http://2bir3tujnjqqjm8.com
-    - http://4fcjjvr2wb2eol4.com
-    - http://h71czf2i8s5m0pp.com
-    - http://l8foc6u49svgu5e.com
-    - http://sf8g7kcc9sp5alz.com
-    - http://ny3vjkob51rn45c.com
-    - http://roxzo7nkx2wuhgx.com
+    - http://by39542cb8nsrxb.com
+    - http://hv6mmy75phf7dkh.com
+    - http://0s0kzggfn66jqa0.com
+    - http://r3xvyodrbdu2amt.com
   url-https:
     invalid:
-    - hts:/u8nlmwnvbjrgqua.com
+    - hts:/wzzqycpdam4lubd.com
+    multiple_valids:
+    - https://zi1hxxxt1oq3ahj.com
+    - https://2kmwtep6un3pk8a.com
+    - https://sk9yt43lz0k9yds.com
+    - https://ap7qqgtlu8d6uvm.com
+    - https://s6ztw71oxskeovp.com
+    - https://6yt8lmp4g97cca7.com
+    - https://7gar5abh5sh31lw.com
+    - https://yaic13hx6peisyt.com
+    - https://xuo2x0ubj8pk4ua.com
+    - https://2t9rg8j9lb7idrz.com
+    - https://1qswdbczmypmdz7.com
+    - https://fljoqm1buepj2x1.com
+    - https://7mcxmbdi2wdkia1.com
+    - https://8p2wxj3fa1wdwck.com
+    - https://udn77knnk0ketrg.com
     valid:
-    - https://9u2npr3umj8bwxk.com
-    - https://srna4bmacglgixp.com
-    - https://9dk6rt9xof1xohs.com
-    - https://8pqd5c7cxa1dbgg.com
-    - https://f2roholejl3cqu4.com
-    - https://4ngsridn928obff.com
-    - https://fd214vvgxj6ddya.com
-    - https://knlwnvg9bs6f296.com
-    - https://784c3a4pdo71hl4.com
-    - https://5cj28s053htp0sz.com
-    - https://3j4t74t93dvf1u8.com
-    - https://paztqs2l7laxtfz.com
-    - https://jjl51mnoub71u89.com
-    - https://41p62fvn34lqlsw.com
-    - https://a8x12vabz3dnyy9.com
+    - https://tua54wukmxgdj3d.com
+    - https://ebtaunojr8pmgv4.com
+    - https://ct5w9je06yl3bvw.com
+    - https://oc0yntxe8abensq.com
   uuid:
     invalid:
     - invalid323Uuid12
+    multiple_valids:
+    - 87d41428-f7a8-11ec-bd7e-7c8ae1979a87
+    - 87d41429-f7a8-11ec-a792-7c8ae1979a87
+    - 87d4142a-f7a8-11ec-8ffd-7c8ae1979a87
+    - 87d4142b-f7a8-11ec-a895-7c8ae1979a87
+    - 87d4142c-f7a8-11ec-a804-7c8ae1979a87
+    - 87d4142d-f7a8-11ec-8bfc-7c8ae1979a87
+    - 87d4142e-f7a8-11ec-8e36-7c8ae1979a87
+    - 87d4142f-f7a8-11ec-811f-7c8ae1979a87
+    - 87d41430-f7a8-11ec-98a1-7c8ae1979a87
+    - 87d41431-f7a8-11ec-ae22-7c8ae1979a87
+    - 87d41432-f7a8-11ec-b1f4-7c8ae1979a87
+    - 87d41433-f7a8-11ec-92b5-7c8ae1979a87
+    - 87d41434-f7a8-11ec-b227-7c8ae1979a87
+    - 87d41435-f7a8-11ec-b4c9-7c8ae1979a87
+    - 87d41436-f7a8-11ec-8527-7c8ae1979a87
     valid:
-    - 1f4906b5-f3bc-11ec-9399-7c8ae196ee3b
-    - 1f491a3e-f3bc-11ec-8bbb-7c8ae196ee3b
-    - 1f491a3f-f3bc-11ec-8054-7c8ae196ee3b
-    - 1f491a40-f3bc-11ec-9ff0-7c8ae196ee3b
-    - 1f491a41-f3bc-11ec-a10a-7c8ae196ee3b
-    - 1f491a42-f3bc-11ec-8574-7c8ae196ee3b
-    - 1f491a43-f3bc-11ec-80a1-7c8ae196ee3b
-    - 1f491a44-f3bc-11ec-a32d-7c8ae196ee3b
-    - 1f491a45-f3bc-11ec-88d7-7c8ae196ee3b
-    - 1f491a46-f3bc-11ec-810e-7c8ae196ee3b
-    - 1f491a47-f3bc-11ec-a303-7c8ae196ee3b
-    - 1f491a48-f3bc-11ec-a66e-7c8ae196ee3b
-    - 1f491a49-f3bc-11ec-b990-7c8ae196ee3b
-    - 1f491a4a-f3bc-11ec-a1ba-7c8ae196ee3b
-    - 1f491a4b-f3bc-11ec-a041-7c8ae196ee3b
+    - 87d41424-f7a8-11ec-9c90-7c8ae1979a87
+    - 87d41425-f7a8-11ec-bb2c-7c8ae1979a87
+    - 87d41426-f7a8-11ec-af61-7c8ae1979a87
+    - 87d41427-f7a8-11ec-a2ee-7c8ae1979a87

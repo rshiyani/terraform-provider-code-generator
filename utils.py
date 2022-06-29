@@ -23,3 +23,14 @@ def quote(s):
     if str(s)[:5] == 'json(':
         return '`'+str(s)+'`'
     return '"'+str(s)+'"'
+
+def make_dot_string(value, *args):
+    lst = value + list(args)
+    s = ".".join(lst)
+    return s
+
+def eliminate_zeroes(value):
+    return '.'.join(value.split(".0."))
+
+def eliminate_zeroes_and_capitalize(value):
+    return pascalize('_'.join(value.split(".0.")))

@@ -13,7 +13,9 @@ schemas:
     depends_on:
       resource_name: "tenant"
       attribute_name:
-        - "id"
+        - "filter"
+        - "filter_entry"
+        - "name"
 
   - attribute: "temp"
     type: "int"
@@ -153,6 +155,15 @@ schemas:
   #   #   schema:
   #   #     type: "string"
 
+  - attribute: "temp_schema_list"
+    type: "set"
+    optional: true
+    element:
+      type: "schema"
+      schema:
+        default: ["Hello", "10.3442", "2"]
+        type: "string"
+
   - attribute: "test_score"
     type: "int"
     # required: true
@@ -214,8 +225,8 @@ schemas:
 
   - attribute: "filter"
     type: "list"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     computed: true
     description: "filter list"
     max_items: 10
@@ -272,9 +283,18 @@ schemas:
                 optional: true
                 computed: true
                 validation:
-                  func_name: "StringInSlice"
+                  func_name: "StringNotInSlice"
                   ignore_case: "false"
                   params:
                     - "yes"
                     - "no"
                 description: "apply to fragment"
+              - attribute: "apply_to_frag_liist_schema"
+                type: "list"
+                optional: true
+                computed: true
+                description: "apply to fragment"
+                element:
+                  type: schema
+                  schema:
+                    type: "bool"

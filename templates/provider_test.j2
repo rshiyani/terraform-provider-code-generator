@@ -73,3 +73,10 @@ var providerFactories = map[string]func() (*schema.Provider, error){
 		return testAccProvider, nil
 	},
 }
+
+
+func searchInObject(testMap map[string]interface{}, attr string) interface{} {
+	jsonStr, _ := json.Marshal(testMap)
+	jsonParsed, _ := gabs.ParseJSON([]byte(jsonStr))
+	return jsonParsed.Path(attr).Data()
+}
