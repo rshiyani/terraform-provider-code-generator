@@ -1,0 +1,72 @@
+{% import './helpers/serviceshelper.j2' as shelper %}
+package client
+
+import (
+	{% for import in imports %}
+    "{{import}}"
+    {% endfor %}
+)
+
+var string BaseURL = "{{BaseURL}}"
+
+{% for resource in resources %}
+{% for path in resource.paths %}
+{% if path.GET is defined and path.GET.parameters is defined%}
+func (c *Client) {{path.GET.funcName}}({{ shelper.getAllArgs(path) | rmlaststr}}) (*gabs.Container, error){	
+	{{resource.name}}Container, err := c.Get(c.BaseURL+fmt.Sprintf({{path.path_name | urlpassvar(path.GET.parameters.Args)}}))
+    if err != nil {
+		return nil, err
+	}
+    return movieContainer, err
+}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{% for resource in resources %}
+{% for path in resource.paths %}
+    {% if path.POST is defined and path.POST.parameters %}
+func (c *client.Client){{path.POST.funcName}}({{shelper.postAllArgs(path) | rmlaststr}})(*gabs.Container, error){
+    
+    {{shelper.modeltomap(path.POST.parameters.modelName, path.POST.requestBody)}}
+    {{path.POST.parameters.modelName}}Container, err := c.Post(c.BaseURL+fmt.Sprintf({{path.path_name | urlpassvar(path.POST.parameters.Args)}}),{{path.POST.parameters.modelName}}Bytes)
+        if err != nil {
+            return nil, err
+        }
+        return {{path.POST.parameters.modelName}}Container, err
+}
+    {% endif %}
+{% endfor %}
+{% endfor %}
+
+{% for resource in resources %}
+    {% for path in resource.paths %}
+        {% if path.PUT is defined and path.PUT.parameters %}
+            func(c *client.Client) {{path.PUT.funcName}}({{shelper.putAllArgs(path) | rmlaststr}}) (*gabs.Container, error) {
+                {{shelper.modeltomap(path.PUT.parameters.modelName, path.PUT.requestBody)}}
+                {{path.POST.parameters.modelName}}Container, err := c.Put(c.BaseURL+fmt.Sprintf({{path.path_name | urlpassvar(path.POST.parameters.Args)}}),{{path.POST.parameters.modelName}}Bytes)
+                if err != nil {
+                    return nil, err
+                }
+                return {{path.POST.parameters.modelName}}Container, err
+            }
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+{% for resource in resources %}
+    {% for path in resource.paths %}
+        {% if path.DELETE is defined and path.DELETE.parameters is defined %}
+        func (c *Client) {{path.DELETE.funcName}}({{shelper.deleteAllArgs(path) | rmlaststr}}) error {
+        {% if path.DELETE.requestBody is defined %}
+            {{shelper.modeltomap(path.DELETE.parameters.modelName, path.DELETE.requestBody)}}
+        {% endif %}
+        {% if path.DELETE.serviceFunc is defined %}
+        return c.{{path.DELETE.serviceFunc}}(c.BaseURL+fmt.Sprintf({{path.path_name | urlpassvar(path.DELETE.parameters.Args)}}),{{path.DELETE.parameters.modelName}}Bytes)
+        {% else %}
+        return c.Delete(c.BaseURL+fmt.Sprintf({{path.path_name | urlpassvar(path.DELETE.parameters.Args)}}))
+        {% endif %}
+        }
+        {% endif %}
+    {% endfor %}
+{% endfor %}

@@ -1,0 +1,96 @@
+package client
+
+import (
+	{% for import in imports %}
+    "{{import}}"
+    {% endfor %}
+)
+
+
+//Create Movie with given MovieAttributes using General POST method of services
+{% for resource in resources %}
+func (c *Client) Create{{resource.name | capitalize}}({{resource.name | lower}}Attr *models.MovieAttributes) (*models.{{resource.name | capitalize}}, error) {
+
+	
+	bytes{{resource.name | capitalize}}, err := json.Marshal({{resource.name | lower}}Attr)
+	if err != nil {
+		return nil, err
+	}
+
+	
+    {% for path in resource.paths %}
+		{% if path.post is defined %}
+			{{resource.name | lower}}Cont, err := c.Post(c.BaseURL+"/{{path.path_name}}", bytes{{resource.name | capitalize}})
+			if err != nil {
+				return nil, err
+			}
+		{% endif %}
+	{% endfor %}
+	
+
+	{{resource.name | lower}}, err := models.{{resource.name | capitalize}}FromContainer({{resource.name | lower}}Cont)
+	if err != nil {
+		return nil, err
+	}
+	return {{resource.name | lower}}, nil
+}
+
+{% endfor %} 
+
+{% for resource in resources %}
+	{% for path in resource.paths %}
+		{% if path.GET is defined %}
+			func (c *Client) Read{{resource.name | capitalize}}({{path.GET.parameters[0].name | lower}} string) (*models.{{resource.name | capitalize}}, error) {
+		{% endif %}
+		
+		{% if path.GET is defined %}
+		{{resource.name | lower}}Cont, err := c.Get(c.BaseURL + "/{{path.path_name}}/" + {{path.GET.parameters[0].name}})
+		if err != nil {
+			return nil, err
+		}
+		{% endif %}
+		
+		{% if path.GET is defined %}
+		{{resource.name | lower}}, err := models.{{resource.name | capitalize}}FromContainer({{resource.name | lower}}Cont)
+		if err != nil {
+			return nil, err
+		}
+		return {{resource.name | lower}}, nil
+		}
+		{% endif %}
+
+	{% endfor %}
+{% endfor %} 
+
+{% for resource in resources %}
+	{% for path in resource.paths %}
+	{% if path.put is defined %}
+func (c *Client) Update{{resource.name | capitalize}}({{path.put.parameters[0].name}} string, {{resource.name | lower}}Attr *models.{{resource.name | capitalize}}Attributes) (*models.{{resource.name | capitalize}}, error) {
+	bytes{{resource.name | capitalize}}, err := json.Marshal({{resource.name}}Attr)
+	if err != nil {
+		return nil, err
+	}
+
+	{{resource.name | lower}}Cont, err := c.Put(c.BaseURL+"/{{path.path_name}}/"+id, bytesMovie)
+	if err != nil {
+		return nil, err
+	}
+	{{resource.name}}, err := models.{{resource.name | capitalize}}FromContainer({{resource.name}}Cont)
+	if err != nil {
+		return nil, err
+	}
+	return {{resource.name}}, nil
+}
+	{% endif %}
+{% endfor %}
+{% endfor %} 
+
+{% for resource in resources %}
+	{% for path in resource.paths %}
+	{% if path.delete is defined %}
+func (c *Client) Delete{{resource.name | capitalize}}({{path.delete.parameters[0].name}} string, {{resource.name | lower}}Attr *models.{{resource.name | capitalize}}Attributes) (*models.{{resource.name | capitalize}}, error) {
+	return c.Delete(c.BaseURL + "/{{resource.name}}/" + id)
+}
+	{% endif %}
+{% endfor %}
+{% endfor %} 

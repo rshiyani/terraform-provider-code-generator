@@ -1,0 +1,64 @@
+{% macro getAllArgs(path) -%}
+        {%- if path.GET is defined -%}
+            {% for para in path.GET.parameters.Args %}
+            {% if path.GET.parameters.modelName is defined and path.GET.parameters.model_repo_path is defined %}
+            {{- para.name}} {{para.type}}, {{path.GET.parameters.modelName}} *models.{{path.GET.parameters.model_repo_path}}
+            {% else %}
+            {{- para.name}} {{para.type}}
+            {% endif %}
+            {% endfor %}
+        {%- endif -%}
+{%- endmacro -%}
+
+{% macro postAllArgs(path) %}
+{%- if path.POST is defined -%}
+    {% for para in path.POST.parameters.Args %}
+    {% if path.POST.parameters.modelName is defined and path.POST.parameters.model_repo_path is defined %}
+    {{- para.name}} {{para.type}}, {{path.POST.parameters.modelName}} *models.{{path.POST.parameters.model_repo_path}}
+    {% else %}
+    {{- para.name}} {{para.type}}
+    {% endif %}
+    {% endfor %}
+{%- endif -%}
+{%- endmacro -%}
+
+{% macro putAllArgs(path) %}
+{%- if path.PUT is defined -%}
+    {% for para in path.PUT.parameters.Args %}
+    {% if path.PUT.parameters.modelName is defined and path.PUT.parameters.model_repo_path is defined %}
+    {{- para.name}} {{para.type}}, {{path.PUT.parameters.modelName}} *models.{{path.PUT.parameters.model_repo_path}}
+    {% else %}
+    {{- para.name}} {{para.type}}
+    {% endif %}
+    {% endfor %}
+{%- endif -%}
+{%- endmacro -%}
+
+{% macro deleteAllArgs(path) %}
+{%- if path.DELETE is defined -%}
+    {%- for para in path.DELETE.parameters.Args %}
+    {% if path.DELETE.parameters.modelName is defined and path.DELETE.parameters.model_repo_path is defined %}
+    {{para.name}} {{para.type}},
+    {%- endif -%}
+    {%- endfor -%}
+{%- endif -%}
+{%- endmacro -%}
+
+{% macro modeltomap(name,reqBody) %}
+    {{name | pascalize }}Map := make(map[string]interface{})
+    {% for props in reqBody.schema.properties %}
+    {% if (props.type == 'list' or props.type == 'set') and props.properties is defined %}
+        {{props.name}}Map := make([]map[string]interface{},0,1)
+        {% for subprop in props.properties %}
+            {{props.name}}Map[0]["{{subprop.name}}"] = {{subprop.model_path}}
+        {% endfor %}
+        {{name | pascalize }}Map["{{props.name}}"] = {{props.name}}Map
+    {% else %}
+        {{name | pascalize }}Map["{{props.name}}"] = {{props.model_path}}
+    {% endif %}
+    {% endfor %}
+    {{name}}Bytes, err := json.Marshal({{name}}Map)
+    if err != nil {
+        return nil, err
+    }
+{% endmacro %}

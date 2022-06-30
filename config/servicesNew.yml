@@ -1,0 +1,230 @@
+BaseURL: http://localhost:8000
+
+imports:
+ - "fmt"
+ - "encoding/json"
+ - "github.com/RutvikS-crest/movies-go-client/models"
+ - "github.com/Jeffail/gabs"
+
+resources:
+  - name: movies 
+    paths:
+      - path_name: /movies/id
+        GET:
+          funcName: getMovieById
+          parameters:
+            Args: 
+            - name: id
+              type: string
+            modelName: Movie  
+            
+          responses:
+          '200': 
+              description: A JSON Array of all the movie resources 
+              content:
+                application/json:
+                  schema:
+                    type: array
+                    items:   
+                      type: object
+                      properties:
+                        id: 
+                          type: string
+                          example: "17852714"
+                        isbn:
+                          type: string
+                          example: "123456789"
+                        title:
+                          type: string
+                          example: "Hera pheri"
+                        director: 
+                          type: object
+                          properties:
+                            firstname: 
+                              type: string
+                              model-path: movie.director
+                            lastname: 
+                              type: string
+                        casts: 
+                          type: array
+                          items: 
+                            type: string
+                        ratings: 
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              rater: 
+                                type: string
+        POST:
+          summary: "Post a data for new cast resource"
+          funcName: postMovie
+          parameters:
+            Args: 
+                - name: id
+                  type: string
+            modelName: Movie
+            model_repo_path: Movie
+              
+          requestBody:
+            schema:
+              required:
+                - title
+              type: object
+              properties:
+                - name: id 
+                  model_path: Movie.Id 
+                  type: string
+                - name: isbn
+                  model_path: Movie.Isbn 
+                  type: string
+                - name: title
+                  model_path: Movie.Title 
+                  type: string
+                - name: director 
+                  model_path: Movie.Director 
+                  type: list 
+                  properties:
+                    - name: firstname 
+                      type: string
+                      model_path: Movie.Director.FirstName
+                    - name: lastname 
+                      type: string
+                      model_path: Movie.Director.LastName
+               
+          responses:
+            '200':
+              description: 'ok'
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      id: 
+                        type: string
+                        example: "17852714"
+                      isbn:
+                        type: string
+                        example: "123456789"
+                      title:
+                        type: string
+                        example: "Hera pheri"
+                      director: 
+                        type: object
+                        properties:
+                          firstname: 
+                            type: string
+                            example: "Rohit"
+                            model-path: Movie.Director.FirstName
+                          lastname: 
+                            type: string
+                            example: "Shetty"
+                            model-path: Movie.Director.LastName
+                      casts: 
+                        type: array
+                        items: 
+                          type: string
+                      ratings: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            rater: 
+                              type: string
+                              example: "IMDB"
+                              model-path: rating.rater
+                            rating: 
+                              type: number
+                              example: 4.5
+                              model-path: rating.rating
+                      genre: 
+                        type: string
+                        example: "comedy"
+        DELETE:
+          summary: One Can Delete the rating 
+          funcName: DeleteMovie
+          parameters:
+            Args:
+              - name: id
+                type: string
+            modelName: ratingAttr
+            model_repo_path: Rating
+          
+          responses:
+          '200': 
+              description: A JSON Array of remaining all the movie resources 
+
+          
+
+      - path_name: /movies/id/ratings
+        POST:
+          summary: One Can Add the rating  
+          funcName: AddRatings
+          parameters:
+            Args: 
+              - name: id
+                type: string
+              # - name: id2
+              #   type: string
+            modelName: ratingAttr
+            model_repo_path: Rating
+            
+          requestBody:
+            schema:
+              required:
+                - title
+              type: object
+              properties:
+                - name: Rater
+                  model_path: Rating.Rater
+                  type: string
+                - name: Rating
+                  model_path: Rating.Rating
+                  type: string
+        PUT:
+          summary: One Can Update the rating 
+          funcName: UpdateRatings
+          parameters:
+            Args: 
+              - name: id
+                type: string 
+            modelName: ratingAttr
+            model_repo_path: Rating
+
+          requestBody:
+            schema:
+              required:
+                - title
+              type: object
+              properties:
+                - name: Rater
+                  model_path: Rating.Rater
+                  type: string
+                - name: Rating
+                  model_path: Rating.Rating
+                  type: string
+        DELETE:
+          summary: One Can Update the rating 
+          funcName: DeleteRatings
+          parameters:
+            Args: 
+              - name: id
+                type: string 
+              - name: rater 
+                type: string
+            modelName: ratingAttr
+            model_repo_path: Rating
+          serviceFunc: DeleteRat 
+
+          requestBody:
+            schema:
+              type: object
+              properties:
+                - name: Rater
+                  model_path: Rating.Rater
+                  type: string
+                - name: Rating
+                  model_path: Rating.Rating
+                  type: string
+
+          
