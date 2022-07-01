@@ -34,3 +34,12 @@ def eliminate_zeroes(value):
 
 def eliminate_zeroes_and_capitalize(value):
     return pascalize('_'.join(value.split(".0.")))
+
+def eliminate_dots_and_capitalize(value):
+    return pascalize('_'.join(value.split(".")))
+
+def get_first(value):
+    return value.split(".")[0]
+
+def eliminate_first(value):
+    return '.'.join(value.split(".")[1:])

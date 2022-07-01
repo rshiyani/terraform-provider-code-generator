@@ -1,7 +1,7 @@
 from jinja2 import Environment, FileSystemLoader
 import yaml
 import random
-from utils import camelize, pascalize, snakify, is_list, quote, make_dot_string, eliminate_zeroes, eliminate_zeroes_and_capitalize
+from utils import camelize, pascalize, snakify, is_list, quote, make_dot_string, eliminate_zeroes, eliminate_zeroes_and_capitalize, eliminate_dots_and_capitalize,get_first,eliminate_first
 import string
 import datetime
 from netaddr import *
@@ -367,7 +367,7 @@ typeMap = {
 }
 
 def pre_process():
-    with open("./config/resources/contract.yml", 'r') as stream:
+    with open("./config/resources/movie.yml", 'r') as stream:
         data = yaml.safe_load(stream)
     data = generate_random_values(data)
 
@@ -517,7 +517,7 @@ def pre_process():
                 }
         elif schema["type"] in ["list","set"]:
             handleListSetMap(data,schema)
-    with open('./config/resources/contract_generated.yml', 'w') as outfile:
+    with open('./config/resources/movie_generated.yml', 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
 
 def pre_process_for_provider():
@@ -551,6 +551,10 @@ env.filters["is_list"] = is_list
 env.filters["quote"] = quote
 env.filters["eliminate_zeroes"] = eliminate_zeroes
 env.filters["eliminate_zeroes_and_capitalize"] = eliminate_zeroes_and_capitalize
+env.filters["eliminate_dots_and_capitalize"] = eliminate_dots_and_capitalize
+env.filters["get_first"] = get_first
+env.filters["eliminate_first"] = eliminate_first
+
 
 
 template = env.get_template('provider_test.j2')
@@ -560,7 +564,7 @@ with open("output/provider_test_output.go", "w") as fh:
     fh.write(template.render(config))
 
 
-config = yaml.full_load(open('./config/resources/contract_generated.yml'))
+config = yaml.full_load(open('./config/resources/movie_generated.yml'))
 env = Environment(loader=FileSystemLoader('./templates'),
                   trim_blocks=True, lstrip_blocks=True)
 
@@ -573,6 +577,9 @@ env.filters["quote"] = quote
 env.filters["make_dot_string"] = make_dot_string
 env.filters["eliminate_zeroes"] = eliminate_zeroes
 env.filters["eliminate_zeroes_and_capitalize"] = eliminate_zeroes_and_capitalize
+env.filters["eliminate_dots_and_capitalize"] = eliminate_dots_and_capitalize
+env.filters["get_first"] = get_first
+env.filters["eliminate_first"] = eliminate_first
 
 
 template = env.get_template('resource_test_new.j2')

@@ -31,19 +31,19 @@ var expectErrorMap = map[string]string{
 
 var Test = map[string]interface{}{
 		"base64": map[string]interface{}{
-			"valid": []interface{}{ "ejRkMXBvanFodA==", "YnQ2bXJiZTZ5eA==", "bnNmaHV1ZGR5Yg==", "Z2RodjI2Y3RnaQ==" },
+			"valid": []interface{}{ "MWM4cjYxNXBoZw==", "ZTZnNnlxeGd2cg==", "bjM0YmlmOWpkOQ==", "Mjg4dzcyeDd3aQ==" },
 			"invalid": []interface{}{ "a3+J1b%mFs//" },
 		},
 		"cidr": map[string]interface{}{
-			"valid": []interface{}{ "244.119.144.0/20", "244.119.240.0/20", "244.119.80.0/20", "244.119.208.0/20" },
-			"invalid": []interface{}{ "270.271.281.277/20" },
+			"valid": []interface{}{ "130.108.0.0/20", "130.108.192.0/20", "130.108.144.0/20", "130.108.80.0/20" },
+			"invalid": []interface{}{ "274.266.283.262/30" },
 		},
 		"ipv4": map[string]interface{}{
-			"valid": []interface{}{ "244.119.54.218", "244.119.36.244", "244.119.97.114", "244.119.4.88" },
-			"invalid": []interface{}{ "268.268.257.289" },
+			"valid": []interface{}{ "130.108.231.110", "130.108.202.160", "130.108.43.127", "130.108.135.181" },
+			"invalid": []interface{}{ "294.259.295.299" },
 		},
 		"ipv6": map[string]interface{}{
-			"valid": []interface{}{ "2001:db8::34f4:0:0:f304", "2001:db8::34f4:0:0:f389", "2001:db8::34f4:0:0:f3f0", "2001:db8::34f4:0:0:f3c1" },
+			"valid": []interface{}{ "2001:db8::34f4:0:0:f379", "2001:db8::34f4:0:0:f34b", "2001:db8::34f4:0:0:f312", "2001:db8::34f4:0:0:f3e8" },
 			"invalid": []interface{}{ "invalidIPv6" },
 		},
 		"json": map[string]interface{}{
@@ -51,7 +51,7 @@ var Test = map[string]interface{}{
 			"invalid": []interface{}{ "json({ name : val)" },
 		},
 		"mac": map[string]interface{}{
-			"valid": []interface{}{ "3b:ab:04:78:14:eb", "ad:75:fe:a7:fe:e7", "77:cc:0a:3f:95:c1", "5a:03:7f:36:b4:ec" },
+			"valid": []interface{}{ "be:e8:ba:fb:3c:72", "3c:85:03:83:98:8f", "39:a8:d1:99:2d:97", "ef:1b:64:b0:fa:97" },
 			"invalid": []interface{}{ "invalidMAC" },
 		},
 		"regex": map[string]interface{}{
@@ -59,23 +59,23 @@ var Test = map[string]interface{}{
 			"invalid": []interface{}{ "[0-9)++" },
 		},
 		"string": map[string]interface{}{
-			"valid": []interface{}{ "26s3fh68yv", "ejkg2wzka0", "oft2shujf9", "bk7aieggc3" },
+			"valid": []interface{}{ "tu59znwjey", "9j60mvxaey", "davprq8qtm", "nwfgq0uxli" },
 			"invalid": []interface{}{ 12345 },
 		},
 		"time": map[string]interface{}{
-			"valid": []interface{}{ "2022-06-29T12:39:34.897900+00:00", "2022-07-22T12:39:34.897900+00:00", "2022-08-14T12:39:34.897900+00:00", "2022-09-06T12:39:34.897900+00:00" },
-			"invalid": []interface{}{ "2022-06-29 18:09:34.897900" },
+			"valid": []interface{}{ "2022-07-01T13:00:28.611928+00:00", "2022-07-24T13:00:28.611928+00:00", "2022-08-16T13:00:28.611928+00:00", "2022-09-08T13:00:28.611928+00:00" },
+			"invalid": []interface{}{ "2022-07-01 18:30:28.611928" },
 		},
 		"url-http": map[string]interface{}{
-			"valid": []interface{}{ "http://w1fvaum3qgod67o.com", "http://hmnv4vtt4l2blif.com", "http://sdsjlwmbgblzi72.com", "http://ewpd2xilcst7a12.com" },
-			"invalid": []interface{}{ "ht:/gme0w5dtwmxwmyj.com" },
+			"valid": []interface{}{ "http://sw834mnli9ho2ts.com", "http://xz2henjjhbhln63.com", "http://ld3sfb6vf8hu1xf.com", "http://xiddmwyqlcoqjsh.com" },
+			"invalid": []interface{}{ "ht:/x9b3p9e88idrfu5.com" },
 		},
 		"url-https": map[string]interface{}{
-			"valid": []interface{}{ "https://uwrixu4kvb6sjo9.com", "https://9idsu4ajojkaj3x.com", "https://la39uzl85cxnpck.com", "https://2h5dthrfrfct0m5.com" },
-			"invalid": []interface{}{ "hts:/0s41ej8edgtn82w.com" },
+			"valid": []interface{}{ "https://rswhqj3l65617zg.com", "https://sn2nr7f1af8kd7m.com", "https://nzkqawgjuo20d76.com", "https://3keuv9rnej0djtf.com" },
+			"invalid": []interface{}{ "hts:/e48el2dczs72z7x.com" },
 		},
 		"uuid": map[string]interface{}{
-			"valid": []interface{}{ "87f1c93b-f7a8-11ec-a40b-7c8ae1979a87", "87f1c93c-f7a8-11ec-a617-7c8ae1979a87", "87f1c93d-f7a8-11ec-a2c0-7c8ae1979a87", "87f1c93e-f7a8-11ec-b1a6-7c8ae1979a87" },
+			"valid": []interface{}{ "c80add71-f93d-11ec-92f6-7c8ae1979a87", "c80add72-f93d-11ec-a425-7c8ae1979a87", "c80add73-f93d-11ec-93fd-7c8ae1979a87", "c80add74-f93d-11ec-9373-7c8ae1979a87" },
 			"invalid": []interface{}{ "invalid323Uuid12" },
 		},
 }

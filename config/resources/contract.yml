@@ -7,7 +7,8 @@ imports:
 schemas:
   - attribute: "name"
     type: "string"
-    required: true
+    optional: true
+    # required: true
     forcenew: true
     description: "name of someone"
     depends_on:
@@ -19,7 +20,8 @@ schemas:
 
   - attribute: "temp"
     type: "int"
-    required: true
+    # required: true
+    optional: true
     forcenew: true
     description: "temp of some resource"
     depends_on:
@@ -29,7 +31,8 @@ schemas:
 
   - attribute: "weight"
     type: "float"
-    required: true
+    optional: true
+    # required: true
     forcenew: true
     description: "weight of someone"
 
@@ -41,8 +44,8 @@ schemas:
 
   - attribute: "ipv4_for"
     type: "string"
-    # optional: true
-    required: true
+    optional: true
+    # required: true
     description: "IP-address v4"
     validation:
       func_name: "IsIPv4Address"
@@ -225,9 +228,9 @@ schemas:
 
   - attribute: "filter"
     type: "list"
-    optional: true
-    # required: true
-    computed: true
+    # optional: true
+    required: true
+    # computed: true
     description: "filter list"
     max_items: 10
     element:
@@ -235,7 +238,8 @@ schemas:
       schema:
         - attribute: "filter_name"
           type: "string"
-          required: true
+          # required: true
+          optional: true
           description: "name of filter"
         - attribute: "id"
           type: "string"
@@ -251,8 +255,9 @@ schemas:
           default_func: true
         - attribute: "filter_entry"
           type: "list"
-          optional: true
-          computed: true
+          required: true
+          # optional: true
+          # computed: true
           description: "list of filter_entry"
           min_items: 1
           max_items: 4
