@@ -221,10 +221,8 @@ resources:
               type: object
               properties:
                 - name: Rater
-                  model_path: Rating.Rater
                   type: string
                 - name: Rating
-                  model_path: Rating.Rating
                   type: string
 
           

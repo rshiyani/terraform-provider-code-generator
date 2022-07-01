@@ -1,6 +1,6 @@
 from jinja2 import Environment, FileSystemLoader
 import yaml
-from utils import urlsplit, rmlaststr, camelize, pascalize, snakify,urlpassvar
+from utils import urlsplit, rmlaststr, camelize, pascalize, snakify,urlpassvar,requestBody
 
 
 config = yaml.full_load(open('./config/servicesNew.yml'))
@@ -13,6 +13,7 @@ env.filters["camelize"] = camelize
 env.filters["pascalize"] = pascalize
 env.filters["snakify"] = snakify
 env.filters["urlpassvar"] = urlpassvar
+env.filters["requestBody"] = requestBody
 
 template = env.get_template('services.j2')
 

@@ -62,3 +62,19 @@
         return nil, err
     }
 {% endmacro %}
+
+{% macro requestBodyFromArgs(path) %}
+    {{path.parameters.modelName}}Map := make([]map[string]interface{},0,1)
+    {% for i in path.requestBody.schema.properties%}
+    {% set attr = path.parameters.Args | requestBody(path.requestBody.schema.properties) %}
+    {% if attr == i.name | lower %} 
+        {{path.parameters.modelName}}Map["{{i.name}}"] = {{attr}} 
+    {% else %}
+        {{path.parameters.modelName}}Map["{{i.name}}"] = 0
+    {% endif %}
+    {% endfor %}
+    {{path.parameters.modelName}}Bytes, err := json.Marshal({{path.parameters.modelName}}Map)
+	if err != nil {
+		return err
+	}
+{% endmacro %}

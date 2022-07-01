@@ -59,7 +59,7 @@ func (c *client.Client){{path.POST.funcName}}({{shelper.postAllArgs(path) | rmla
         {% if path.DELETE is defined and path.DELETE.parameters is defined %}
         func (c *Client) {{path.DELETE.funcName}}({{shelper.deleteAllArgs(path) | rmlaststr}}) error {
         {% if path.DELETE.requestBody is defined %}
-            {{shelper.modeltomap(path.DELETE.parameters.modelName, path.DELETE.requestBody)}}
+            {{ shelper.requestBodyFromArgs(path.DELETE) }}
         {% endif %}
         {% if path.DELETE.serviceFunc is defined %}
         return c.{{path.DELETE.serviceFunc}}(c.BaseURL+fmt.Sprintf({{path.path_name | urlpassvar(path.DELETE.parameters.Args)}}),{{path.DELETE.parameters.modelName}}Bytes)

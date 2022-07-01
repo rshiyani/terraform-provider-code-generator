@@ -35,9 +35,9 @@ def urlpassvar(path, *args):
     finalurl = ""
     for i in range(len(arguments)):
         if arguments[i] in listArgs:
-            finalurl += "%s"
+            finalurl += "/%s"
         else:
-            finalurl += "/"+arguments[i] + "/"  
+            finalurl += "/"+arguments[i]  
     finalurl = '"'+finalurl+'"'
     for i in range(len(listArgs)):
         check =  any(item in listArgs[i] for item in arguments)
@@ -45,6 +45,16 @@ def urlpassvar(path, *args):
             finalurl += ","+ listArgs[i]
     return finalurl 
 
-
-
+def requestBody(args, rbody):
+    argsNameList = []
+    for i in args:
+        argsNameList.append(i["name"])
+        
+    rbodyList = []
+    for i in rbody:
+        rbodyList.append(i["name"].lower())
     
+    for i in range(len(rbodyList)):
+        check =  any(item in rbodyList[i] for item in argsNameList)
+        if check is False:
+            return argsNameList[i]

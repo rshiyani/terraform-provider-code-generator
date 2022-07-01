@@ -49,7 +49,7 @@ func (c *client.Client) AddRatings(id string, ratingAttr *models.Rating) (*gabs.
 		return nil, err
 	}
 
-	ratingAttrContainer, err := c.Post(c.BaseURL+fmt.Sprintf("/movies/%s/ratings/", id), ratingAttrBytes)
+	ratingAttrContainer, err := c.Post(c.BaseURL+fmt.Sprintf("/movies/%s/ratings", id), ratingAttrBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *client.Client) UpdateRatings(id string, ratingAttr *models.Rating) (*ga
 		return nil, err
 	}
 
-	ratingAttrContainer, err := c.Put(c.BaseURL+fmt.Sprintf("/movies/%s/ratings/", id), ratingAttrBytes)
+	ratingAttrContainer, err := c.Put(c.BaseURL+fmt.Sprintf("/movies/%s/ratings", id), ratingAttrBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -76,13 +76,14 @@ func (c *Client) DeleteMovie(id string) error {
 	return c.Delete(c.BaseURL + fmt.Sprintf("/movies/%s", id))
 }
 func (c *Client) DeleteRatings(id string, rater string) error {
-	RatingattrMap := make(map[string]interface{})
-	RatingattrMap["Rater"] = Rating.Rater
-	RatingattrMap["Rating"] = Rating.Rating
+	ratingAttrMap := make([]map[string]interface{}, 0, 1)
+
+	ratingAttrMap["Rater"] = rater
+	ratingAttrMap["Rating"] = 0
 	ratingAttrBytes, err := json.Marshal(ratingAttrMap)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return c.DeleteRat(c.BaseURL+fmt.Sprintf("/movies/%s/ratings/", id), ratingAttrBytes)
+	return c.DeleteRat(c.BaseURL+fmt.Sprintf("/movies/%s/ratings", id), ratingAttrBytes)
 }
