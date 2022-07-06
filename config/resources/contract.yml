@@ -7,32 +7,32 @@ imports:
 schemas:
   - attribute: "name"
     type: "string"
-    optional: true
-    # required: true
+    # optional: true
+    required: true
     forcenew: true
     description: "name of someone"
-    depends_on:
-      resource_name: "tenant"
-      attribute_name:
-        - "filter"
-        - "filter_entry"
-        - "name"
+    # depends_on:
+    #   resource_name: "tenant"
+    #   attribute_name:
+    #     - "filter"
+    #     - "filter_entry"
+    #     - "name"
 
   - attribute: "temp"
     type: "int"
-    # required: true
-    optional: true
+    required: true
+    # optional: true
     forcenew: true
     description: "temp of some resource"
-    depends_on:
-      resource_name: "application_profile"
-      attribute_name:
-        - "application_dn"
+    # depends_on:
+    #   resource_name: "application_profile"
+    #   attribute_name:
+    #     - "application_dn"
 
   - attribute: "weight"
     type: "float"
-    optional: true
-    # required: true
+    # optional: true
+    required: true
     forcenew: true
     description: "weight of someone"
 
@@ -160,7 +160,8 @@ schemas:
 
   - attribute: "temp_schema_list"
     type: "set"
-    optional: true
+    # optional: true
+    required: true
     element:
       type: "schema"
       schema:
@@ -237,10 +238,15 @@ schemas:
       type: "resource"
       schema:
         - attribute: "filter_name"
-          type: "string"
+          type: "float"
           # required: true
           optional: true
           description: "name of filter"
+          validation:
+            func_name: "FloatBetween"
+            params:
+              - 50
+              - 100
         - attribute: "id"
           type: "string"
           computed: true
@@ -249,7 +255,8 @@ schemas:
           envvar: "FILTER_ID"
         - attribute: "description"
           type: "string"
-          optional: true
+          required: true
+          # optional: true
           computed: true
           description: "description of filter"
           default_func: true

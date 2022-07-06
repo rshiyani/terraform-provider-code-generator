@@ -10,13 +10,22 @@
 
 
 {# ---------------------------------------Macros used to create Map------------------------------------------------ #}
+{% set stringSubTypeList = ["base64","cidr","ipv4","ipv6","json","mac","regex","time","url-http","url-https","uuid"]%}
 
 {% macro getMapValuesForAttr(schema) %}
+{% if schema.validation is defined and schema.type == "string" and schema.subtype in stringSubTypeList %}
+"{{schema.attribute}}" : map[string]interface{}{
+	"valid": searchInObject(Test, {{[schema.attribute] | make_dot_string("valid") | quote}}),
+	"invalid": searchInObject(Test, {{[schema.attribute] | make_dot_string("invalid") | quote}}),
+	"multiple_valids": searchInObject(Test, {{[schema.attribute] | make_dot_string("multiple_valids") | quote}}),
+},
+{% else %}
 "{{schema.attribute}}" : map[string]interface{}{
 	"valid": []interface{}{ {{schema.test_params.valid | map("tojson") | join(', ')}} },
 	"invalid": []interface{}{ {{ schema.test_params.invalid | map("tojson") | join(', ')}} },
 	"multiple_valids": []interface{}{ {{ schema.test_params.multiple_valids | map("tojson") | join(', ')}} },
 },
+{% endif %}
 {% endmacro %}
 
 {% macro getMapValuesForAttrDependsOn(schema) %}
@@ -83,6 +92,24 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdEqual({{name
 		}
 		if Id1 != Id2 {
 			return fmt.Errorf("{{name | pascalize}} IDs are not equal")
+		}
+		return nil
+	}
+}
+{% endmacro %}
+{% macro printFunctionForIdNotEqual(name,provider_name)%}
+func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{name | camelize}}1, {{name | camelize}}2 *models.{{name | pascalize}}) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		Id1, err := getIdFrom{{name | pascalize}}Model({{name | camelize}}1)
+		if err != nil {
+			return err
+		}
+		Id2, err := getIdFrom{{name | pascalize}}Model({{name | camelize}}2)
+		if err != nil {
+			return err
+		}
+		if Id1 == Id2 {
+			return fmt.Errorf("{{name | pascalize}} IDs are equal")
 		}
 		return nil
 	}
@@ -961,3 +988,268 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 		return resource
 	}
 {% endmacro %}
+
+{# ---------------------------------------------Steps to Update Required Attribute---------------------------------------------- #}
+
+{% set allRequiredAttr = [] %}
+
+
+{% macro genAllRequiredAttrInternal(name, provider_name, schemas, parentAttr) %}
+	{% for schema in schemas %}
+		{% if schema.required is true and schema.depends_on is not defined %}
+			{% if schema.type not in ["list", "map", "set" ]%}
+				{{allRequiredAttr.append(parentAttr +"."+ schema.attribute) or ""}}
+			{% elif schema.type in ["list", "set"] %}
+				{% if schema.element.type == "schema" %}
+					{{allRequiredAttr.append(parentAttr + '.'+ schema.attribute) or ""}}
+				{% elif schema.element.type == "resource" %}
+					{{ genAllRequiredAttrInternal(name, provider_name, schema.element.schema, parentAttr+'.'+schema.attribute) }}
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+
+{% macro genAllRequiredAttr(name,provider_name,schemas) %}
+		{% for schema in schemas %}
+			{% if schema.required is true and schema.depends_on is not defined %}
+				{% if schema.type not in ["list", "map", "set" ] %}
+					{{allRequiredAttr.append(schema.attribute) or ""}}
+				{% elif schema.type in ["list", "set"] %}
+					{% if schema.element.type == "schema" %}
+						{{allRequiredAttr.append(schema.attribute) or ""}}
+					{% else %}
+						{{ genAllRequiredAttrInternal(name, provider_name, schema.element.schema, schema.attribute) }}
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+{% endmacro %}	
+
+{% macro getInternalAttributesForMultiple(name, provider_name, schema, args, parentAttr, attr, indent) %}
+    {{-indent.append(0) or ""-}}
+    {{-indent.append(0) or ""-}}
+    {% for sch in schema %}
+            {% if sch.type not in ["list","set","map"] %}
+                {% if sch.depends_on is defined %}
+                    
+                        {{'  '*(indent | length)}}{{sch.attribute}} = {{provider_name | camelize}}_{{sch.depends_on.resource_name | snakify}}.test.{{sch.depends_on.attribute_name | make_dot_string}}
+                {% else %}
+					{% if attr | get_first == sch.attribute %}
+					
+						{{'  '*(indent | length)}}{{sch.attribute}} = {{getValueType(sch)}}
+						{{- args.append('value') or ""}}
+					{% else %}
+                        
+                        {{'  '*(indent | length)}}{{sch.attribute}} = {{getValueType(sch)}}
+                        {{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(parentAttr,sch.attribute, "valid", "0") | quote+')') or ""}}
+					{% endif%}
+				{% endif %}
+            {% elif sch.type in ["list", "set"] %}
+                {% if sch.element.type == "schema" %}
+					{% if sch.element.schema.type not in ["list","set", "map"] %}
+						{% if attr | get_first == sch.attribute %}
+
+						{{'  '*(indent | length)}}{{sch.attribute}} = [{{getValueType(sch.element.schema)}}]
+						{{- args.append('value') or ""}}
+						{% else %}
+
+						{{'  '*(indent | length)}}{{sch.attribute}} = [{{getValueType(sch.element.schema)}}, {{getValueType(sch.element.schema)}}]
+						{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(sch.attribute, "valid", "0") | quote+')') or ""}}
+						{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(sch.attribute, "valid", "1") | quote+')') or ""}}
+						{% endif %}
+					{% endif %}  
+                {% else %}
+					{% if attr|get_first == sch.attribute %}
+
+						{{'  '*(indent | length)}}{{sch.attribute}} {
+						{{getInternalAttributesForMultiple(name,provider_name,sch.element.schema,args,sch.attribute,attr | eliminate_first,indent)}}
+						{{'  '*(indent | length-1)}}}
+					{% else %}
+
+						{{'  '*(indent | length)}}{{sch.attribute}} {
+                        {{getInternalAttributes(name, provider_name, sch.element.schema, args, parentAttr+'.'+sch.attribute,indent) }}
+                        {{'  '*(indent | length-1)}}}
+					{% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+{% endmacro %}
+
+
+{% macro printFunctionForUpdateRequiredAttribute(name,provider_name,schemas) %}
+	{% for attr in allRequiredAttr %}
+		func CreateAcc{{name | pascalize}}UpdateRequired{{attr|eliminate_dots_and_capitalize}}() string {
+			var resource string
+			parentResources := getParent{{name | pascalize}}()
+			parentResources = parentResources[:len(parentResources)-1]
+			resource += create{{name | pascalize}}Config(parentResources)
+			value := searchInObject(resource{{name | pascalize}}Test, {{(attr+".valid.1") | quote}})
+			resource += fmt.Sprintf(`
+			resource "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+			{% set args = [] %}
+			{% for schema in schemas %}
+				{% if schema.type not in ["list","set","map"] %}
+					{% if schema.depends_on is defined %}
+
+							{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name | make_dot_string}}
+					{% else %}
+						{% if attr | get_first == schema.attribute %}
+							
+							{{schema.attribute}} = {{getValueType(schema)}}
+							{{- args.append('value') or ""}}
+						{% else %}
+
+							{{schema.attribute}} = {{getValueType(schema)}}
+							{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "0") | quote+')') or ""}}
+						{% endif %}
+					{% endif %}
+				{% elif schema.type in ["list", "set"] %}
+					{% if schema.element.type == "schema" %}
+						{% if schema.element.schema.type not in ["list","set", "map"] %}
+							{% if attr | get_first == schema.attribute %}
+
+							{{schema.attribute}} = [{{getValueType(schema.element.schema)}}]
+							{{- args.append('value') or ""}}
+							{% else %}
+
+							{{schema.attribute}} = [{{getValueType(schema.element.schema)}}, {{getValueType(schema.element.schema)}}]
+							{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "0") | quote+')') or ""}}
+							{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "1") | quote+')') or ""}}
+							{% endif %}
+						{% endif %}
+					{% else %}
+						{% if attr | get_first == schema.attribute %}
+
+							{{schema.attribute}} {
+							{% set indent = []%}    
+							{{getInternalAttributesForMultiple(name,provider_name,schema.element.schema,args,schema.attribute,attr | eliminate_first, indent)}}
+							}
+						{% else %}
+
+							{{schema.attribute}} {
+							{% set indent = []%}    
+							{{getInternalAttributes(name,provider_name,schema.element.schema,args,schema.attribute,indent)}}
+							}
+						{% endif %}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+			}
+		`, {{args | join(',\n')}})
+			return resource
+		}
+	{% endfor %}
+{% endmacro %}
+
+
+{#{% macro printStepsToUpdateRequiredArguments() %}
+	{% for schema in schemas %}
+		{% if schema.required is true %}
+			{% if schema.depends_on is defined %}
+				{
+					Config: CreateAcc{{name | pascalize}}UpdateParentRequiredArgument{{schema.attribute | pascalize}}(),
+					Check: resource.ComposeTestCheckFunc(
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_updated),
+						{% if schema.depends_on.attribute_name == "id" %}
+							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v",
+							func() string {
+								id, err := getIdFrom{{name | pascalize}}Model(&{{name | camelize}}_updated)
+								if err != nil{
+									return ""
+								}
+								return id
+							}())), // Function to get ID based on the model provided
+						{% else %}
+							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute | snakify}}"].(map[string]interface{})["valid"].([]interface{})[1])),
+						{% endif %}
+						func (model1, model2 *models.{{name | pascalize}}) resource.TestCheckFunc {
+							// Check if {{schema.depends_on.resource_name | pascalize}} have some independent required field
+							if {{schema.depends_on.resource_name | camelize}}SelfRequiredCount > 0{
+								return testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual(model1, model2)
+							}
+							return testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdEqual(model1, model2)
+						}({{name | camelize}}_default, {{name | camelize}}_updated),
+					),
+				},
+			{% else %}
+				{
+					Config: CreateAcc{{name | pascalize}}UpdateRequiredArgument{{schema.attribute | pascalize}}(),
+					Check: resource.ComposeTestCheckFunc(
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_updated),
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute | snakify}}", fmt.Sprintf("%v", resource{{name | pascalize}}Test["{{schema.attribute}}"].(map[string]interface{})["valid"].([]interface{})[1])),
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual(&{{name | camelize}}_default, &{{name | camelize}}_updated),
+					),
+				},
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	
+{% endmacro %}
+#}
+
+
+{% macro getInternalStepsForUpdatedRequiredAttr(name, provider_name, schemas, parentAttr) %}
+	{% for schema in schemas %}
+		{% if schema.required is true and schema.depends_on is not defined and schema.type not in ["list", "map", "set" ]%}
+			value = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(parentAttr | eliminate_zeroes+ '.' +schema.attribute,"valid.1") | quote}})
+			testSteps = append(testSteps,resource.TestStep{
+				Config: CreateAcc{{name | pascalize}}UpdateRequired{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
+					resource.TestCheckResourceAttr(resourceName, {{[] | make_dot_string(parentAttr+ '.0.' +schema.attribute) | quote}}, fmt.Sprintf("%v", value)),
+					testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{name | camelize}}_default, {{name | camelize}}_updated),
+				), 
+			})
+		{% elif schema.required is true and schema.depends_on is not defined and schema.type in ["list", "set"] %}
+			{% if schema.element.type == "schema" %}
+				value = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(parentAttr | eliminate_zeroes + '.' +schema.attribute,"valid.1") | quote}})
+					testSteps = append(testSteps,resource.TestStep{
+						Config: CreateAcc{{name | pascalize}}UpdateRequired{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(),
+						Check: resource.ComposeTestCheckFunc(
+							testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
+							resource.TestCheckResourceAttr(resourceName, {{[] | make_dot_string(parentAttr+ '.0.' +schema.attribute + '.0') | quote}}, fmt.Sprintf("%v", value)),
+							testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{name | camelize}}_default, {{name | camelize}}_updated),
+						), 
+					})
+			{% elif schema.element.type == "resource" %}
+				{{ getInternalStepsForUpdatedRequiredAttr(name, provider_name, schema.element.schema, parentAttr+'.0.'+schema.attribute) }}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+
+{% macro printGenerateStepsForUpdatedRequiredAttr(name,provider_name,schemas) %}
+	func generateStepForUpdatedRequiredAttr(resourceName string,{{name | camelize}}_default,{{name | camelize}}_updated *models.{{name | pascalize}}) []resource.TestStep{
+		testSteps := make([]resource.TestStep, 0, 1)
+		var value interface{} 
+		{% for schema in schemas %}
+			{% if schema.required is true and schema.depends_on is not defined and schema.type not in ["list", "map", "set" ]%}
+				value = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(schema.attribute,"valid.1") | quote}})
+				testSteps = append(testSteps,resource.TestStep{
+					Config: CreateAcc{{name | pascalize}}UpdateRequired{{schema.attribute|pascalize}}(),
+					Check: resource.ComposeTestCheckFunc(
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", value)),
+						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{name | camelize}}_default, {{name | camelize}}_updated),
+					), 
+				})
+			{% elif schema.required is true and schema.depends_on is not defined and schema.type in ["list", "set"] %}
+				{% if schema.element.type == "schema" %}
+					value = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string( schema.attribute,"valid.1") | quote}})
+					testSteps = append(testSteps,resource.TestStep{
+						Config: CreateAcc{{name | pascalize}}UpdateRequired{{schema.attribute|pascalize}}(),
+						Check: resource.ComposeTestCheckFunc(
+							testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
+							resource.TestCheckResourceAttr(resourceName, {{[] | make_dot_string(schema.attribute+'.0') | quote}}, fmt.Sprintf("%v", value)),
+							testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{name | camelize}}_default, {{name | camelize}}_updated),
+						), 
+					})
+				{% else %}
+					{{ getInternalStepsForUpdatedRequiredAttr(name, provider_name, schema.element.schema, schema.attribute) }}
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+		return testSteps
+	}
+{% endmacro %}	

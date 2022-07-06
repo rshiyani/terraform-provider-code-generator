@@ -34,6 +34,7 @@ var Test = map[string]interface{}{
 		"{{type}}": map[string]interface{}{
 			"valid": []interface{}{ {{ value.valid | map("tojson") | join(', ')}} },
 			"invalid": []interface{}{ {{ value.invalid | map("tojson") | join(', ')}} },
+			"multiple_valids": []interface{}{ {{ value.multiple_valids | map("tojson") | join(', ')}} },
 		},
 	{% endfor %}
 }

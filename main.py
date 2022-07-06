@@ -85,46 +85,11 @@ def generate_random_values(data):
     return data
 
 def handleListSetMap(data, schema):
+    
     if schema["element"]["type"] == "schema":
         if schema["element"]["schema"]["type"] == "string":
             if "validation" in schema["element"]["schema"]:
-                if schema["element"]["schema"]["validation"]["func_name"] in typeMap:
-                    schema["subtype"] = typeMap[schema["element"]["schema"]["validation"]["func_name"]]
-                    schema["test_params"] = {
-                        "valid": data["types"][schema["subtype"]]["valid"],
-                        "invalid": data["types"][schema["subtype"]]["invalid"],
-                        "multiple_valids": data["types"][schema["subtype"]]["multiple_valids"]
-                    }
-                elif schema["element"]["schema"]["validation"]["func_name"] == "StringInSlice":
-                    schema["subtype"] = "string"
-                    schema["test_params"] = {
-                        "valid": [i for i in schema["element"]["schema"]["validation"]["params"]],
-                        "invalid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10))],
-                        "multiple_valids": [i for i in schema["element"]["schema"]["validation"]["params"]]
-                    }
-                elif schema["element"]["schema"]["validation"]["func_name"] == "StringNotInSlice":
-                    schema["subtype"] = "string"
-                    schema["test_params"] = {
-                        "invalid": [i for i in schema["element"]["schema"]["validation"]["params"]],
-                        "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                        "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)],
-                    }
-                elif schema["element"]["schema"]["validation"]["func_name"] == "IsCIDRNetwork":
-                    schema["subtype"] = "string"
-                    x = schema["element"]["schema"]["validation"]["params"][0]
-                    y = schema["element"]["schema"]["validation"]["params"][1]
-                    schema["test_params"] = {
-                        "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
-                        "invalid": [x-1, y+1],
-                        "multiple_valids":[x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
-                    }
-                else:
-                    schema["subtype"] = "string"
-                    schema["test_params"] = {
-                        "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                        "invalid": [10, 12.43],
-                        "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
-                    }
+                handle_string_validation(schema,schema["element"]["schema"]["validation"],schema["element"]["schema"]["validation"]["func_name"],data)
             else:
                 schema["subtype"] = "string"
                 schema["test_params"] = {
@@ -133,37 +98,8 @@ def handleListSetMap(data, schema):
                     "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
                 }
         elif schema["element"]["schema"]["type"] == "int":
-            if "validation" in schema["element"]["schema"]:
-                if schema["element"]["schema"]["validation"]["func_name"] == "IntBetween":
-                    schema["subtype"] = "range"
-                    x = schema["element"]["schema"]["validation"]["params"][0]
-                    y = schema["element"]["schema"]["validation"]["params"][1]
-                    schema["test_params"] = {
-                        "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
-                        "invalid": [x-1, y+1],
-                        "multiple_valids":[x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
-                    }
-                elif schema["element"]["schema"]["validation"]["func_name"] == "IsPortNumber":
-                    schema["subtype"] = "port"
-                    schema["test_params"] = {
-                        "valid": [1, 65535] + [random.randint(2,65534) for i in range(2)],
-                        "invalid": [0, 65536],
-                        "multiple_valids": [1, 65535] + [random.randint(2,65534) for i in range(13)]
-                    }
-                elif schema["element"]["schema"]["validation"]["func_name"] == "IsPortNumberOrZero":
-                    schema["subtype"] = "port0"
-                    schema["test_params"] = {
-                        "valid": [0, 65535] + [random.randint(1,65534) for i in range(2)],
-                        "invalid": [-1, 65536],
-                        "multiple_valids": [0, 65535] + [random.randint(1,65534) for i in range(13)]
-                    }
-                else:
-                    schema["subtype"] = "int"
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000) for i in range(4)],
-                        "invalid": ["random",10.023],
-                        "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
-                    }
+            if "validation" in schema["element"]["schema"]: 
+                handle_int_validation(schema, schema["element"]["schema"]["validation"], schema["element"]["schema"]["validation"]["func_name"], data)
             else:
                 schema["subtype"] = "int"
                 schema["test_params"] = {
@@ -172,30 +108,7 @@ def handleListSetMap(data, schema):
                     "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
                 }
         elif schema["element"]["schema"]["type"] == "float":
-            if "validation" in schema["element"]["schema"]:
-                if schema["element"]["schema"]["validation"]["func_name"] == "FloatBetween":
-                    schema["subtype"] = "range"
-                    x = schema["element"]["schema"]["validation"]["params"][0]
-                    y = schema["element"]["schema"]["validation"]["params"][1]
-                    schema["test_params"] = {
-                        "valid": [x, y, (x+y)/2] + [random.randint(x,y)*random.random() for i in range(1)],
-                        "invalid": [x-1, y+1],
-                        "multiple_valids": [x, y, (x+y)/2] + [random.randint(x,y)*random.random() for i in range(13)]
-                    }
-                else:
-                    schema["subtype"] = "float"
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                        "invalid": ["random",10],
-                        "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)]
-                    }
-            else:
-                schema["subtype"] = "float"
-                schema["test_params"] = {
-                    "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                    "invalid": ["random",10],
-                    "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)]
-                }
+            handle_float_validation(schema, schema["element"]["schema"]["validation"], schema["element"]["schema"]["validation"]["func_name"], data)
         elif schema["element"]["schema"]["type"] == "bool":
             schema["subtype"] = "bool"
             schema["test_params"] = {
@@ -206,115 +119,11 @@ def handleListSetMap(data, schema):
     else:    
         for schema in schema["element"]["schema"]:
             if schema["type"] == "string":
-                if "validation" in schema:
-                    if schema["validation"]["func_name"] in typeMap:
-                        schema["subtype"] = typeMap[schema["validation"]["func_name"]]
-                        schema["test_params"] = {
-                            "valid": data["types"][schema["subtype"]]["valid"],
-                            "invalid": data["types"][schema["subtype"]]["invalid"],
-                            "multiple_valids": data["types"][schema["subtype"]]["multiple_valids"]
-                        }
-                    elif schema["validation"]["func_name"] == "StringInSlice":
-                        schema["subtype"] = "string"
-                        schema["test_params"] = {
-                            "valid": [i for i in schema["validation"]["params"]],
-                            "invalid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10))],
-                            "multiple_valids": [i for i in schema["validation"]["params"]]
-                        }
-                    elif schema["validation"]["func_name"] == "StringNotInSlice":
-                        schema["subtype"] = "string"
-                        schema["test_params"] = {
-                            "invalid": [i for i in schema["validation"]["params"]],
-                            "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                            "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)],
-                        }
-                    elif schema["validation"]["func_name"] == "IsCIDRNetwork":
-                        schema["subtype"] = "string"
-                        x = schema["validation"]["params"][0]
-                        y = schema["validation"]["params"][1]
-                        schema["test_params"] = {
-                            "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
-                            "invalid": [x-1, y+1],
-                            "multiple_valids": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
-                        }
-                    else:
-                        schema["subtype"] = "string"
-                        schema["test_params"] = {
-                            "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                            "invalid": [10, 12.43],
-                            "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
-                        }
-                else:
-                    schema["subtype"] = "string"
-                    schema["test_params"] = {
-                        "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                        "invalid": [10, 12.43],
-                        "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
-                    }
+                handle_string(schema, data)
             elif schema["type"] == "int":
-                if "validation" in schema:
-                    if schema["validation"]["func_name"] == "IntBetween":
-                        schema["subtype"] = "range"
-                        x = schema["validation"]["params"][0]
-                        y = schema["validation"]["params"][1]
-                        schema["test_params"] = {
-                            "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
-                            "invalid": [x-1, y+1],
-                            "multiple_valids": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
-                        }
-                    elif schema["validation"]["func_name"] == "IsPortNumber":
-                        schema["subtype"] = "port"
-                        schema["test_params"] = {
-                            "valid": [1, 65535] + [random.randint(2,65534) for i in range(2)],
-                            "invalid": [0, 65536],
-                            "multiple_valids": [1, 65535] + [random.randint(2,65534) for i in range(13)]
-                        }
-                    elif schema["validation"]["func_name"] == "IsPortNumberOrZero":
-                        schema["subtype"] = "port0"
-                        schema["test_params"] = {
-                            "valid": [0, 65535] + [random.randint(1,65534) for i in range(2)],
-                            "invalid": [-1, 65536],
-                            "multiple_valids": [0, 65535] + [random.randint(1,65534) for i in range(13)]
-                        }
-                    else:
-                        schema["subtype"] = "int"
-                        schema["test_params"] = {
-                            "valid": [random.randint(-1000,1000) for i in range(4)],
-                            "invalid": ["random",10.023],
-                            "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
-                        }
-                else:
-                    schema["subtype"] = "int"
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000) for i in range(4)],
-                        "invalid": ["random",10.023],
-                        "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
-                    }
+                handle_int(schema, data)
             elif schema["type"] == "float":
-                if "validation" in schema:
-                    if schema["validation"]["func_name"] == "FloatBetween":
-                        schema["subtype"] = "range"
-                        x = schema["validation"]["params"][0]
-                        y = schema["validation"]["params"][1]
-                        schema["test_params"] = {
-                            "valid": [x, y, (x+y)/2] + [random.randint(x,y)*random.random() for i in range(1)],
-                            "invalid": [x-1, y+1],
-                            "multiple_valids": [x, y, (x+y)/2] + [random.randint(x,y)*random.random() for i in range(13)]
-                        }
-                    else:
-                        schema["subtype"] = "float"
-                        schema["test_params"] = {
-                            "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                            "invalid": ["random",10],
-                            "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)]
-                        }
-                else:
-                    schema["subtype"] = "float"
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                        "invalid": ["random",10],
-                        "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)]
-                    }
+                handle_float(schema, data)
             elif schema["type"] == "bool":
                 schema["subtype"] = "bool"
                 schema["test_params"] = {
@@ -324,30 +133,7 @@ def handleListSetMap(data, schema):
                 }
             elif schema["type"] == "map":
                 schema["subtype"] = "map"
-                if schema["element"]["schema"]["type"] == "string":
-                    schema["test_params"] = {
-                        "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                        "invalid": [10, 12.43],
-                        "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
-                    }
-                elif schema["element"]["schema"]["type"] == "int":
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000) for i in range(4)],
-                        "invalid": ["random",10.023],
-                        "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
-                    }
-                elif schema["element"]["schema"]["type"] == "float":
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                        "invalid": ["random",10],
-                        "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)],
-                    } 
-                elif schema["element"]["schema"]["type"] == "bool":
-                    schema["test_params"] = {
-                        "valid": [True, False],
-                        "invalid": ["random", 10],
-                        "multiple_valids": [True, False]
-                    }
+                handle_map(schema, data)
             elif schema["type"] in ["list","set"]:
                 handleListSetMap(data,schema)
 
@@ -366,122 +152,171 @@ typeMap = {
     "StringIsValidRegExp": "regex",
 }
 
+def handle_string_validation(schema,validation, validation_func_name, data):
+    if validation_func_name in typeMap:
+        schema["subtype"] = typeMap[validation_func_name]
+        schema["test_params"] = {
+            "valid": data["types"][schema["subtype"]]["valid"],
+            "invalid": data["types"][schema["subtype"]]["invalid"],
+            "multiple_valids": data["types"][schema["subtype"]]["multiple_valids"]
+        }
+    elif validation_func_name == "StringInSlice":
+        schema["subtype"] = "string"
+        schema["test_params"] = {
+            "valid": [i for i in validation["params"]],
+            "invalid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10))],
+            "multiple_valids": [i for i in validation["params"]]
+        }
+    elif validation_func_name == "StringNotInSlice":
+        schema["subtype"] = "string"
+        schema["test_params"] = {
+            "invalid": [i for i in validation["params"]],
+            "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
+            "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)],
+        }
+    elif validation_func_name == "IsCIDRNetwork":
+        schema["subtype"] = "string"
+        x = validation["params"][0]
+        y = validation["params"][1]
+        schema["test_params"] = {
+            "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
+            "invalid": [x-1, y+1],
+            "multiple_valids": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
+        }
+    else:
+        schema["subtype"] = "string"
+        schema["test_params"] = {
+            "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
+            "invalid": [10, 12.43],
+            "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
+        }
+
+def handle_string(schema, data):
+    if "validation" in schema:
+        handle_string_validation(schema,schema["validation"], schema["validation"]["func_name"], data)
+    else:
+        schema["subtype"] = "string"
+        schema["test_params"] = {
+            "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
+            "invalid": [10, 12.43],
+            "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
+        }
+
+
+def handle_int_validation(schema,validation, validation_func_name, data):
+    if validation_func_name == "IntBetween":
+        schema["subtype"] = "range"
+        x = validation["params"][0]
+        y = validation["params"][1]
+        schema["test_params"] = {
+            "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
+            "invalid": [x-1, y+1],
+            "multiple_valids": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
+        }
+    elif validation_func_name == "IsPortNumber":
+        schema["subtype"] = "port"
+        schema["test_params"] = {
+            "valid": [1, 65535] + [random.randint(2,65534) for i in range(2)],
+            "invalid": [0, 65536],
+            "multiple_valids": [1, 65535] + [random.randint(2,65534) for i in range(13)]
+        }
+    elif validation_func_name == "IsPortNumberOrZero":
+        schema["subtype"] = "port0"
+        schema["test_params"] = {
+            "valid": [0, 65535] + [random.randint(1,65534) for i in range(2)],
+            "invalid": [-1, 65536],
+            "multiple_valids": [0, 65535] + [random.randint(1,65534) for i in range(13)]
+        }
+    else:
+        schema["subtype"] = "int"
+        schema["test_params"] = {
+            "valid": [random.randint(-1000,1000) for i in range(4)],
+            "invalid": ["random",10.023],
+            "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
+        }
+
+
+def handle_int(schema, data):
+    if "validation" in schema:
+        handle_int_validation(schema,schema["validation"], schema["validation"]["func_name"], data)
+    else:
+        schema["subtype"] = "int"
+        schema["test_params"] = {
+                "valid": [random.randint(-1000,1000) for i in range(4)],
+                "invalid": ["random",10.023],
+                "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
+        }
+
+
+def handle_float_validation(schema,validation, validation_func_name, data):
+    if validation_func_name == "FloatBetween":
+        schema["subtype"] = "range"
+        x = validation["params"][0]
+        y = validation["params"][1]
+        schema["test_params"] = {
+            "valid": [x, y, (x+y)/2] + [random.randint(x,y-1) + random.random() for i in range(1)],
+            "invalid": [x-1, y+1],
+            "multiple_valids": [x, y, (x+y)/2] + [random.randint(x,y-1) + random.random() for i in range(12)]
+        }
+    else:
+        schema["subtype"] = "float"
+        schema["test_params"] = {
+            "valid": [random.randint(-1000,1000)+random.random() for i in range(4)],
+            "invalid": ["random",10],
+            "multiple_valids": [random.randint(-1000,1000)+random.random() for i in range(15)]
+        }
+
+def handle_float(schema, data):
+    if "validation" in schema:
+        handle_float_validation(schema, schema["validation"],schema["validation"]["func_name"], data)
+    else:
+        schema["subtype"] = "float"
+        schema["test_params"] = {
+            "valid": [random.randint(-1000,1000)+random.random() for i in range(4)],
+            "invalid": ["random",10],
+            "multiple_valids": [random.randint(-1000,1000)+random.random() for i in range(15)]
+        }
+
+
+def handle_map(schema, data):
+    if schema["element"]["schema"]["type"] == "string":
+        schema["test_params"] = {
+            "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
+            "invalid": [10, 12.43],
+            "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
+        }
+    elif schema["element"]["schema"]["type"] == "int":
+        schema["test_params"] = {
+            "valid": [random.randint(-1000,1000) for i in range(4)],
+            "invalid": ["random",10.023],
+            "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
+        }
+    elif schema["element"]["schema"]["type"] == "float":
+        schema["test_params"] = {
+            "valid": [random.randint(-1000,1000)+random.random() for i in range(4)],
+            "invalid": ["random",10],
+            "multiple_valids": [random.randint(-1000,1000)+random.random() for i in range(15)]
+        } 
+    elif schema["element"]["schema"]["type"] == "bool":
+        schema["test_params"] = {
+            "valid": ["true", "false"],
+            "invalid": ["random", 10],
+            "multiple_valids": ["true", "false"]
+        }
+
+
 def pre_process():
-    with open("./config/resources/movie.yml", 'r') as stream:
+    with open("./config/resources/contract.yml", 'r') as stream:
         data = yaml.safe_load(stream)
     data = generate_random_values(data)
 
     for schema in data['schemas']:
         if schema["type"] == "string":
-            if "validation" in schema:
-                if schema["validation"]["func_name"] in typeMap:
-                    schema["subtype"] = typeMap[schema["validation"]["func_name"]]
-                    schema["test_params"] = {
-                        "valid": data["types"][schema["subtype"]]["valid"],
-                        "invalid": data["types"][schema["subtype"]]["invalid"],
-                        "multiple_valids": data["types"][schema["subtype"]]["multiple_valids"]
-                    }
-                elif schema["validation"]["func_name"] == "StringInSlice":
-                    schema["subtype"] = "string"
-                    schema["test_params"] = {
-                        "valid": [i for i in schema["validation"]["params"]],
-                        "invalid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10))],
-                        "multiple_valids": [i for i in schema["validation"]["params"]]
-                    }
-                elif schema["validation"]["func_name"] == "StringNotInSlice":
-                    schema["subtype"] = "string"
-                    schema["test_params"] = {
-                        "invalid": [i for i in schema["validation"]["params"]],
-                        "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                        "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)],
-                    }
-                elif schema["validation"]["func_name"] == "IsCIDRNetwork":
-                    schema["subtype"] = "string"
-                    x = schema["validation"]["params"][0]
-                    y = schema["validation"]["params"][1]
-                    schema["test_params"] = {
-                        "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
-                        "invalid": [x-1, y+1],
-                        "multiple_valids": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
-                    }
-                else:
-                    schema["subtype"] = "string"
-                    schema["test_params"] = {
-                        "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                        "invalid": [10, 12.43],
-                        "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
-                    }
-            else:
-                schema["subtype"] = "string"
-                schema["test_params"] = {
-                    "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                    "invalid": [10, 12.43],
-                    "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
-                }
+            handle_string(schema, data)
         elif schema["type"] == "int":
-            if "validation" in schema:
-                if schema["validation"]["func_name"] == "IntBetween":
-                    schema["subtype"] = "range"
-                    x = schema["validation"]["params"][0]
-                    y = schema["validation"]["params"][1]
-                    schema["test_params"] = {
-                        "valid": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(1) if i != (x+y)//2],
-                        "invalid": [x-1, y+1],
-                        "multiple_valids": [x, y, (x+y)//2] + [random.randint(x+1,y-1) for i in range(12) if i != (x+y)//2]
-                    }
-                elif schema["validation"]["func_name"] == "IsPortNumber":
-                    schema["subtype"] = "port"
-                    schema["test_params"] = {
-                        "valid": [1, 65535] + [random.randint(2,65534) for i in range(2)],
-                        "invalid": [0, 65536],
-                        "multiple_valids": [1, 65535] + [random.randint(2,65534) for i in range(13)]
-                    }
-                elif schema["validation"]["func_name"] == "IsPortNumberOrZero":
-                    schema["subtype"] = "port0"
-                    schema["test_params"] = {
-                        "valid": [0, 65535] + [random.randint(1,65534) for i in range(2)],
-                        "invalid": [-1, 65536],
-                        "multiple_valids": [0, 65535] + [random.randint(1,65534) for i in range(13)]
-                    }
-                else:
-                    schema["subtype"] = "int"
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000) for i in range(4)],
-                        "invalid": ["random",10.023],
-                        "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
-                    }
-            else:
-                schema["subtype"] = "int"
-                schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000) for i in range(4)],
-                        "invalid": ["random",10.023],
-                        "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
-                }
+            handle_int(schema, data)
         elif schema["type"] == "float":
-            if "validation" in schema:
-                if schema["validation"]["func_name"] == "FloatBetween":
-                    schema["subtype"] = "range"
-                    x = schema["validation"]["params"][0]
-                    y = schema["validation"]["params"][1]
-                    schema["test_params"] = {
-                        "valid": [x, y, (x+y)/2] + [random.randint(x,y)*random.random() for i in range(1)],
-                        "invalid": [x-1, y+1],
-                        "multiple_valids": [x, y, (x+y)/2] + [random.randint(x,y)*random.random() for i in range(12)]
-                    }
-                else:
-                    schema["subtype"] = "float"
-                    schema["test_params"] = {
-                        "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                        "invalid": ["random",10],
-                        "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)]
-                    }
-            else:
-                schema["subtype"] = "float"
-                schema["test_params"] = {
-                    "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                    "invalid": ["random",10],
-                    "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)]
-                }
+            handle_float(schema, data)
         elif schema["type"] == "bool":
             schema["subtype"] = "bool"
             schema["test_params"] = {
@@ -491,33 +326,10 @@ def pre_process():
             }
         elif schema["type"] == "map":
             schema["subtype"] = "map"
-            if schema["element"]["schema"]["type"] == "string":
-                schema["test_params"] = {
-                    "valid": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(4)],
-                    "invalid": [10, 12.43],
-                    "multiple_valids": [''.join(random.choices(string.ascii_lowercase + string.digits, k=10)) for i in range(15)]
-                }
-            elif schema["element"]["schema"]["type"] == "int":
-                schema["test_params"] = {
-                    "valid": [random.randint(-1000,1000) for i in range(4)],
-                    "invalid": ["random",10.023],
-                    "multiple_valids": [random.randint(-1000,1000) for i in range(15)]
-                }
-            elif schema["element"]["schema"]["type"] == "float":
-                schema["test_params"] = {
-                    "valid": [random.randint(-1000,1000)*random.random() for i in range(4)],
-                    "invalid": ["random",10],
-                    "multiple_valids": [random.randint(-1000,1000)*random.random() for i in range(15)]
-                } 
-            elif schema["element"]["schema"]["type"] == "bool":
-                schema["test_params"] = {
-                    "valid": ["true", "false"],
-                    "invalid": ["random", 10],
-                    "multiple_valids": ["true", "false"]
-                }
+            handle_map(schema, data)
         elif schema["type"] in ["list","set"]:
             handleListSetMap(data,schema)
-    with open('./config/resources/movie_generated.yml', 'w') as outfile:
+    with open('./config/resources/contract_generated.yml', 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
 
 def pre_process_for_provider():
@@ -530,7 +342,8 @@ def pre_process_for_provider():
             for k, v in data[key].items():
                 new_data[k] = {
                     "valid": data["types"][str(k)]["valid"],
-                    "invalid": data["types"][str(k)]["invalid"]
+                    "invalid": data["types"][str(k)]["invalid"],
+                    "multiple_valids": data["types"][str(k)]["multiple_valids"]
                 }
     data["types"] = new_data
     with open('./config/provider_generated.yml', 'w') as outfile:
@@ -564,7 +377,7 @@ with open("output/provider_test_output.go", "w") as fh:
     fh.write(template.render(config))
 
 
-config = yaml.full_load(open('./config/resources/movie_generated.yml'))
+config = yaml.full_load(open('./config/resources/contract_generated.yml'))
 env = Environment(loader=FileSystemLoader('./templates'),
                   trim_blocks=True, lstrip_blocks=True)
 
