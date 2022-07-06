@@ -1,5 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
-package aci
+package {{provider_name | snakify}}
 
 import(
     {% for import in imports  %}
@@ -17,13 +17,13 @@ func Provider() *schema.Provider {
 
 		ResourcesMap: map[string]*schema.Resource{
             {% for resource in resources %}
-            "{{provider_name |lower +"_"+resource}}": resource{{provider_name | capitalize}}{{schemaHelper.genFuncName(resource)}}(),
+            "{{provider_name |snakify +"_"+resource}}": resource{{provider_name | pascalize}}{{schemaHelper.genFuncName(resource)}}(),
             {% endfor %}
         },
 		
 		DataSourcesMap: map[string]*schema.Resource{
             {% for ds in datasources %}
-            "{{provider_name |lower +"_"+ds}}": dataSource{{provider_name | capitalize}}{{schemaHelper.genFuncName(ds)}}(),
+            "{{provider_name |snakify +"_"+ds}}": dataSource{{provider_name | pascalize}}{{schemaHelper.genFuncName(ds)}}(),
             {% endfor %}
         },
 

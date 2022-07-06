@@ -1,0 +1,47 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package {{provider_name | camelize}}
+
+import(
+    {% for import in imports  %}
+    "{{ import }}"
+    {% endfor %}
+)
+
+func dataSource{{provider_name | pascalize}}{{name | pascalize}}() *schema.Resource {
+	return &schema.Resource{
+        ReadContext: dataSource{{provider_name | pascalize}}{{name | pascalize}}Read,
+
+		Schema: map[string]*schema.Schema{
+			{% for schema in schemas %}
+				{{ schemaHelper.getDataSchemaEle(schema) }}
+			{% endfor %}
+		},
+	}
+}
+
+func dataSource{{provider_name | pascalize}}{{name | pascalize}}Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	
+	{{provider_name | camelize}}Client := m.(*client.Client)
+
+    {{name | camelize}}Model := models.{{name | pascalize}}{
+    {% for schema in schemas %}
+		{{ schemaHelper.getRequiredModel(schema) }}
+    {% endfor %}
+	}
+
+    {{name | camelize}}Id, err := getIdFrom{{name | pascalize}}Model(&{{name | camelize}}Model)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+    
+    {{name | camelize}}, err := get{{name | pascalize}}Attributes({{provider_name | camelize}}Client, {{name | camelize}}Id)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	_, err = set{{name | pascalize}}Attributes({{name | camelize}}, d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	return nil
+}

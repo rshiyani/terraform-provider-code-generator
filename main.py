@@ -395,7 +395,7 @@ env.filters["get_first"] = get_first
 env.filters["eliminate_first"] = eliminate_first
 
 
-template = env.get_template('resource_test_new.j2')
+template = env.get_template('resource_test.j2')
 
 # to save the results
 with open("output/resource_test_output.go", "w") as fh:
