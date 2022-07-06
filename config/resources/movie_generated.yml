@@ -1,0 +1,544 @@
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation
+name: movie
+provider_name: Movies
+schemas:
+- attribute: title
+  description: Title of the Movie
+  forcenew: true
+  required: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - r4wpbhdond
+    - rec49p7m91
+    - 91sb4qtrm8
+    - tzqbi3jrqv
+    - 73fe3v3xla
+    - y0skdzg583
+    - 429l65375i
+    - rq6x89my84
+    - sliaaiz7ur
+    - h2uld9gtt3
+    - fli14qz33r
+    - qur2uni5ou
+    - 8zfu6ulwcb
+    - v9d66z7nyx
+    - hilt3rpqfo
+    valid:
+    - wc9gmapm3i
+    - 41xoxams69
+    - wplvvmj8b9
+    - n2qweqhf4r
+  type: string
+- attribute: isbn
+  description: ISBN of the Movie
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - nruisbknrh
+    - ljtsior8hr
+    - pb1v7gm4zk
+    - jv3s7ozgux
+    - vqh886r109
+    - oyxjx092xd
+    - h59t58n4l7
+    - ye4lql14px
+    - k34evtn2ep
+    - 0af7bh7lus
+    - nudplfb4zp
+    - lh4dttlxbr
+    - 0uuv8lmv3j
+    - n8yqss5noq
+    - i6i8g3j55r
+    valid:
+    - bdy34mokel
+    - ad678a14v0
+    - zbdzh0hm3p
+    - dezmy6gqlq
+  type: string
+- attribute: genre
+  default: thriller
+  description: Genre of the movie
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - coto1ao9lp
+    multiple_valids:
+    - thriller
+    - action
+    - horror
+    - fiction
+    - comedy
+    valid:
+    - thriller
+    - action
+    - horror
+    - fiction
+    - comedy
+  type: string
+  validation:
+    func_name: StringInSlice
+    ignore_case: false
+    params:
+    - thriller
+    - action
+    - horror
+    - fiction
+    - comedy
+- attribute: director
+  description: Director of the Movie
+  element:
+    schema:
+    - attribute: firstname
+      description: Firstname of the Director
+      required: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - um0zmk14mk
+        - hczo0gbl1w
+        - 9jm8cnijgd
+        - c2zhumbxy8
+        - s13213p38d
+        - yjwy2431kp
+        - o6463a2v3e
+        - fe2qzcwaes
+        - 1y73fm8lfr
+        - odnvfmu480
+        - g5muy6jqfh
+        - jkygp6c1di
+        - yzt4gsoj4z
+        - gcract0xfg
+        - drbwwfibri
+        valid:
+        - bfpcpn1ghy
+        - 10tmoz3kaz
+        - a6eo2hi973
+        - u3hypf5fvj
+      type: string
+    - attribute: lastname
+      description: Lastname of the Director
+      optional: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - lm1rmup9kv
+        - 9o1u9tyi87
+        - nl90um10mz
+        - 7zby8nj6yt
+        - yooz242jbs
+        - bw74x551nd
+        - x0qo37q8a5
+        - m8623o2ds1
+        - 1f806zvvv9
+        - joav11uz8c
+        - wy7nh4kuao
+        - 34c8co96n4
+        - mdj7gex45l
+        - x3yalfeqdl
+        - 7wokmlemal
+        valid:
+        - fzcdorc89x
+        - dfszmfc5nm
+        - 9knogstu7e
+        - tkvo3dkxyx
+      type: string
+    type: resource
+  max_items: 1
+  optional: true
+  type: list
+- attribute: rating
+  element:
+    schema:
+    - attribute: rater
+      description: Rater that provide rating
+      required: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - taobizt84w
+        - r2zmas1er5
+        - 99r7n09u0o
+        - fypn5s3iwy
+        - cpy33g06cx
+        - rxh3dy2ram
+        - ur6459a33r
+        - c7g6d9do5m
+        - rzshjqxtky
+        - t7b2063gok
+        - wzas7mem1s
+        - nmndwsstkg
+        - e3f3s6yr6b
+        - 18va4npv3i
+        - mwskas9n8p
+        valid:
+        - uwmljw5oe3
+        - dg196iu9j6
+        - 5qplpl7kkd
+        - 36mhzo77t5
+      type: string
+    - attribute: rating
+      default: 1
+      optional: true
+      subtype: range
+      test_params:
+        invalid:
+        - 0
+        - 11
+        multiple_valids:
+        - 1
+        - 10
+        - 5.5
+        - 9.025413009419267
+        - 1.4373062255803255
+        - 5.417767179609171
+        - 6.626344579755322
+        - 9.251245882498731
+        - 3.8237397813373324
+        - 2.5303729743965944
+        - 4.484809389965576
+        - 6.595149657914912
+        - 6.936043629669857
+        - 7.487711307115614
+        - 9.966158218901077
+        - 2.6963183554982466
+        valid:
+        - 1
+        - 10
+        - 5.5
+        - 4.070084270438499
+      type: float
+      validation:
+        func_name: FloatBetween
+        params:
+        - 1
+        - 10
+    type: resource
+  optional: true
+  type: list
+- attribute: casts
+  element:
+    schema:
+      type: string
+    type: schema
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - 3bezrd92zv
+    - lgyfu8yrot
+    - raucy1xtle
+    - jxozxdsuob
+    - 1n5gmndr3s
+    - fftzlkxajq
+    - rtf23isywx
+    - aenm4ema8c
+    - k4aqren9yu
+    - f0loe4876j
+    - wf5fwudhzp
+    - fcc85vpwvr
+    - 88cns88u6j
+    - ozxcum1z9z
+    - l0mzy1e1wh
+    valid:
+    - iws5qvfw93
+    - bs6tqvefwg
+    - hzvtnu7a7n
+    - zd5zksrisw
+  type: set
+types:
+  base64:
+    invalid:
+    - a3+J1b%mFs//
+    multiple_valids:
+    - eHF6c2xhcmoyMQ==
+    - Mzk5dzBiODdmbQ==
+    - cWpqYm5hbWJnNg==
+    - eDltM3FsOHk1Yw==
+    - dmdieDZqZzNkOA==
+    - dHZnZ285ejJmOQ==
+    - MThyYWxmdW95Yg==
+    - enJzbmFreHBuMA==
+    - bXI1NHRncTRtbg==
+    - YWNtcTZsNmU5MQ==
+    - Y2M0cmh0bmZpaA==
+    - ZmRpYW1wMGwzdw==
+    - eWo5OGd0dzA1bg==
+    - aTgyOXFocW43MA==
+    - NGZ3Y3Yzazc4Ng==
+    valid:
+    - MHZrMnNtMDBoeA==
+    - a3RrNGVpMTZ2eQ==
+    - ZGlnbTdqc3pyNQ==
+    - N216bWF3YjV4cg==
+  cidr:
+    invalid:
+    - 285.283.295.268/2
+    multiple_valids:
+    - 44.210.224.0/20
+    - 44.210.80.0/20
+    - 44.210.112.0/20
+    - 44.210.240.0/20
+    - 44.210.192.0/20
+    - 44.210.32.0/20
+    - 44.210.48.0/20
+    - 44.210.0.0/20
+    - 44.210.128.0/20
+    - 44.210.160.0/20
+    - 44.210.176.0/20
+    - 44.210.144.0/20
+    - 44.210.16.0/20
+    - 44.210.64.0/20
+    - 44.210.208.0/20
+    valid:
+    - 44.210.224.0/20
+    - 44.210.80.0/20
+    - 44.210.112.0/20
+    - 44.210.240.0/20
+  ipv4:
+    invalid:
+    - 274.282.277.289
+    multiple_valids:
+    - 44.210.179.35
+    - 44.210.162.131
+    - 44.210.32.237
+    - 44.210.247.142
+    - 44.210.237.127
+    - 44.210.11.192
+    - 44.210.83.253
+    - 44.210.223.75
+    - 44.210.239.95
+    - 44.210.92.15
+    - 44.210.102.21
+    - 44.210.72.80
+    - 44.210.63.52
+    - 44.210.63.106
+    - 44.210.99.103
+    valid:
+    - 44.210.179.35
+    - 44.210.162.131
+    - 44.210.32.237
+    - 44.210.247.142
+  ipv6:
+    invalid:
+    - invalidIPv6
+    multiple_valids:
+    - 2001:db8::34f4:0:0:f34b
+    - 2001:db8::34f4:0:0:f3bb
+    - 2001:db8::34f4:0:0:f37f
+    - 2001:db8::34f4:0:0:f347
+    - 2001:db8::34f4:0:0:f3b2
+    - 2001:db8::34f4:0:0:f346
+    - 2001:db8::34f4:0:0:f3b6
+    - 2001:db8::34f4:0:0:f30b
+    - 2001:db8::34f4:0:0:f3be
+    - 2001:db8::34f4:0:0:f331
+    - 2001:db8::34f4:0:0:f322
+    - 2001:db8::34f4:0:0:f348
+    - 2001:db8::34f4:0:0:f309
+    - 2001:db8::34f4:0:0:f3a8
+    - 2001:db8::34f4:0:0:f3cb
+    valid:
+    - 2001:db8::34f4:0:0:f34b
+    - 2001:db8::34f4:0:0:f3bb
+    - 2001:db8::34f4:0:0:f37f
+    - 2001:db8::34f4:0:0:f347
+  json:
+    invalid:
+    - 'json({ name : val)'
+    multiple_valids:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+    - 'json({ "attribute" : "value4" })'
+    - 'json({ "attribute" : "value5" })'
+    - 'json({ "attribute" : "value6" })'
+    - 'json({ "attribute" : "value7" })'
+    - 'json({ "attribute" : "value8" })'
+    - 'json({ "attribute" : "value9" })'
+    - 'json({ "attribute" : "value10" })'
+    - 'json({ "attribute" : "value11" })'
+    - 'json({ "attribute" : "value12" })'
+    - 'json({ "attribute" : "value13" })'
+    - 'json({ "attribute" : "value14" })'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+  mac:
+    invalid:
+    - invalidMAC
+    multiple_valids:
+    - 46:46:26:7d:6d:de
+    - 25:87:6a:c5:35:48
+    - 75:64:74:ae:c3:42
+    - 25:01:d2:fa:0f:10
+    - 99:34:3b:54:8f:e6
+    - d8:41:fe:7d:48:4d
+    - 57:7c:22:74:1d:f9
+    - 92:2d:68:60:69:32
+    - 61:ad:b4:ec:05:b2
+    - cd:99:46:df:86:4c
+    - 2e:11:77:9a:bd:76
+    - 26:d0:fb:6e:6d:d4
+    - fa:12:7d:5b:9b:34
+    - 2d:e0:f2:39:11:6e
+    - 5a:27:03:d5:e4:f7
+    valid:
+    - 65:16:1d:04:20:bb
+    - d5:5c:03:64:ca:a9
+    - 0c:5d:71:76:46:eb
+    - f5:7d:5d:d3:cd:0b
+  regex:
+    invalid:
+    - '[0-9)++'
+    multiple_valids:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+    valid:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+  string:
+    invalid:
+    - 12345
+    multiple_valids:
+    - hnboptwb8h
+    - 1pda1zgfdb
+    - yqvzcvdk91
+    - jut2et8ogk
+    - etwiwscyh1
+    - e2v64mh6su
+    - rxjat6alwe
+    - w49ik4f1ll
+    - 1tl3zijr88
+    - inm7mqpt2p
+    - 37jt9lwo8z
+    - t36bfdnyq8
+    - 9jur9wqq5e
+    - bvk23uxxxy
+    - ns0pcm43m6
+    valid:
+    - bt5q8xhrew
+    - jp52jxc9u9
+    - 0ve1uiurtv
+    - wf60a2s2zn
+  time:
+    invalid:
+    - '2022-07-05 11:26:27.492455'
+    multiple_valids:
+    - '2022-07-05T05:56:27.492455+00:00'
+    - '2022-07-28T05:56:27.492455+00:00'
+    - '2022-08-20T05:56:27.492455+00:00'
+    - '2022-09-12T05:56:27.492455+00:00'
+    - '2022-10-05T05:56:27.492455+00:00'
+    - '2022-10-28T05:56:27.492455+00:00'
+    - '2022-11-20T05:56:27.492455+00:00'
+    - '2022-12-13T05:56:27.492455+00:00'
+    - '2023-01-05T05:56:27.492455+00:00'
+    - '2023-01-28T05:56:27.492455+00:00'
+    - '2023-02-20T05:56:27.492455+00:00'
+    - '2023-03-15T05:56:27.492455+00:00'
+    - '2023-04-07T05:56:27.492455+00:00'
+    - '2023-04-30T05:56:27.492455+00:00'
+    - '2023-05-23T05:56:27.492455+00:00'
+    valid:
+    - '2022-07-05T05:56:27.492455+00:00'
+    - '2022-07-28T05:56:27.492455+00:00'
+    - '2022-08-20T05:56:27.492455+00:00'
+    - '2022-09-12T05:56:27.492455+00:00'
+  url-http:
+    invalid:
+    - ht:/f4s50chpx9qb76z.com
+    multiple_valids:
+    - http://j0995v9j7t0vrti.com
+    - http://rttx8608zaew6ky.com
+    - http://u5xhi7icfw6hnft.com
+    - http://a43hjmtf7wc9lsd.com
+    - http://z8qmwpz6y0af668.com
+    - http://vq8by3wmm516kmf.com
+    - http://kzvzizvfwfb5epf.com
+    - http://injc0r8z48woxyu.com
+    - http://q7sit658it5s7v4.com
+    - http://lt3tvit2count9j.com
+    - http://r7jb409jcs6ubk3.com
+    - http://g8k2udoqgsbglbu.com
+    - http://mnh8sx8lkxr7kre.com
+    - http://3ygd1koron6ibaz.com
+    - http://1qvlsnlq9n6clg3.com
+    valid:
+    - http://szqo5jke3a6fkyi.com
+    - http://wkeckynkeohh4it.com
+    - http://kh8ngh153ismol1.com
+    - http://ys6p2tm3tjn0xt9.com
+  url-https:
+    invalid:
+    - hts:/x5doaac5i19af02.com
+    multiple_valids:
+    - https://qi06r83w33c2jxc.com
+    - https://8a00a1xw937ldsj.com
+    - https://fizwsvjioekkmhb.com
+    - https://ho5d3vnfr5x9th1.com
+    - https://ov0y1nnqopa3w25.com
+    - https://zihq3mhmkn0act5.com
+    - https://doskc8igohl2d5l.com
+    - https://wzfxfb50fhneedv.com
+    - https://ztlfj8huoy9g2zc.com
+    - https://cur93vvyzhbu0ft.com
+    - https://qxxzd1m9p5hcs1q.com
+    - https://juhyqcjpia6jsex.com
+    - https://vr96kfipo2rg1x9.com
+    - https://gtxq3dvu13wpuxe.com
+    - https://ib4nvhz0p9bncao.com
+    valid:
+    - https://4ni35w48rdz3upn.com
+    - https://7hstrxne2db30c3.com
+    - https://yso5t4suvut8c8h.com
+    - https://c85ez0rdgxltwoq.com
+  uuid:
+    invalid:
+    - invalid323Uuid12
+    multiple_valids:
+    - 359bdf8a-fc27-11ec-9262-7c8ae196ee3b
+    - 359bdf8b-fc27-11ec-a2bf-7c8ae196ee3b
+    - 359bdf8c-fc27-11ec-b013-7c8ae196ee3b
+    - 359bdf8d-fc27-11ec-ae91-7c8ae196ee3b
+    - 359bdf8e-fc27-11ec-a56f-7c8ae196ee3b
+    - 359bdf8f-fc27-11ec-a951-7c8ae196ee3b
+    - 359bdf90-fc27-11ec-adfb-7c8ae196ee3b
+    - 359bdf91-fc27-11ec-be3e-7c8ae196ee3b
+    - 359bdf92-fc27-11ec-afd0-7c8ae196ee3b
+    - 359bdf93-fc27-11ec-8948-7c8ae196ee3b
+    - 359bdf94-fc27-11ec-bcd4-7c8ae196ee3b
+    - 359bdf95-fc27-11ec-be5c-7c8ae196ee3b
+    - 359bdf96-fc27-11ec-a921-7c8ae196ee3b
+    - 359bdf97-fc27-11ec-82be-7c8ae196ee3b
+    - 359bdf98-fc27-11ec-9290-7c8ae196ee3b
+    valid:
+    - 359bdf86-fc27-11ec-9f56-7c8ae196ee3b
+    - 359bdf87-fc27-11ec-aa74-7c8ae196ee3b
+    - 359bdf88-fc27-11ec-a422-7c8ae196ee3b
+    - 359bdf89-fc27-11ec-a3ec-7c8ae196ee3b
