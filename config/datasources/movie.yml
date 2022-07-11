@@ -1,0 +1,65 @@
+provider_name: "Movies"
+name: "movie"
+imports:
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+schemas:
+  - attribute: "id"
+    type: "string"
+    required: true
+    description: "ID of the Movie"
+    exclude: true
+  - attribute: "title"
+    type: "string"
+    computed: true
+    description: "Title of the Movie"
+
+  - attribute: "isbn"
+    type: "string"
+    computed: true
+    description: "ISBN of the Movie"
+
+  - attribute: "genre"
+    type: "string"
+    computed: true
+    description: "Genre of the movie"
+    default: "thriller"
+
+  - attribute: "director"
+    type: "list"
+    computed: true
+    description: "Director of the Movie"
+    max_items: 1
+    element:
+      type: "resource"
+      schema:
+        - attribute: "firstname"
+          type: "string"
+          required: true
+          description: "Firstname of the Director"
+        - attribute: "lastname"
+          type: "string"
+          computed: true
+          description: "Lastname of the Director"
+  - attribute: rating
+    type: "list"
+    computed: true
+    element:
+      type: "resource"
+      schema:
+        - attribute: rater
+          type: "string"
+          required: true
+          description: "Rater that provide rating"
+        - attribute: rating
+          type: "float"
+          computed: true
+          default: 1
+  - attribute: casts
+    type: set
+    computed: true
+    element:
+      type: schema
+      schema:
+        type: string

@@ -306,7 +306,7 @@ def handle_map(schema, data):
 
 
 def pre_process():
-    with open("./config/resources/contract.yml", 'r') as stream:
+    with open("./config/resources/movie.yml", 'r') as stream:
         data = yaml.safe_load(stream)
     data = generate_random_values(data)
 
@@ -329,7 +329,7 @@ def pre_process():
             handle_map(schema, data)
         elif schema["type"] in ["list","set"]:
             handleListSetMap(data,schema)
-    with open('./config/resources/contract_generated.yml', 'w') as outfile:
+    with open('./config/resources/movie_generated.yml', 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
 
 def pre_process_for_provider():
@@ -377,7 +377,7 @@ with open("output/provider_test_output.go", "w") as fh:
     fh.write(template.render(config))
 
 
-config = yaml.full_load(open('./config/resources/contract_generated.yml'))
+config = yaml.full_load(open('./config/resources/movie_generated.yml'))
 env = Environment(loader=FileSystemLoader('./templates'),
                   trim_blocks=True, lstrip_blocks=True)
 

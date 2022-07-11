@@ -1,4 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
+{% import './helpers/test.j2' as testHelper %}
 package {{provider_name | camelize}}
 
 import(
@@ -7,39 +8,7 @@ import(
     {% endfor %}
 )
 
-{# remove below var after resource_test#}
-//remove after resource_test 
-var resourceContractTest = map[string]interface{}{
-	"name" : map[string]interface{}{
-		"valid": []string{ "Hello", "World" },
-		"invalid": []interface{}{ 234, 987 },
-	},
-	"id" : map[string]interface{}{
-		"valid": []int{ 234, 987 },
-		"invalid": []interface{}{ "Hello", "World" },
-	},
-	"weight" : map[string]interface{}{
-		"valid": []float64{ 23.4, 987 },
-		"invalid": []interface{}{ "Hello", "World" },
-	},
-		"ipv4_for" : map[string]interface{}{
-			"valid": Test["ipv4"].(map[string]interface{})["valid"].([]string),
-			"invalid": Test["ipv4"].(map[string]interface{})["invalid"].([]interface{}),
-		},
-	"port_number" : map[string]interface{}{
-		"valid": []int{ 1, 53, 65535 },
-		"invalid": []interface{}{ 0, 65536 },
-	},
-	"test_score" : map[string]interface{}{
-		"valid": []int{ 1, 100, 50 },
-		"invalid": []interface{}{ 0, 101 },
-	},
-			"valid_cidr" : map[string]interface{}{
-				"valid": []int{ 0, 32 },
-				"invalid": []int{349, 57},
-			},
 
-}
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}DataSource_Basic(t *testing.T) {
 	resourceName := "{{provider_name | camelize}}_{{name | camelize}}.test"
     dataSourceName := "data.{{provider_name | camelize}}_{{name | camelize}}.test"
@@ -47,85 +16,47 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}DataSource_Basic(t 
 	randomValue := acctest.RandString(5)
     resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: testAccProviders,
+		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
-		Steps: []resource.TestStep{
-            {% for schema in schemas %}
-			    {{ schemaHelper.getRequiredDNFunc(name,schema) }}
-			{% endfor %}
+		Steps: append([]resource.TestStep{
+
+			{{testHelper.printStepsWithoutRequiredArgumentsDS(name, schemas)}}
             {
-				Config: CreateAcc{{name | pascalize}}ConfigDataSource(),
+				Config: CreateAcc{{name|pascalize}}DataSourceConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					{% for schema in schemas %}
-			        	{{ schemaHelper.getTestAttr(schema) }}
-			        {% endfor %}
+					{{testHelper.printStepsForConfigDataSource(schemas)}}
 				),
 			},
             {
 				Config:      CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(randomParameter, randomValue),
 				ExpectError: regexp.MustCompile(`An argument named (.)+ is not expected here.`),
 			},
-			
-			{% for schema in schemas %}
-			    {{ schemaHelper.getRequiredInvalidFunc(name,schema) }}
-			{% endfor %}
-
-			{% for schema in schemas %}
-				{% if schema.optional is true and schema.type == "string" %}
-				{
-					Config: CreateAcc{{name | pascalize}}UpdateConfigDataSource("{{schema.attribute}}", randomValue),
-					Check: resource.ComposeTestCheckFunc(
-						resource.TestCheckResourceAttrPair(dataSourceName,"{{schema.attribute}}", resourceName,"{{schema.attribute}}"),
-						),
-				},	
-				{% endif %}
-			{% endfor %}
-        },
+			{{testHelper.printStepsForInvalidArgumentsDS(name, schemas)}}
+		}, generateStepForDataSourceUpdatedOptionalAttr(dataSourceName, resourceName)...),
 	})
 }
 
 
-{{ schemaHelper.getRequiredDNFuncWithoutVar(provider_name,name,schemas) }}
+
+{#---------------------------------------Without Required--------------------------------------#}
+{{'\n'+testHelper.printFunctionWithoutRequiredArgumentsDS(name, provider_name, schemas)}}
+
+{#---------------------------------------Data Source Config------------------------------------#}
+{{testHelper.printFunctionForDataSourceConfig(name, provider_name, schemas)}}
+
+{#-------------------------------------Data Source Random Attr---------------------------------#}
+{{testHelper.printFuncUpdatedConfigDataSourceRandomAttr(name, provider_name, schemas)}}
+
+{#------------------------------------Data Source Invalid Arguments----------------------------#}
+{{testHelper.printFuncForInvalidArgumentsDS(name,provider_name,schemas)}}
+
+{#------------------------------------Data Source Update Config Optional-----------------------#}
+{{testHelper.genUpdateComputedFunction(name,provider_name,schemas)}}
+{{testHelper.printGenerateStepsForDataSourceUpdatedOptionalAttr(name,provider_name,schemas)}}
+{{testHelper.printFuncForDataSourceUpdatedOptionalAttr(name,provider_name,schemas)}}
 
 
-func CreateAcc{{name | pascalize}}ConfigDataSource() string {
-	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source creation with required arguments only")
-	resource := CreateAcc{{name | pascalize}}Config() //from resource_test
-	resource += fmt.Sprintf(`
-
-	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
-		{% for schema in schemas %}
-			{% if schema.required is true  %}
-			{{schema.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}
-			{% endif %}
-		{% endfor %}
-	}
-	`)
-	return resource
-}
-
-
-func CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(key, value string) string {
-	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source creation with random attributes")
-	resource := CreateAcc{{name | pascalize}}Config() //from resource_test
-	resource += fmt.Sprintf(`
-
-	data "{{provider_name | camelize}}_{{name | camelize}}" "test" {
-		{% for schema in schemas %}
-			{% if schema.required is true  %}
-			{{schema.attribute}} = {{provider_name | camelize}}_{{name | camelize}}.test.{{schema.attribute}}
-			{% endif %}
-		{% endfor %}
-			%s = "%s"
-	}
-	`,key, value)
-	return resource
-}
-
-{{ schemaHelper.getDSFuncWithInvalidRequired(provider_name,name,schemas) }}
-
-
-func CreateAcc{{name | pascalize}}UpdatedConfigDataSource(key, value string) string {
+{#func CreateAcc{{name | pascalize}}UpdatedConfigDataSource(key, value string) string {
 	fmt.Println("=== STEP  Basic: testing {{name | pascalize}} data source with updated resource")
 	resource := CreateAcc{{name | pascalize}}UpdatedAttr(key,value) //from resource_test
 	resource += fmt.Sprintf(`
@@ -138,36 +69,6 @@ func CreateAcc{{name | pascalize}}UpdatedConfigDataSource(key, value string) str
 	}
 	`)
 	return resource
-}
+}#}
 
 
-{#remove below func after resource_test#}
-//remove after resource_test
-func CreateAccContractConfig() string {
-	resource := fmt.Sprintf(`
-	resource "aci_tenant" "test"{
-		name = "abcd"
-	}
-	resource "aci_contract" "test" {
-		tenant_dn = aci_tenant.test.id
-		name = "xyzw"
-	}
-	`)
-	return resource
-}
-
-{#remove below func after resource_test#}
-//remove after resource_test
-func CreateAccContractUpdatedAttr(attribute, value string) string {
-	resource := fmt.Sprintf(`
-	resource "aci_tenant" "test"{
-		name = "abcd"
-	}
-	resource "aci_contract" "test"{
-		tenant_dn = aci_tenant.test.id
-		name = "xyzw"
-		%s = "%s"
-	}
-	`,attribute, value)
-	return resource
-}

@@ -1,4 +1,4 @@
-package aci
+package movies
 
 import (
 	"fmt"
@@ -8,230 +8,112 @@ import (
 	"github.com/RutvikS-crest/movies-go-client/client"
 )
 
-const contractSelfRequiredCount = 5
+const movieSelfRequiredCount = 1
 
-var resourceContractTest = map[string]interface{}{
-	"name": map[string]interface{}{
-		"valid":           []interface{}{"b6epjiajkc", "c7o6sg433u", "y04f9l7p5s", "j6wcreq2do"},
+var resourceMovieTest = map[string]interface{}{
+	"title": map[string]interface{}{
+		"valid":           []interface{}{"reb9mfgujf", "rotf377xld", "pigjrkl2i7", "qhlphte62c"},
 		"invalid":         []interface{}{10, 12.43},
-		"multiple_valids": []interface{}{"3bqkrd25nz", "ps33hh05jw", "atdj7y9tgh", "p8a8i1kth0", "x043jtvts2", "s0daqkly3e", "nzkj5jib3a", "iayfzajfix", "mqvlijttxf", "zuij23gl4m", "o37n5xulux", "6sq3bul6r6", "tnv0bvsm8b", "glgpm6c99h", "jz9b0on36l"},
+		"multiple_valids": []interface{}{"kg10fbwcz7", "k1kz1au15a", "2ki0e88t4w", "jd9nakr11f", "bewjgqjo3q", "kpofubatve", "3fo17tajnv", "rsuk6jckg4", "rzl0x2uf6r", "o4qy52ueri", "iydt4lult7", "i8o95dz89b", "m5efm3d33g", "gqr7zlix8h", "ea05g1oocv"},
 	},
 
-	"temp": map[string]interface{}{
-		"valid":           []interface{}{180, 45, 650, 388},
-		"invalid":         []interface{}{"random", 10.023},
-		"multiple_valids": []interface{}{-72, 395, -455, 84, 283, -265, -804, 36, -925, -32, 469, 730, 425, -416, -564},
-	},
-
-	"weight": map[string]interface{}{
-		"valid":           []interface{}{-968.2083562524816, 319.83828987522924, 914.3886433874081, 533.7449091697114},
-		"invalid":         []interface{}{"random", 10},
-		"multiple_valids": []interface{}{39.85083893763871, -631.6408667714682, -944.267139291758, 213.58423554456127, 373.9668403322991, 552.8699640142963, -621.7213035453773, 971.9117263000096, -656.5891299950213, 108.12052311373095, 993.2418126639959, -935.9610603231043, -353.30039837746784, 628.8930792119718, -657.903676337481},
-	},
-
-	"ipv4_for": map[string]interface{}{
-		"valid":           searchInObject(Test, "ipv4_for.valid"),
-		"invalid":         searchInObject(Test, "ipv4_for.invalid"),
-		"multiple_valids": searchInObject(Test, "ipv4_for.multiple_valids"),
-	},
-
-	"port_number": map[string]interface{}{
-		"valid":           []interface{}{1, 65535, 37225, 53880},
-		"invalid":         []interface{}{0, 65536},
-		"multiple_valids": []interface{}{1, 65535, 14311, 26358, 41876, 11422, 47173, 21233, 34776, 11221, 47279, 10056, 751, 46741, 57119},
-	},
-
-	"temp_schema_list": map[string]interface{}{
-		"valid":           []interface{}{"wvwkl1j7qm", "svu5byk2os", "o9cquhcauv", "ie9zo3bglk"},
+	"isbn": map[string]interface{}{
+		"valid":           []interface{}{"vu6t5rb3qx", "1n3yo1gvcr", "6sbganzn2p", "wblhz74mcp"},
 		"invalid":         []interface{}{10, 12.43},
-		"multiple_valids": []interface{}{"1cwl6sg3ko", "jqww9eauck", "z2dcvjr1d1", "5bys2v04dj", "o4o4lw4rx3", "li376ugct2", "7zbmbfe29g", "lcjs78lrdm", "h00prlm13w", "9sz8zpzwr0", "2ttf0qre1g", "v57d9fkf7x", "dzec0df43b", "nk78kitujg", "h6g5p0osrw"},
+		"multiple_valids": []interface{}{"9d6is9p00i", "dn8ybvbs0b", "5a83o5swuw", "f2mwe83rw3", "0ytgykwnmh", "aegb5ka3o4", "mgjhlvqe2r", "9qh6k1zoss", "4uvy25sqrj", "hqszr06926", "q4p2r3ozcd", "rvhsezo8im", "yc008r2gxg", "758z3xzdc3", "kwhu5f9z9b"},
 	},
 
-	"test_score": map[string]interface{}{
-		"valid":           []interface{}{1, 100, 50, 88},
-		"invalid":         []interface{}{0, 101},
-		"multiple_valids": []interface{}{1, 100, 50, 5, 83, 2, 61, 65, 17, 84, 15, 86, 67, 35, 27},
+	"genre": map[string]interface{}{
+		"valid":           []interface{}{"thriller", "action", "horror", "fiction", "comedy"},
+		"invalid":         []interface{}{"u10gyzoswm"},
+		"multiple_valids": []interface{}{"thriller", "action", "horror", "fiction", "comedy"},
 	},
 
-	"string_in_some_names": map[string]interface{}{
-		"valid":           []interface{}{"parth", "aarsh", "arjun", "alfatah", "krunal"},
-		"invalid":         []interface{}{"6t4mt1im0l"},
-		"multiple_valids": []interface{}{"parth", "aarsh", "arjun", "alfatah", "krunal"},
-	},
-
-	"valid_cidr": map[string]interface{}{
-		"valid":           []interface{}{0, 32, 16, 23},
-		"invalid":         []interface{}{-1, 33},
-		"multiple_valids": []interface{}{0, 32, 16, 29, 6, 9, 10, 24, 11, 25, 13, 28, 7, 23, 13},
-	},
-
-	"percentage": map[string]interface{}{
-		"valid":           []interface{}{0, 100, 50.0, 8.901470198524594},
-		"invalid":         []interface{}{-1, 101},
-		"multiple_valids": []interface{}{0, 100, 50.0, 69.23049722298951, 45.187452338007105, 35.251861221822146, 59.00225935528169, 54.564866948679914, 35.90301308432537, 98.18484397088255, 87.3436783369663, 9.696505845874814, 98.95790156011914, 53.173833837510124, 0.7119919193560287},
-	},
-
-	"testingmap": map[string]interface{}{
-		"valid":           []interface{}{-471, 586, -778, -176},
-		"invalid":         []interface{}{"random", 10.023},
-		"multiple_valids": []interface{}{392, -58, -662, 981, 939, -926, -574, 715, -99, 283, -41, -534, -317, 324, -437},
-	},
-
-	"filter": map[string]interface{}{
-		"filter_name": map[string]interface{}{
-			"valid":           []interface{}{50, 100, 75.0, 52.03287158785944},
-			"invalid":         []interface{}{49, 101},
-			"multiple_valids": []interface{}{50, 100, 75.0, 76.86387871635571, 89.11103592316053, 85.6898488194801, 83.7025704049203, 92.43865170222696, 63.04113698293864, 73.51116852350565, 62.462066017526006, 64.66893937964593, 84.41348388396842, 82.67839221075506, 56.51072346271268},
-		},
-
-		"id": map[string]interface{}{
-			"valid":           []interface{}{"fast21p525", "of946zaloh", "6dnxsknkbj", "fdai9wx99u"},
+	"director": map[string]interface{}{
+		"firstname": map[string]interface{}{
+			"valid":           []interface{}{"y8fbb197bv", "s5cawisxjs", "e21is5fy10", "2tkj8myojf"},
 			"invalid":         []interface{}{10, 12.43},
-			"multiple_valids": []interface{}{"pzpe3ogcbx", "zuyayqaw21", "em1eausher", "j0hxifgp0i", "5wol7aigt0", "g5yd82ho8s", "8emu78z6hd", "4115j9xbtu", "qdgt8nvxes", "v2pmdff59x", "5dq2dumfzd", "op99crepbg", "p0rcp62wrd", "1a5d8dx4xv", "me492u99t5"},
+			"multiple_valids": []interface{}{"qdaiwihjj8", "zcs4ccpv1c", "q6vcj9xzkg", "irddgz2emm", "gbqthyjni6", "dt7lz1w6wr", "fvsylqhxgc", "mqd4ni2f8b", "8wd0oo9ske", "eai9aceltj", "l6iufp0fg8", "m1xlst9r6m", "dnxwmzc1l3", "avwjtdkl0l", "cptpne6zgk"},
 		},
 
-		"description": map[string]interface{}{
-			"valid":           []interface{}{"82attosmwc", "a2rs7no28o", "it6e3grd7s", "prith0q4t7"},
+		"lastname": map[string]interface{}{
+			"valid":           []interface{}{"9cfkeac00o", "sm9jlwkl0o", "l0q337pqsq", "i0aql3afvq"},
 			"invalid":         []interface{}{10, 12.43},
-			"multiple_valids": []interface{}{"yl0v44j8qg", "vmcpc973zn", "6nod5wt0wd", "fgzgu9wt04", "dc8nll0tqh", "p6iy35npp9", "pp4fgmxz0a", "ap2vwgx3m5", "yolvvkjk1o", "12qq6e75di", "rtv0uhujlu", "cth118uwnd", "3tql8m34p9", "fp58g43a3c", "6o8dzm3oej"},
+			"multiple_valids": []interface{}{"mlex79t71s", "fi7geoq37m", "2qqy0e8wo0", "3wwgaz0pnh", "syh8xmyje8", "qh51boe7gk", "7lk5nqro44", "dziei9tme3", "807yse8myd", "6fm5u3akp0", "1loclap0wh", "d32s6a19ip", "dinxpsuhg5", "o9uumlhb2b", "7v23dgzv53"},
+		},
+	},
+
+	"rating": map[string]interface{}{
+		"rater": map[string]interface{}{
+			"valid":           []interface{}{"j941xenc9g", "0clp8bilj4", "k8nc5mdrm9", "0zjd4itmq2"},
+			"invalid":         []interface{}{10, 12.43},
+			"multiple_valids": []interface{}{"qu03wzno10", "afxdgb0b34", "8dxy78k9wp", "iua9krjv57", "9gyqp3lx58", "jdh0qfd4yx", "z37cp0jihw", "ljplqz1s77", "owqmlpqlvb", "9wmh36ucg6", "zjibh46nw1", "byhhe6vmx9", "m4dzpv11tn", "g2un4gqn1q", "tp4t74yyu1"},
 		},
 
-		"filter_entry": map[string]interface{}{
-			"id_list": map[string]interface{}{
-				"valid":           []interface{}{"cq7fzzofpi", "a7trdzcdrd", "7gpnn3gb6q", "gm21lda2jj"},
-				"invalid":         []interface{}{10, 12.43},
-				"multiple_valids": []interface{}{"zkoeuwgcki", "wileekqdi2", "9f122iqcym", "7ceuwkiu9w", "l6839w4vf1", "7n53gqncqq", "3lgji2c3tg", "u4hzmrzrn5", "z3fl1398rh", "ysrvjhzexl", "xzkipoh4od", "t9eark9dsj", "xi1sjnfdyo", "6emwdqz320", "s9p2zlju2t"},
-			},
-
-			"filter_entry_name": map[string]interface{}{
-				"valid":           []interface{}{"60jtv6ol7v", "aatca1c5xm", "a7q43k503l", "2ubim52ixk"},
-				"invalid":         []interface{}{10, 12.43},
-				"multiple_valids": []interface{}{"f2frj2twzt", "pn2zbozfir", "pe0txf3l2v", "cbpcuj9d1g", "o5gu806orb", "lx8s6tfhbs", "lha0x53dud", "otxn48oh7b", "idd5hcoqq3", "n2j891fgml", "eotyqmsld8", "0l2fskm89b", "7498kf59m2", "trlbh6qmjc", "ootzzctspc"},
-			},
-
-			"ipv6": map[string]interface{}{
-				"valid":           searchInObject(Test, "ipv6.valid"),
-				"invalid":         searchInObject(Test, "ipv6.invalid"),
-				"multiple_valids": searchInObject(Test, "ipv6.multiple_valids"),
-			},
-
-			"apply_to_frag": map[string]interface{}{
-				"valid":           []interface{}{"u91jaxum1e", "5og5tw9xl5", "ktub750mch", "8uhh3stlms"},
-				"invalid":         []interface{}{"yes", "no"},
-				"multiple_valids": []interface{}{"nnjp87lzy5", "gx6kh8t99b", "1daquyuznb", "vwx46ikrur", "rkordixx7f", "1pwosqviza", "j9pf9fphwm", "tm9hscvy99", "rzk4xlcigv", "x7zkvzbbln", "h6tx35h7al", "6f0lw83c18", "9dhpacrob5", "rztkm4lnk7", "t2w535jh8r"},
-			},
-
-			"apply_to_frag_liist_schema": map[string]interface{}{
-				"valid":           []interface{}{true, false},
-				"invalid":         []interface{}{"random", 10},
-				"multiple_valids": []interface{}{true, false},
-			},
+		"rating": map[string]interface{}{
+			"valid":           []interface{}{1, 10, 5.5, 5.327493256150269},
+			"invalid":         []interface{}{0, 11},
+			"multiple_valids": []interface{}{1, 10, 5.5, 6.3077942796079425, 3.8319217250341877, 7.284504431375421, 3.938417818790897, 4.803870162269427, 4.125968612341213, 5.012689864396442, 6.666219282869619, 9.076894442102645, 1.0244780871351846, 6.451452026875719, 2.2539842447992426},
 		},
+	},
+
+	"casts": map[string]interface{}{
+		"valid":           []interface{}{"ao08fjphu0", "tj7oh8qu2p", "fs2hzniqj6", "ijcsi2kocb"},
+		"invalid":         []interface{}{10, 12.43},
+		"multiple_valids": []interface{}{"og35f0mipd", "vm5qe7ezh3", "0a107dr14y", "lofl9pcn3p", "x21nq0p2dg", "m7wyp6z58z", "8n2xfwcrod", "z39ir85570", "j6r31a7svi", "2es32rzq3g", "aptehn6o3k", "kc6x7umvk7", "ijjqk3dvbs", "kppufs3o2j", "rsu1fnbdh9"},
 	},
 }
 
-func TestAccAciContract_Basic(t *testing.T) {
-	var contract_default models.Contract
-	var contract_updated models.Contract
-	resourceName := "aci_contract.test"
+func TestAccMoviesMovie_Basic(t *testing.T) {
+	var movie_default models.Movie
+	var movie_updated models.Movie
+	resourceName := "movies_movie.test"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckAciContractDestroy,
+		CheckDestroy:      testAccCheckMoviesMovieDestroy,
 		Steps: append([]resource.TestStep{
 			{
-				Config:      CreateAccContractWithoutName(),
+				Config:      CreateAccMovieWithoutTitle(),
 				ExpectError: regexp.MustCompile(`Missing required argument`),
 			},
 			{
-				Config:      CreateAccContractWithoutTemp(),
-				ExpectError: regexp.MustCompile(`Missing required argument`),
-			},
-			{
-				Config:      CreateAccContractWithoutWeight(),
-				ExpectError: regexp.MustCompile(`Missing required argument`),
-			},
-			{
-				Config:      CreateAccContractWithoutTempSchemaList(),
-				ExpectError: regexp.MustCompile(`Missing required argument`),
-			},
-			{
-				Config:      CreateAccContractWithoutFilter(),
-				ExpectError: regexp.MustCompile(`Missing required argument`),
-			},
-			{
-				Config: CreateAccContractConfig(),
+				Config: CreateAccMovieConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAciContractExists(resourceName, &contract_default),
-					resource.TestCheckResourceAttr(resourceName, "name", fmt.Sprintf("%v", searchInObject(resourceContractTest, "name.valid.0"))),
+					testAccCheckMoviesMovieExists(resourceName, &movie_default),
+					resource.TestCheckResourceAttr(resourceName, "title", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "title.valid.0"))),
 
-					resource.TestCheckResourceAttr(resourceName, "temp", fmt.Sprintf("%v", searchInObject(resourceContractTest, "temp.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "isbn", ""),
 
-					resource.TestCheckResourceAttr(resourceName, "weight", fmt.Sprintf("%v", searchInObject(resourceContractTest, "weight.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "genre", "thriller"),
 
-					resource.TestCheckResourceAttr(resourceName, "ipv4_for", ""),
+					resource.TestCheckResourceAttr(resourceName, "director.#", "0"),
 
-					resource.TestCheckResourceAttr(resourceName, "port_number", "0"),
+					resource.TestCheckResourceAttr(resourceName, "rating.#", "0"),
 
-					resource.TestCheckResourceAttr(resourceName, "temp_schema_list.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "temp_schema_list.0", fmt.Sprintf("%v", searchInObject(resourceContractTest, "temp_schema_list.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "temp_schema_list.1", fmt.Sprintf("%v", searchInObject(resourceContractTest, "temp_schema_list.valid.1"))),
-
-					resource.TestCheckResourceAttr(resourceName, "test_score", "0"),
-
-					resource.TestCheckResourceAttr(resourceName, "string_in_some_names", "parth"),
-
-					resource.TestCheckResourceAttr(resourceName, "valid_cidr", ""),
-
-					resource.TestCheckResourceAttr(resourceName, "percentage", "0.0"),
-
-					resource.TestCheckResourceAttr(resourceName, "filter.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_name", "0.0"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.id", ""),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.description", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.description.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.id_list.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.id_list.0", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.id_list.1", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.filter_entry_name", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.ipv6", ""),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.apply_to_frag", ""),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.apply_to_frag_liist_schema.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "casts.#", "0"),
 				),
 			},
 			{
-				Config: CreateAccContractConfigWithOptional(),
+				Config: CreateAccMovieConfigWithOptional(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAciContractExists(resourceName, &contract_updated),
-					resource.TestCheckResourceAttr(resourceName, "name", fmt.Sprintf("%v", searchInObject(resourceContractTest, "name.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "temp", fmt.Sprintf("%v", searchInObject(resourceContractTest, "temp.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "weight", fmt.Sprintf("%v", searchInObject(resourceContractTest, "weight.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "ipv4_for", fmt.Sprintf("%v", searchInObject(resourceContractTest, "ipv4_for.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "port_number", fmt.Sprintf("%v", searchInObject(resourceContractTest, "port_number.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "temp_schema_list.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "temp_schema_list.0", fmt.Sprintf("%v", searchInObject(resourceContractTest, "temp_schema_list.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "temp_schema_list.1", fmt.Sprintf("%v", searchInObject(resourceContractTest, "temp_schema_list.valid.1"))),
-					resource.TestCheckResourceAttr(resourceName, "test_score", fmt.Sprintf("%v", searchInObject(resourceContractTest, "test_score.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "string_in_some_names", fmt.Sprintf("%v", searchInObject(resourceContractTest, "string_in_some_names.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "valid_cidr", fmt.Sprintf("%v", searchInObject(resourceContractTest, "valid_cidr.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "percentage", fmt.Sprintf("%v", searchInObject(resourceContractTest, "percentage.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_name", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_name.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.id", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.id.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.description", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.description.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.id_list.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.id_list.0", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.id_list.1", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.filter_entry_name", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.ipv6", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.apply_to_frag", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.apply_to_frag_liist_schema.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.apply_to_frag_liist_schema.0", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"))),
-					resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.apply_to_frag_liist_schema.1", fmt.Sprintf("%v", searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))),
+					testAccCheckMoviesMovieExists(resourceName, &movie_updated),
+					resource.TestCheckResourceAttr(resourceName, "title", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "title.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "isbn", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "isbn.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "genre", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "genre.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "director.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "director.0.firstname", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "director.firstname.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "director.0.lastname", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "director.lastname.valid.0"))),
 
-					testAccCheckAciContractIdEqual(&contract_default, &contract_updated),
+					resource.TestCheckResourceAttr(resourceName, "rating.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "rating.0.rater", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "rating.rater.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "rating.0.rating", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "rating.rating.valid.0"))),
+
+					resource.TestCheckResourceAttr(resourceName, "casts.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "casts.0", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "casts.valid.0"))),
+					resource.TestCheckResourceAttr(resourceName, "casts.1", fmt.Sprintf("%v", searchInObject(resourceMovieTest, "casts.valid.1"))),
+					testAccCheckMoviesMovieIdEqual(&movie_default, &movie_updated),
 				),
 			},
 			{
@@ -240,1591 +122,478 @@ func TestAccAciContract_Basic(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: CreateAccContractConfig(),
+				Config: CreateAccMovieConfig(),
 			},
-		}, generateStepForUpdatedRequiredAttr(resourceName, &contract_default, &contract_updated)...),
+		}, generateStepForUpdatedRequiredAttr(resourceName, &movie_default, &movie_updated)...),
 	})
 }
 
-func TestAccAciContract_Update(t *testing.T) {
-	var contract_default models.Contract
-	var contract_updated models.Contract
-	resourceName := "aci_contract.test"
+func TestAccMoviesMovie_Update(t *testing.T) {
+	var movie_default models.Movie
+	var movie_updated models.Movie
+	resourceName := "movies_movie.test"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckAciContractDestroy,
+		CheckDestroy:      testAccCheckMoviesMovieDestroy,
 		Steps: append([]resource.TestStep{
 			{
-				Config: CreateAccContractConfig(),
-				Check:  testAccCheckAciContractExists(resourceName, &contract_default),
+				Config: CreateAccMovieConfig(),
+				Check:  testAccCheckMoviesMovieExists(resourceName, &movie_default),
 			},
-		}, generateStepForUpdatedAttr(resourceName, &contract_default, &contract_updated)...),
+		}, generateStepForUpdatedAttr(resourceName, &movie_default, &movie_updated)...),
 	})
 }
 
-func TestAccAciContract_NegativeCases(t *testing.T) {
-	resourceName := "aci_contract.test"
+func TestAccMoviesMovie_NegativeCases(t *testing.T) {
+	resourceName := "movies_movie.test"
 
 	// [TODO]: Add makeTestVariable() to utils.go file
 	// rName := makeTestVariable(acctest.RandString(5))
 	// rOther := makeTestVariable(acctest.RandString(5))
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckAciContractDestroy,
+		CheckDestroy:      testAccCheckMoviesMovieDestroy,
 		Steps: append([]resource.TestStep{
 			{
-				Config: CreateAccContractConfig(),
+				Config: CreateAccMovieConfig(),
 			},
 		}, generateNegativeSteps(resourceName)...),
 	})
 }
 
-func TestAccAciContract_MultipleCreateDelete(t *testing.T) {
-	resourceName := "aci_contract.test"
+func TestAccMoviesMovie_MultipleCreateDelete(t *testing.T) {
+	resourceName := "movies_movie.test"
 
 	// [TODO]: Add makeTestVariable() to utils.go file
 	// rName := makeTestVariable(acctest.RandString(5))
 	// rOther := makeTestVariable(acctest.RandString(5))
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckAciContractDestroy,
+		CheckDestroy:      testAccCheckMoviesMovieDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: CreateAccContractMultipleConfig(),
+				Config: CreateAccMovieMultipleConfig(),
 			},
 		},
 	})
 }
 
-func CreateAccContractWithoutName() string {
+func CreateAccMovieWithoutTitle() string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
+	resource += createMovieConfig(parentResources)
 	resource += fmt.Sprintf(`
-				resource  "aci_contract" "test" {
+				resource  "movies_movie" "test" {
 
-									temp = %v
+									isbn = "%v"
 
-									weight = %v
+									genre = "%v"
 
-									ipv4_for = "%v"
-
-									port_number = %v
-
-									temp_schema_list = ["%v","%v"]
-
-									test_score = %v
-
-									string_in_some_names = "%v"
-
-									valid_cidr = "%v"
-
-									percentage = %v
-
-									filter {
+									director {
     
 									                        
-                                        filter_name = %v
+                                        firstname = "%v"
                         
-                                        id = "%v"
-                        
-                                        description = "%v"
-
-                                        filter_entry {
-                                                    
-                                            id_list = ["%v","%v"]
-                        
-                                            filter_entry_name = "%v"
-                        
-                                            ipv6 = "%v"
-                        
-                                            apply_to_frag = "%v"
-                        
-                                            apply_to_frag_liist_schema = ["%v","%v"]
-
-                                          }
+                                        lastname = "%v"
 
 									}
-				}
-			`, searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractWithoutTemp() string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-				resource  "aci_contract" "test" {
 
-									name = "%v"
-
-									weight = %v
-
-									ipv4_for = "%v"
-
-									port_number = %v
-
-									temp_schema_list = ["%v","%v"]
-
-									test_score = %v
-
-									string_in_some_names = "%v"
-
-									valid_cidr = "%v"
-
-									percentage = %v
-
-									filter {
+									rating {
     
 									                        
-                                        filter_name = %v
+                                        rater = "%v"
                         
-                                        id = "%v"
-                        
-                                        description = "%v"
-
-                                        filter_entry {
-                                                    
-                                            id_list = ["%v","%v"]
-                        
-                                            filter_entry_name = "%v"
-                        
-                                            ipv6 = "%v"
-                        
-                                            apply_to_frag = "%v"
-                        
-                                            apply_to_frag_liist_schema = ["%v","%v"]
-
-                                          }
+                                        rating = %v
 
 									}
+
+									casts = ["%v","%v"]
 				}
-			`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractWithoutWeight() string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-				resource  "aci_contract" "test" {
-
-									name = "%v"
-
-									temp = %v
-
-									ipv4_for = "%v"
-
-									port_number = %v
-
-									temp_schema_list = ["%v","%v"]
-
-									test_score = %v
-
-									string_in_some_names = "%v"
-
-									valid_cidr = "%v"
-
-									percentage = %v
-
-									filter {
-    
-									                        
-                                        filter_name = %v
-                        
-                                        id = "%v"
-                        
-                                        description = "%v"
-
-                                        filter_entry {
-                                                    
-                                            id_list = ["%v","%v"]
-                        
-                                            filter_entry_name = "%v"
-                        
-                                            ipv6 = "%v"
-                        
-                                            apply_to_frag = "%v"
-                        
-                                            apply_to_frag_liist_schema = ["%v","%v"]
-
-                                          }
-
-									}
-				}
-			`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractWithoutTempSchemaList() string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-				resource  "aci_contract" "test" {
-
-									name = "%v"
-
-									temp = %v
-
-									weight = %v
-
-									ipv4_for = "%v"
-
-									port_number = %v
-
-									test_score = %v
-
-									string_in_some_names = "%v"
-
-									valid_cidr = "%v"
-
-									percentage = %v
-
-									filter {
-    
-									                        
-                                        filter_name = %v
-                        
-                                        id = "%v"
-                        
-                                        description = "%v"
-
-                                        filter_entry {
-                                                    
-                                            id_list = ["%v","%v"]
-                        
-                                            filter_entry_name = "%v"
-                        
-                                            ipv6 = "%v"
-                        
-                                            apply_to_frag = "%v"
-                        
-                                            apply_to_frag_liist_schema = ["%v","%v"]
-
-                                          }
-
-									}
-				}
-			`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractWithoutFilter() string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-				resource  "aci_contract" "test" {
-
-									name = "%v"
-
-									temp = %v
-
-									weight = %v
-
-									ipv4_for = "%v"
-
-									port_number = %v
-
-									temp_schema_list = ["%v","%v"]
-
-									test_score = %v
-
-									string_in_some_names = "%v"
-
-									valid_cidr = "%v"
-
-									percentage = %v
-				}
-			`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"))
+			`, searchInObject(resourceMovieTest, "isbn.valid.0"),
+		searchInObject(resourceMovieTest, "genre.valid.0"),
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+		searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.1"))
 	return resource
 }
 
-func CreateAccContractConfig() string {
+func CreateAccMovieConfig() string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
+	resource += createMovieConfig(parentResources)
 	resource += fmt.Sprintf(`
-		resource  "aci_contract" "test" {
+		resource  "movies_movie" "test" {
 
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							temp_schema_list = ["%v","%v"]
-
-							filter {
-    
-							 
-
-						          description = "%v"
-
-						          filter_entry {
-							
-						              id_list = ["%v","%v"]
- 
-
-						              filter_entry_name = "%v"
-
-						            }
-
-							}
+							title = "%v"
 		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"))
+	`, searchInObject(resourceMovieTest, "title.valid.0"))
 	return resource
 }
 
-func CreateAccContractConfigWithOptional() string {
-	resource := createContractConfig(getParentContract())
+func CreateAccMovieConfigWithOptional() string {
+	resource := createMovieConfig(getParentMovie())
 	return resource
 }
 
-func generateStepForUpdatedRequiredAttr(resourceName string, contract_default, contract_updated *models.Contract) []resource.TestStep {
+func generateStepForUpdatedRequiredAttr(resourceName string, movie_default, movie_updated *models.Movie) []resource.TestStep {
 	testSteps := make([]resource.TestStep, 0, 1)
 	var value interface{}
-	value = searchInObject(resourceContractTest, "name.valid.1")
+	value = searchInObject(resourceMovieTest, "title.valid.1")
 	testSteps = append(testSteps, resource.TestStep{
-		Config: CreateAccContractUpdateRequiredName(),
+		Config: CreateAccMovieUpdateRequiredTitle(),
 		Check: resource.ComposeTestCheckFunc(
-			testAccCheckAciContractExists(resourceName, contract_updated),
-			resource.TestCheckResourceAttr(resourceName, "name", fmt.Sprintf("%v", value)),
-			testAccCheckAciContractIdNotEqual(contract_default, contract_updated),
+			testAccCheckMoviesMovieExists(resourceName, movie_updated),
+			resource.TestCheckResourceAttr(resourceName, "title", fmt.Sprintf("%v", value)),
+			testAccCheckMoviesMovieIdNotEqual(movie_default, movie_updated),
 		),
 	})
-	value = searchInObject(resourceContractTest, "temp.valid.1")
-	testSteps = append(testSteps, resource.TestStep{
-		Config: CreateAccContractUpdateRequiredTemp(),
-		Check: resource.ComposeTestCheckFunc(
-			testAccCheckAciContractExists(resourceName, contract_updated),
-			resource.TestCheckResourceAttr(resourceName, "temp", fmt.Sprintf("%v", value)),
-			testAccCheckAciContractIdNotEqual(contract_default, contract_updated),
-		),
-	})
-	value = searchInObject(resourceContractTest, "weight.valid.1")
-	testSteps = append(testSteps, resource.TestStep{
-		Config: CreateAccContractUpdateRequiredWeight(),
-		Check: resource.ComposeTestCheckFunc(
-			testAccCheckAciContractExists(resourceName, contract_updated),
-			resource.TestCheckResourceAttr(resourceName, "weight", fmt.Sprintf("%v", value)),
-			testAccCheckAciContractIdNotEqual(contract_default, contract_updated),
-		),
-	})
-	value = searchInObject(resourceContractTest, "temp_schema_list.valid.1")
-	testSteps = append(testSteps, resource.TestStep{
-		Config: CreateAccContractUpdateRequiredTempSchemaList(),
-		Check: resource.ComposeTestCheckFunc(
-			testAccCheckAciContractExists(resourceName, contract_updated),
-			resource.TestCheckResourceAttr(resourceName, "temp_schema_list.0", fmt.Sprintf("%v", value)),
-			testAccCheckAciContractIdNotEqual(contract_default, contract_updated),
-		),
-	})
-	value = searchInObject(resourceContractTest, "filter.description.valid.1")
-	testSteps = append(testSteps, resource.TestStep{
-		Config: CreateAccContractUpdateRequiredFilterDescription(),
-		Check: resource.ComposeTestCheckFunc(
-			testAccCheckAciContractExists(resourceName, contract_updated),
-			resource.TestCheckResourceAttr(resourceName, "filter.0.description", fmt.Sprintf("%v", value)),
-			testAccCheckAciContractIdNotEqual(contract_default, contract_updated),
-		),
-	})
-	value = searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1")
-	testSteps = append(testSteps, resource.TestStep{
-		Config: CreateAccContractUpdateRequiredFilterFilterEntryIdList(),
-		Check: resource.ComposeTestCheckFunc(
-			testAccCheckAciContractExists(resourceName, contract_updated),
-			resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.id_list.0", fmt.Sprintf("%v", value)),
-			testAccCheckAciContractIdNotEqual(contract_default, contract_updated),
-		),
-	})
-	value = searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.1")
-	testSteps = append(testSteps, resource.TestStep{
-		Config: CreateAccContractUpdateRequiredFilterFilterEntryFilterEntryName(),
-		Check: resource.ComposeTestCheckFunc(
-			testAccCheckAciContractExists(resourceName, contract_updated),
-			resource.TestCheckResourceAttr(resourceName, "filter.0.filter_entry.0.filter_entry_name", fmt.Sprintf("%v", value)),
-			testAccCheckAciContractIdNotEqual(contract_default, contract_updated),
-		),
-	})
-
 	return testSteps
 }
-func CreateAccContractUpdateRequiredName() string {
+func CreateAccMovieUpdateRequiredTitle() string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	value := searchInObject(resourceContractTest, "name.valid.1")
+	resource += createMovieConfig(parentResources)
+	value := searchInObject(resourceMovieTest, "title.valid.1")
 	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
+			resource "movies_movie" "test" {
 							
-							name = "%v"
+							title = "%v"
 
-							temp = %v
+							isbn = "%v"
 
-							weight = %v
+							genre = "%v"
 
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							director {
     
 							                        
-                            filter_name = %v
+                            firstname = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            lastname = "%v"
 
 							}
+
+							rating {
+    
+							                        
+                            rater = "%v"
+                        
+                            rating = %v
+
+							}
+
+							casts = ["%v", "%v"]
 			}
 		`, value,
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
+		searchInObject(resourceMovieTest, "isbn.valid.0"),
+		searchInObject(resourceMovieTest, "genre.valid.0"),
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+		searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.1"))
 	return resource
 }
-func CreateAccContractUpdateRequiredTemp() string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	value := searchInObject(resourceContractTest, "temp.valid.1")
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
 
-							name = "%v"
+func CreateAccMovieUpdatedAttrIsbn(value interface{}) string {
+	var resource string
+	parentResources := getParentMovie()
+	parentResources = parentResources[:len(parentResources)-1]
+	resource += createMovieConfig(parentResources)
+	resource += fmt.Sprintf(`
+			resource "movies_movie" "test" {
+
+							title = "%v"
 							
-							temp = %v
+							isbn = "%v"
 
-							weight = %v
+							genre = "%v"
 
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							director {
     
 							                        
-                            filter_name = %v
+                            firstname = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            lastname = "%v"
 
 							}
-			}
-		`, searchInObject(resourceContractTest, "name.valid.0"),
+
+							rating {
+    
+							                        
+                            rater = "%v"
+                        
+                            rating = %v
+
+							}
+
+							casts = ["%v", "%v"]
+		}
+	`, searchInObject(resourceMovieTest, "title.valid.0"),
 		value,
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
+		searchInObject(resourceMovieTest, "genre.valid.0"),
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+		searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.1"))
 	return resource
 }
-func CreateAccContractUpdateRequiredWeight() string {
+func CreateAccMovieUpdatedAttrGenre(value interface{}) string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	value := searchInObject(resourceContractTest, "weight.valid.1")
+	resource += createMovieConfig(parentResources)
 	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
+			resource "movies_movie" "test" {
 
-							name = "%v"
+							title = "%v"
 
-							temp = %v
+							isbn = "%v"
 							
-							weight = %v
+							genre = "%v"
 
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							director {
     
 							                        
-                            filter_name = %v
+                            firstname = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            lastname = "%v"
 
 							}
-			}
-		`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		value,
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractUpdateRequiredTempSchemaList() string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	value := searchInObject(resourceContractTest, "temp_schema_list.valid.1")
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
 
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							rating {
     
 							                        
-                            filter_name = %v
+                            rater = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            rating = %v
 
 							}
-			}
-		`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
+
+							casts = ["%v", "%v"]
+		}
+	`, searchInObject(resourceMovieTest, "title.valid.0"),
+		searchInObject(resourceMovieTest, "isbn.valid.0"),
 		value,
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+		searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.1"))
 	return resource
 }
-func CreateAccContractUpdateRequiredFilterDescription() string {
+func CreateAccMovieUpdatedAttrDirectorLastname(value interface{}) string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	value := searchInObject(resourceContractTest, "filter.description.valid.1")
+	resource += createMovieConfig(parentResources)
 	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
+			resource "movies_movie" "test" {
 
-							name = "%v"
+							title = "%v"
 
-							temp = %v
+							isbn = "%v"
 
-							weight = %v
+							genre = "%v"
 
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							director {
     
 							                        
-                            filter_name = %v
-                        
-                            id = "%v"
+                            firstname = "%v"
 					
-						    description = "%v"
-
-						    filter_entry {
-                                                
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+						    lastname = "%v"
 
 							}
-			}
-		`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		value,
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractUpdateRequiredFilterFilterEntryIdList() string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	value := searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1")
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
 
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							rating {
     
 							                        
-                            filter_name = %v
+                            rater = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-						    filter_entry {
-						
-						        id_list = ["%v"]
-  
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-
-						        apply_to_frag_liist_schema = ["%v", "%v"]
-  
-
-						      }
+                            rating = %v
 
 							}
-			}
-		`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
+
+							casts = ["%v", "%v"]
+		}
+	`, searchInObject(resourceMovieTest, "title.valid.0"),
+		searchInObject(resourceMovieTest, "isbn.valid.0"),
+		searchInObject(resourceMovieTest, "genre.valid.0"),
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
 		value,
-		searchInObject(resourceContractTest, "filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "apply_to_frag_liist_schema.valid.1"))
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.1"))
 	return resource
 }
-func CreateAccContractUpdateRequiredFilterFilterEntryFilterEntryName() string {
+func CreateAccMovieUpdatedAttrRatingRating(value interface{}) string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	value := searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.1")
+	resource += createMovieConfig(parentResources)
 	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
+			resource "movies_movie" "test" {
 
-							name = "%v"
+							title = "%v"
 
-							temp = %v
+							isbn = "%v"
 
-							weight = %v
+							genre = "%v"
 
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							director {
     
 							                        
-                            filter_name = %v
+                            firstname = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
+                            lastname = "%v"
 
-						    filter_entry {
-						
-						        id_list = ["%v", "%v"]
-  
+							}
+
+							rating {
+    
+							                        
+                            rater = "%v"
 					
-						        filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-
-						        apply_to_frag_liist_schema = ["%v", "%v"]
-  
-
-						      }
+						    rating = %v
 
 							}
-			}
-		`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "id_list.valid.0"),
-		searchInObject(resourceContractTest, "id_list.valid.1"),
+
+							casts = ["%v", "%v"]
+		}
+	`, searchInObject(resourceMovieTest, "title.valid.0"),
+		searchInObject(resourceMovieTest, "isbn.valid.0"),
+		searchInObject(resourceMovieTest, "genre.valid.0"),
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+		searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
 		value,
-		searchInObject(resourceContractTest, "filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "apply_to_frag_liist_schema.valid.1"))
+		searchInObject(resourceMovieTest, "casts.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.1"))
 	return resource
 }
-
-func CreateAccContractUpdatedAttrIpv4For(value interface{}) string {
+func CreateAccMovieUpdatedAttrCasts(value interface{}) string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
+	resource += createMovieConfig(parentResources)
 	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
+			resource "movies_movie" "test" {
 
-							name = "%v"
+							title = "%v"
 
-							temp = %v
+							isbn = "%v"
 
-							weight = %v
-							
-							ipv4_for = "%v"
+							genre = "%v"
 
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							director {
     
 							                        
-                            filter_name = %v
+                            firstname = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            lastname = "%v"
 
 							}
-		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		value,
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractUpdatedAttrPortNumber(value interface{}) string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
 
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							ipv4_for = "%v"
-							
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							rating {
     
 							                        
-                            filter_name = %v
+                            rater = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            rating = %v
 
 							}
+
+							casts = ["%v"]
 		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		value,
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractUpdatedAttrTestScore(value interface{}) string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
-
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-							
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
-    
-							                        
-                            filter_name = %v
-                        
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
-
-							}
-		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		value,
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractUpdatedAttrStringInSomeNames(value interface{}) string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
-
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-							
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
-    
-							                        
-                            filter_name = %v
-                        
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
-
-							}
-		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		value,
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractUpdatedAttrValidCidr(value interface{}) string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
-
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-							
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
-    
-							                        
-                            filter_name = %v
-                        
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
-
-							}
-		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		value,
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
-	return resource
-}
-func CreateAccContractUpdatedAttrPercentage(value interface{}) string {
-	var resource string
-	parentResources := getParentContract()
-	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	resource += fmt.Sprintf(`
-			resource "aci_contract" "test" {
-
-							name = "%v"
-
-							temp = %v
-
-							weight = %v
-
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-							
-							percentage = %v
-
-							filter {
-    
-							                        
-                            filter_name = %v
-                        
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
-
-							}
-		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		value,
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
+	`, searchInObject(resourceMovieTest, "title.valid.0"),
+		searchInObject(resourceMovieTest, "isbn.valid.0"),
+		searchInObject(resourceMovieTest, "genre.valid.0"),
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+		searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+		value)
 	return resource
 }
 
-func generateStepForUpdatedAttr(resourceName string, contract_default, contract_updated *models.Contract) []resource.TestStep {
+func generateStepForUpdatedAttr(resourceName string, movie_default, movie_updated *models.Movie) []resource.TestStep {
 	testSteps := make([]resource.TestStep, 0, 1)
 	var valid []interface{}
-	valid = searchInObject(resourceContractTest, "ipv4_for.valid").([]interface{})
+	valid = searchInObject(resourceMovieTest, "isbn.valid").([]interface{})
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
-			Config: CreateAccContractUpdatedAttrIpv4For(value),
+			Config: CreateAccMovieUpdatedAttrIsbn(value),
 			Check: resource.ComposeTestCheckFunc(
-				testAccCheckAciContractExists(resourceName, contract_updated),
-				resource.TestCheckResourceAttr(resourceName, "ipv4_for", v),
-				testAccCheckAciContractIdEqual(contract_default, contract_updated),
+				testAccCheckMoviesMovieExists(resourceName, movie_updated),
+				resource.TestCheckResourceAttr(resourceName, "isbn", v),
+				testAccCheckMoviesMovieIdEqual(movie_default, movie_updated),
 			),
 		})
 	}
-	valid = searchInObject(resourceContractTest, "port_number.valid").([]interface{})
+	valid = searchInObject(resourceMovieTest, "genre.valid").([]interface{})
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
-			Config: CreateAccContractUpdatedAttrPortNumber(value),
+			Config: CreateAccMovieUpdatedAttrGenre(value),
 			Check: resource.ComposeTestCheckFunc(
-				testAccCheckAciContractExists(resourceName, contract_updated),
-				resource.TestCheckResourceAttr(resourceName, "port_number", v),
-				testAccCheckAciContractIdEqual(contract_default, contract_updated),
+				testAccCheckMoviesMovieExists(resourceName, movie_updated),
+				resource.TestCheckResourceAttr(resourceName, "genre", v),
+				testAccCheckMoviesMovieIdEqual(movie_default, movie_updated),
 			),
 		})
 	}
-	valid = searchInObject(resourceContractTest, "test_score.valid").([]interface{})
+	valid = searchInObject(resourceMovieTest, "director.lastname.valid").([]interface{})
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
-			Config: CreateAccContractUpdatedAttrTestScore(value),
+			Config: CreateAccMovieUpdatedAttrDirectorLastname(value),
 			Check: resource.ComposeTestCheckFunc(
-				testAccCheckAciContractExists(resourceName, contract_updated),
-				resource.TestCheckResourceAttr(resourceName, "test_score", v),
-				testAccCheckAciContractIdEqual(contract_default, contract_updated),
+				testAccCheckMoviesMovieExists(resourceName, movie_updated),
+				resource.TestCheckResourceAttr(resourceName, "director.0.lastname", v),
+				testAccCheckMoviesMovieIdEqual(movie_default, movie_updated),
 			),
 		})
 	}
-	valid = searchInObject(resourceContractTest, "string_in_some_names.valid").([]interface{})
+
+	valid = searchInObject(resourceMovieTest, "rating.rating.valid").([]interface{})
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
-			Config: CreateAccContractUpdatedAttrStringInSomeNames(value),
+			Config: CreateAccMovieUpdatedAttrRatingRating(value),
 			Check: resource.ComposeTestCheckFunc(
-				testAccCheckAciContractExists(resourceName, contract_updated),
-				resource.TestCheckResourceAttr(resourceName, "string_in_some_names", v),
-				testAccCheckAciContractIdEqual(contract_default, contract_updated),
+				testAccCheckMoviesMovieExists(resourceName, movie_updated),
+				resource.TestCheckResourceAttr(resourceName, "rating.0.rating", v),
+				testAccCheckMoviesMovieIdEqual(movie_default, movie_updated),
 			),
 		})
 	}
-	valid = searchInObject(resourceContractTest, "valid_cidr.valid").([]interface{})
+
+	valid = searchInObject(resourceMovieTest, "casts.valid").([]interface{})
 	for _, value := range valid {
 		v := fmt.Sprintf("%v", value)
 		testSteps = append(testSteps, resource.TestStep{
-			Config: CreateAccContractUpdatedAttrValidCidr(value),
+			Config: CreateAccMovieUpdatedAttrCasts(value),
 			Check: resource.ComposeTestCheckFunc(
-				testAccCheckAciContractExists(resourceName, contract_updated),
-				resource.TestCheckResourceAttr(resourceName, "valid_cidr", v),
-				testAccCheckAciContractIdEqual(contract_default, contract_updated),
-			),
-		})
-	}
-	valid = searchInObject(resourceContractTest, "percentage.valid").([]interface{})
-	for _, value := range valid {
-		v := fmt.Sprintf("%v", value)
-		testSteps = append(testSteps, resource.TestStep{
-			Config: CreateAccContractUpdatedAttrPercentage(value),
-			Check: resource.ComposeTestCheckFunc(
-				testAccCheckAciContractExists(resourceName, contract_updated),
-				resource.TestCheckResourceAttr(resourceName, "percentage", v),
-				testAccCheckAciContractIdEqual(contract_default, contract_updated),
+				testAccCheckMoviesMovieExists(resourceName, movie_updated),
+				resource.TestCheckResourceAttr(resourceName, "casts.0", v),
+				testAccCheckMoviesMovieIdEqual(movie_default, movie_updated),
 			),
 		})
 	}
@@ -1835,135 +604,78 @@ func generateNegativeSteps(resourceName string) []resource.TestStep {
 	//Use Update Config Function with false value
 	testSteps := make([]resource.TestStep, 0, 1)
 	var invalid []interface{}
-	invalid = searchInObject(resourceContractTest, "ipv4_for.invalid").([]interface{})
+	invalid = searchInObject(resourceMovieTest, "genre.invalid").([]interface{})
 	for _, value := range invalid {
 		testSteps = append(testSteps, resource.TestStep{
-			Config:      CreateAccContractUpdatedAttrIpv4For(value),
-			ExpectError: regexp.MustCompile(expectErrorMap["IsIPv4Address"]),
-		})
-	}
-	invalid = searchInObject(resourceContractTest, "port_number.invalid").([]interface{})
-	for _, value := range invalid {
-		testSteps = append(testSteps, resource.TestStep{
-			Config:      CreateAccContractUpdatedAttrPortNumber(value),
-			ExpectError: regexp.MustCompile(expectErrorMap["IsPortNumber"]),
-		})
-	}
-	invalid = searchInObject(resourceContractTest, "test_score.invalid").([]interface{})
-	for _, value := range invalid {
-		testSteps = append(testSteps, resource.TestStep{
-			Config:      CreateAccContractUpdatedAttrTestScore(value),
-			ExpectError: regexp.MustCompile(expectErrorMap["IntBetween"]),
-		})
-	}
-	invalid = searchInObject(resourceContractTest, "string_in_some_names.invalid").([]interface{})
-	for _, value := range invalid {
-		testSteps = append(testSteps, resource.TestStep{
-			Config:      CreateAccContractUpdatedAttrStringInSomeNames(value),
+			Config:      CreateAccMovieUpdatedAttrGenre(value),
 			ExpectError: regexp.MustCompile(expectErrorMap["StringInSlice"]),
 		})
 	}
-	invalid = searchInObject(resourceContractTest, "valid_cidr.invalid").([]interface{})
+
+	invalid = searchInObject(resourceMovieTest, "rating.rating.invalid").([]interface{})
 	for _, value := range invalid {
 		testSteps = append(testSteps, resource.TestStep{
-			Config:      CreateAccContractUpdatedAttrValidCidr(value),
-			ExpectError: regexp.MustCompile(expectErrorMap["IsCIDRNetwork"]),
-		})
-	}
-	invalid = searchInObject(resourceContractTest, "percentage.invalid").([]interface{})
-	for _, value := range invalid {
-		testSteps = append(testSteps, resource.TestStep{
-			Config:      CreateAccContractUpdatedAttrPercentage(value),
+			Config:      CreateAccMovieUpdatedAttrRatingRating(value),
 			ExpectError: regexp.MustCompile(expectErrorMap["FloatBetween"]),
 		})
 	}
+
 	testSteps = append(testSteps, resource.TestStep{
 		Config: CreateAccMovieConfig(),
 	})
 	return testSteps
 }
 
-func CreateAccContractMultipleConfig() string {
+func CreateAccMovieMultipleConfig() string {
 	var resource string
-	parentResources := getParentContract()
+	parentResources := getParentMovie()
 	parentResources = parentResources[:len(parentResources)-1]
-	resource += createContractConfig(parentResources)
-	multipleValues := searchInObject(resourceContractTest, "name.multiple_valids").([]interface{})
+	resource += createMovieConfig(parentResources)
+	multipleValues := searchInObject(resourceMovieTest, "title.multiple_valids").([]interface{})
 	for i, val := range multipleValues {
 		resource += fmt.Sprintf(`
-			resource "aci_contract" "test%d" {
+			resource "movies_movie" "test%d" {
 							
-							name = "%v"
+							title = "%v"
 
-							temp = %v
+							isbn = "%v"
 
-							weight = %v
+							genre = "%v"
 
-							ipv4_for = "%v"
-
-							port_number = %v
-
-							temp_schema_list = ["%v", "%v"]
-
-							test_score = %v
-
-							string_in_some_names = "%v"
-
-							valid_cidr = "%v"
-
-							percentage = %v
-
-							filter {
+							director {
     
 							                        
-                            filter_name = %v
+                            firstname = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            lastname = "%v"
 
 							}
+
+							rating {
+    
+							                        
+                            rater = "%v"
+                        
+                            rating = %v
+
+							}
+
+							casts = ["%v", "%v"]
 			}
 		`, i, val,
-			searchInObject(resourceContractTest, "temp.valid.0"),
-			searchInObject(resourceContractTest, "weight.valid.0"),
-			searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-			searchInObject(resourceContractTest, "port_number.valid.0"),
-			searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-			searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-			searchInObject(resourceContractTest, "test_score.valid.0"),
-			searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-			searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-			searchInObject(resourceContractTest, "percentage.valid.0"),
-			searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-			searchInObject(resourceContractTest, "filter.id.valid.0"),
-			searchInObject(resourceContractTest, "filter.description.valid.0"),
-			searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-			searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-			searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-			searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-			searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-			searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-			searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
+			searchInObject(resourceMovieTest, "isbn.valid.0"),
+			searchInObject(resourceMovieTest, "genre.valid.0"),
+			searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+			searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+			searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+			searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+			searchInObject(resourceMovieTest, "casts.valid.0"),
+			searchInObject(resourceMovieTest, "casts.valid.1"))
 	}
 	return resource
 }
 
-func testAccCheckAciContractExists(name string, contract *models.Contract) resource.TestCheckFunc {
+func testAccCheckMoviesMovieExists(name string, movie *models.Movie) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		// [TODO]: Write your code here
 	}
@@ -1974,127 +686,96 @@ func testAccCheckMoviesMovieDestroy(s *terraform.State) error {
 
 	for _, rs := range s.RootModule().Resources {
 
-		if rs.Type == "aci_contract" {
+		if rs.Type == "movies_movie" {
 			// [TODO]: Write your code here
 		}
 	}
 	return nil
 }
 
-func testAccCheckAciContractIdEqual(contract1, contract2 *models.Contract) resource.TestCheckFunc {
+func testAccCheckMoviesMovieIdEqual(movie1, movie2 *models.Movie) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		Id1, err := getIdFromContractModel(contract1)
+		Id1, err := getIdFromMovieModel(movie1)
 		if err != nil {
 			return err
 		}
-		Id2, err := getIdFromContractModel(contract2)
+		Id2, err := getIdFromMovieModel(movie2)
 		if err != nil {
 			return err
 		}
 		if Id1 != Id2 {
-			return fmt.Errorf("Contract IDs are not equal")
+			return fmt.Errorf("Movie IDs are not equal")
 		}
 		return nil
 	}
 }
 
-func testAccCheckAciContractIdNotEqual(contract1, contract2 *models.Contract) resource.TestCheckFunc {
+func testAccCheckMoviesMovieIdNotEqual(movie1, movie2 *models.Movie) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		Id1, err := getIdFromContractModel(contract1)
+		Id1, err := getIdFromMovieModel(movie1)
 		if err != nil {
 			return err
 		}
-		Id2, err := getIdFromContractModel(contract2)
+		Id2, err := getIdFromMovieModel(movie2)
 		if err != nil {
 			return err
 		}
 		if Id1 == Id2 {
-			return fmt.Errorf("Contract IDs are equal")
+			return fmt.Errorf("Movie IDs are equal")
 		}
 		return nil
 	}
 }
 
-func getParentContract() []string {
+func getParentMovie() []string {
 	t := []string{}
-	t = append(t, contractBlock())
+	t = append(t, movieBlock())
 	return t
 }
 
-func contractBlock() string {
+func movieBlock() string {
 	return fmt.Sprintf(`
-		resource  "aci_contract" "test" {
+		resource  "movies_movie" "test" {
 
-						name = "%v"
+						title = "%v"
 
-						temp = %v
+						isbn = "%v"
 
-						weight = %v
+						genre = "%v"
 
-						ipv4_for = "%v"
-
-						port_number = %v
-
-				        temp_schema_list = ["%v","%v"]
-
-						test_score = %v
-
-						string_in_some_names = "%v"
-
-						valid_cidr = "%v"
-
-						percentage = %v
-
-                        filter {
+                        director {
     
                                                 
-                            filter_name = %v
+                            firstname = "%v"
                         
-                            id = "%v"
-                        
-                            description = "%v"
-
-                            filter_entry {
-                                                    
-                                id_list = ["%v","%v"]
-                        
-                                filter_entry_name = "%v"
-                        
-                                ipv6 = "%v"
-                        
-                                apply_to_frag = "%v"
-                        
-                                apply_to_frag_liist_schema = ["%v","%v"]
-
-                              }
+                            lastname = "%v"
 
                         }
+
+                        rating {
+    
+                                                
+                            rater = "%v"
+                        
+                            rating = %v
+
+                        }
+
+				        casts = ["%v","%v"]
 		}
-	`, searchInObject(resourceContractTest, "name.valid.0"),
-		searchInObject(resourceContractTest, "temp.valid.0"),
-		searchInObject(resourceContractTest, "weight.valid.0"),
-		searchInObject(resourceContractTest, "ipv4_for.valid.0"),
-		searchInObject(resourceContractTest, "port_number.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.0"),
-		searchInObject(resourceContractTest, "temp_schema_list.valid.1"),
-		searchInObject(resourceContractTest, "test_score.valid.0"),
-		searchInObject(resourceContractTest, "string_in_some_names.valid.0"),
-		searchInObject(resourceContractTest, "valid_cidr.valid.0"),
-		searchInObject(resourceContractTest, "percentage.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.id.valid.0"),
-		searchInObject(resourceContractTest, "filter.description.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.id_list.valid.1"),
-		searchInObject(resourceContractTest, "filter.filter_entry.filter_entry_name.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.ipv6.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.0"),
-		searchInObject(resourceContractTest, "filter.filter_entry.apply_to_frag_liist_schema.valid.1"))
+	`, searchInObject(resourceMovieTest, "title.valid.0"),
+		searchInObject(resourceMovieTest, "isbn.valid.0"),
+		searchInObject(resourceMovieTest, "genre.valid.0"),
+		searchInObject(resourceMovieTest, "director.firstname.valid.0"),
+		searchInObject(resourceMovieTest, "director.lastname.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rater.valid.0"),
+		searchInObject(resourceMovieTest, "rating.rating.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.0"),
+		searchInObject(resourceMovieTest, "casts.valid.1"))
 }
 
 // To eliminate duplicate resource block from slice of resource blocks
-func createContractConfig(configSlice []string) string {
+func createMovieConfig(configSlice []string) string {
 	keys := make(map[string]bool)
 	str := ""
 
