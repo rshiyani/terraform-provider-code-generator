@@ -1,7 +1,7 @@
 from jinja2 import Environment, FileSystemLoader
 import yaml
 import random
-from utils import camelize, pascalize, snakify, is_list, quote, make_dot_string, eliminate_zeroes, eliminate_zeroes_and_capitalize, eliminate_dots_and_capitalize,get_first,eliminate_first
+from utils import *
 import string
 import datetime
 from netaddr import *
@@ -305,9 +305,15 @@ def handle_map(schema, data):
         }
 
 
-def pre_process():
-    with open("./config/resources/movie.yml", 'r') as stream:
-        data = yaml.safe_load(stream)
+def pre_process(filename):
+    print(f"=== Starting Preprocessing of Resource File Named {filename}")
+    try:
+        with open(f"./config/resources/{filename}.yml", 'r') as stream:
+            data = yaml.safe_load(stream)
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Preprocessing of Resource File Named {filename}")
+        return False
     data = generate_random_values(data)
 
     for schema in data['schemas']:
@@ -329,12 +335,26 @@ def pre_process():
             handle_map(schema, data)
         elif schema["type"] in ["list","set"]:
             handleListSetMap(data,schema)
-    with open('./config/resources/movie_generated.yml', 'w') as outfile:
-        yaml.dump(data, outfile, default_flow_style=False)
+    try:
+        with open(f'./config/resources/preprocess/{filename}_generated.yml', 'w') as outfile:
+            yaml.dump(data, outfile, default_flow_style=False)
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Preprocessing of Resource File Named {filename}")
+        return False
+    
+    print(f"=== Completed Preprocessing of Resource File Named {filename}")
+    return True
 
 def pre_process_for_provider():
-    with open("./config/provider.yml", 'r') as stream:
-        data = yaml.safe_load(stream)
+    print(f"=== Started Preprocessing for Provider Test File")
+    try:
+        with open(f"./config/provider.yml", 'r') as stream:
+            data = yaml.safe_load(stream)
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Preprocessing for Provider Test File")
+        return False
     data = generate_random_values(data)
     new_data = {}
     for key, _ in data.items():
@@ -346,57 +366,96 @@ def pre_process_for_provider():
                     "multiple_valids": data["types"][str(k)]["multiple_valids"]
                 }
     data["types"] = new_data
-    with open('./config/provider_generated.yml', 'w') as outfile:
-        yaml.dump(data, outfile, default_flow_style=False)
 
-pre_process()
-pre_process_for_provider()
+    try:
+        with open('./config/provider_generated.yml', 'w') as outfile:
+            yaml.dump(data, outfile, default_flow_style=False)
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Preprocessing for Provider Test File")
+        return False
 
-config = yaml.full_load(open('./config/provider_generated.yml'))
-env = Environment(loader=FileSystemLoader('./templates'),
-                  trim_blocks=True, lstrip_blocks=True)
+    print(f"=== Completed Preprocessing for Provider Test File")
+    return True
 
-
-env.filters["camelize"] = camelize
-env.filters["pascalize"] = pascalize
-env.filters["snakify"] = snakify
-env.filters["is_list"] = is_list
-env.filters["quote"] = quote
-env.filters["eliminate_zeroes"] = eliminate_zeroes
-env.filters["eliminate_zeroes_and_capitalize"] = eliminate_zeroes_and_capitalize
-env.filters["eliminate_dots_and_capitalize"] = eliminate_dots_and_capitalize
-env.filters["get_first"] = get_first
-env.filters["eliminate_first"] = eliminate_first
+# pre_process("movie.yml")
+# pre_process_for_provider("provider.yml")
 
 
 
-template = env.get_template('provider_test.j2')
+def generate_provider_test_file():
+    print(f"=== Started Creation of Provider Test File")
+    try:
+        config = yaml.full_load(open(f'./config/provider_generated.yml'))
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Creation of Provider Test File")
+        return False
+    env = Environment(loader=FileSystemLoader('./templates'),
+                    trim_blocks=True, lstrip_blocks=True)
 
-# to save the results
-with open("output/provider_test_output.go", "w") as fh:
-    fh.write(template.render(config))
-
-
-config = yaml.full_load(open('./config/resources/movie_generated.yml'))
-env = Environment(loader=FileSystemLoader('./templates'),
-                  trim_blocks=True, lstrip_blocks=True)
-
-
-env.filters["camelize"] = camelize
-env.filters["pascalize"] = pascalize
-env.filters["snakify"] = snakify
-env.filters["is_list"] = is_list
-env.filters["quote"] = quote
-env.filters["make_dot_string"] = make_dot_string
-env.filters["eliminate_zeroes"] = eliminate_zeroes
-env.filters["eliminate_zeroes_and_capitalize"] = eliminate_zeroes_and_capitalize
-env.filters["eliminate_dots_and_capitalize"] = eliminate_dots_and_capitalize
-env.filters["get_first"] = get_first
-env.filters["eliminate_first"] = eliminate_first
+    env.filters["camelize"] = camelize
+    env.filters["pascalize"] = pascalize
+    env.filters["snakify"] = snakify
+    env.filters["is_list"] = is_list
+    env.filters["quote"] = quote
+    env.filters["eliminate_zeroes"] = eliminate_zeroes
+    env.filters["eliminate_zeroes_and_capitalize"] = eliminate_zeroes_and_capitalize
+    env.filters["eliminate_dots_and_capitalize"] = eliminate_dots_and_capitalize
+    env.filters["get_first"] = get_first
+    env.filters["eliminate_first"] = eliminate_first
 
 
-template = env.get_template('resource_test.j2')
 
-# to save the results
-with open("output/resource_test_output.go", "w") as fh:
-    fh.write(template.render(config))
+    template = env.get_template('provider_test.j2')
+
+    # to save the results
+    try:
+        with open(f"output/provider_test.go", "w") as fh:
+            fh.write(template.render(config))
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Creation of Provider Test File")
+        return False
+
+    print(f"=== Completed Creation of Provider Test File")
+    return True
+
+
+def generate_resource_test_file(filename,provider_name):
+    print(f"=== Started Creation of Resource File Named {filename}")
+    try:
+        config = yaml.full_load(open(f'./config/resources/preprocess/{filename}_generated.yml'))
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Creation of Resource File Named {filename}")
+        return False
+    env = Environment(loader=FileSystemLoader('./templates'),
+                    trim_blocks=True, lstrip_blocks=True)
+
+
+    env.filters["camelize"] = camelize
+    env.filters["pascalize"] = pascalize
+    env.filters["snakify"] = snakify
+    env.filters["is_list"] = is_list
+    env.filters["quote"] = quote
+    env.filters["make_dot_string"] = make_dot_string
+    env.filters["eliminate_zeroes"] = eliminate_zeroes
+    env.filters["eliminate_zeroes_and_capitalize"] = eliminate_zeroes_and_capitalize
+    env.filters["eliminate_dots_and_capitalize"] = eliminate_dots_and_capitalize
+    env.filters["get_first"] = get_first
+    env.filters["eliminate_first"] = eliminate_first
+
+
+    template = env.get_template('resource_test.j2')
+
+    # to save the results
+    try:
+        with open(f"output/resources/{provider_name}_resource_{filename}_test.go", "w") as fh:
+            fh.write(template.render(config))
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Creation of Resource File Named {filename}")
+        return False
+    print(f"=== Completed Creation of Resource File Named {filename}")
+    return True

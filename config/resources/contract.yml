@@ -165,7 +165,6 @@ schemas:
     element:
       type: "schema"
       schema:
-        default: ["Hello", "10.3442", "2"]
         type: "string"
 
   - attribute: "test_score"

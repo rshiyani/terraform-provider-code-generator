@@ -1,0 +1,865 @@
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation
+name: Contract
+provider_name: Aci
+schemas:
+- attribute: name
+  description: name of someone
+  forcenew: true
+  required: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - 9hu1byywd9
+    - xzlydby1ov
+    - 7rwzbxs0pb
+    - yuvvaegmxx
+    - zhz0a4ibxz
+    - t3tde0h7hd
+    - a81oe4wmzw
+    - fyknxaizqo
+    - mtic2mwv7s
+    - uxexngqiuw
+    - 26agg4qxvb
+    - nclm1749gg
+    - da3koxmq5p
+    - 1isf36ml1h
+    - ilv410vmyu
+    valid:
+    - v1daq3oi8p
+    - hfnnyimfu8
+    - lscjpo48hl
+    - m9secymg3l
+  type: string
+- attribute: temp
+  description: temp of some resource
+  forcenew: true
+  required: true
+  subtype: int
+  test_params:
+    invalid:
+    - random
+    - 10.023
+    multiple_valids:
+    - -471
+    - -382
+    - -377
+    - -188
+    - 759
+    - -615
+    - 43
+    - 989
+    - -932
+    - 321
+    - -308
+    - -345
+    - -401
+    - -816
+    - 487
+    valid:
+    - 795
+    - 701
+    - -313
+    - 28
+  type: int
+- attribute: weight
+  description: weight of someone
+  forcenew: true
+  required: true
+  subtype: float
+  test_params:
+    invalid:
+    - random
+    - 10
+    multiple_valids:
+    - -750.7744998859465
+    - -730.0022055494736
+    - -769.462410276016
+    - 653.7174459302064
+    - 134.35744638123765
+    - -558.1312202329572
+    - -426.25165004283434
+    - 31.71857699009872
+    - -154.0781068489042
+    - -635.858780858422
+    - 846.9501174699731
+    - -832.3864581362134
+    - -716.9768590640205
+    - -28.440057837722275
+    - -697.0346700964219
+    valid:
+    - -315.58542918996443
+    - -945.4436011568524
+    - -305.9830712751915
+    - -561.6892180382613
+  type: float
+- attribute: ipv4_for
+  description: IP-address v4
+  optional: true
+  subtype: ipv4
+  test_params:
+    invalid: &id001
+    - 263.287.280.293
+    multiple_valids: &id002
+    - 31.3.96.192
+    - 31.3.25.118
+    - 31.3.51.138
+    - 31.3.111.88
+    - 31.3.223.87
+    - 31.3.143.135
+    - 31.3.147.254
+    - 31.3.210.51
+    - 31.3.235.135
+    - 31.3.18.186
+    - 31.3.223.18
+    - 31.3.166.232
+    - 31.3.160.209
+    - 31.3.100.99
+    - 31.3.249.158
+    valid: &id003
+    - 31.3.96.192
+    - 31.3.25.118
+    - 31.3.51.138
+    - 31.3.111.88
+  type: string
+  validation:
+    func_name: IsIPv4Address
+- attribute: port_number
+  optional: true
+  subtype: port
+  test_params:
+    invalid:
+    - 0
+    - 65536
+    multiple_valids:
+    - 1
+    - 65535
+    - 46300
+    - 53298
+    - 20286
+    - 25583
+    - 9829
+    - 19376
+    - 56532
+    - 32110
+    - 64309
+    - 12490
+    - 12355
+    - 58481
+    - 46904
+    valid:
+    - 1
+    - 65535
+    - 64123
+    - 51306
+  type: int
+  validation:
+    func_name: IsPortNumber
+- attribute: temp_schema_list
+  element:
+    schema:
+      type: string
+    type: schema
+  required: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - d1115ju1qs
+    - gjbaxsz3a3
+    - crj53l9hf3
+    - dudnojqfsx
+    - 35a1imi0kx
+    - 3ikx8erafr
+    - 0wogmoy10k
+    - 8igjpek3xw
+    - o66erd3yy8
+    - kku8woqbmx
+    - 22s9fkdi19
+    - p89hvs7ib3
+    - qfrgwk9i4w
+    - zbskbmq1uy
+    - 72tmpuchwi
+    valid:
+    - kdijm3eld2
+    - qba51os9r8
+    - bvd1mvq2mn
+    - k5g0xov9r5
+  type: set
+- attribute: test_score
+  computed: true
+  description: range
+  optional: true
+  subtype: range
+  test_params:
+    invalid:
+    - 0
+    - 101
+    multiple_valids:
+    - 1
+    - 100
+    - 50
+    - 88
+    - 23
+    - 88
+    - 34
+    - 74
+    - 35
+    - 16
+    - 2
+    - 49
+    - 35
+    - 75
+    - 38
+    valid:
+    - 1
+    - 100
+    - 50
+    - 71
+  type: int
+  validation:
+    func_name: IntBetween
+    params:
+    - 1
+    - 100
+- attribute: string_in_some_names
+  computed: true
+  default: parth
+  description: string in valid list
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - zt1hjfbr1a
+    multiple_valids:
+    - parth
+    - aarsh
+    - arjun
+    - alfatah
+    - krunal
+    valid:
+    - parth
+    - aarsh
+    - arjun
+    - alfatah
+    - krunal
+  type: string
+  validation:
+    func_name: StringInSlice
+    ignore_case: true
+    params:
+    - parth
+    - aarsh
+    - arjun
+    - alfatah
+    - krunal
+- attribute: valid_cidr
+  computed: true
+  description: cidr network
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - -1
+    - 33
+    multiple_valids:
+    - 0
+    - 32
+    - 16
+    - 15
+    - 20
+    - 5
+    - 20
+    - 31
+    - 22
+    - 28
+    - 27
+    - 18
+    - 16
+    - 23
+    - 25
+    valid:
+    - 0
+    - 32
+    - 16
+    - 12
+  type: string
+  validation:
+    func_name: IsCIDRNetwork
+    ignore_case: true
+    params:
+    - 0
+    - 32
+- attribute: percentage
+  computed: true
+  optional: true
+  subtype: range
+  test_params:
+    invalid:
+    - -1
+    - 101
+    multiple_valids:
+    - 0
+    - 100
+    - 50.0
+    - 1.0592478314742722
+    - 63.976324094382846
+    - 0.3107773470213435
+    - 3.1166697328007453
+    - 70.51078902890364
+    - 77.6371859059308
+    - 87.93904748605951
+    - 86.78252561701244
+    - 33.1721846680716
+    - 59.9472538932499
+    - 28.90584260628349
+    - 83.99458009024725
+    valid:
+    - 0
+    - 100
+    - 50.0
+    - 22.080140157243974
+  type: float
+  validation:
+    func_name: FloatBetween
+    params:
+    - 0
+    - 100
+- attribute: testingmap
+  computed: true
+  element:
+    schema:
+      type: int
+    type: schema
+  optional: true
+  subtype: map
+  test_params:
+    invalid:
+    - random
+    - 10.023
+    multiple_valids:
+    - 727
+    - -877
+    - 891
+    - 917
+    - 798
+    - -225
+    - -43
+    - 686
+    - -358
+    - -193
+    - 416
+    - 861
+    - -553
+    - 41
+    - -686
+    valid:
+    - -781
+    - 517
+    - -753
+    - 725
+  type: map
+- attribute: filter
+  description: filter list
+  element:
+    schema:
+    - attribute: filter_name
+      description: name of filter
+      optional: true
+      required: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - oyjn53wk85
+        - m4w81lsao4
+        - 0cui0ytihf
+        - sud0jkqkf7
+        - 2f8uab0xv6
+        - kp1pfnjccx
+        - 1s6cb98kli
+        - ftpe4s8gjc
+        - wvzc592l1b
+        - g4sxk5x6n4
+        - i5r9h4wp7s
+        - cwnqu2m6d3
+        - fa3q0zuvx1
+        - ndun0qebrz
+        - arncu6eo2b
+        valid:
+        - b0yidomli4
+        - bziwt7m0hl
+        - j672vuk7gq
+        - b0e20ll1z6
+      type: string
+    - attribute: id
+      computed: true
+      default_func: true
+      description: id of filter
+      envvar: FILTER_ID
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - vpfypwejfl
+        - l7iym17ndg
+        - ifthbj4lgi
+        - q8oboseaii
+        - bdc3lwcu98
+        - i8o8x438rr
+        - xkus4ef6f7
+        - s3ylos0fkq
+        - soxyn3ljeq
+        - o4q3m34ozb
+        - v1zqyoyoqh
+        - ik0s9ilvh5
+        - 21ry1ulfd5
+        - cxrrsph5pg
+        - 7rc8bfcgqe
+        valid:
+        - ilrbty5i2s
+        - c60wa3wcqe
+        - 18jasp0nmu
+        - 319gnggtzg
+      type: string
+    - attribute: description
+      computed: true
+      default_func: true
+      description: description of filter
+      required: true
+      subtype: string
+      test_params:
+        invalid:
+        - 10
+        - 12.43
+        multiple_valids:
+        - vrr43v2qjf
+        - te0c78ucde
+        - x4elmzgx97
+        - sx2vkl1zfi
+        - na5ekqrarh
+        - 2rkcqqe00k
+        - u0i6lhhxxd
+        - wh8l5imcjb
+        - 41jr6ut2ul
+        - cvhz9xh65a
+        - 998wtqwhlf
+        - 1cudhzhn2u
+        - zqmjxzb6cr
+        - sgtg588zoz
+        - qbnhh2xkkp
+        valid:
+        - 84fz41s0wf
+        - 9dpudmxsdo
+        - 5dj7ccs3g4
+        - hsvbwu86ye
+      type: string
+    - attribute: filter_entry
+      description: list of filter_entry
+      element:
+        schema:
+        - attribute: id_list
+          element:
+            schema:
+              type: string
+            type: schema
+          required: true
+          subtype: string
+          test_params:
+            invalid:
+            - 10
+            - 12.43
+            multiple_valids:
+            - adcv8o6gvn
+            - gtfyu3q2aq
+            - rxtqoasygu
+            - 1ubs1q56t9
+            - et4at2ytmj
+            - 5n5kn6f543
+            - 6yjknc307u
+            - hc4qgs08kr
+            - 07rfh6itwh
+            - 0qfwdk2tub
+            - 9oqr4g1ize
+            - vwlwpexcs7
+            - iaezrd2ca4
+            - jxz4tnflb0
+            - 4jyxdi6bbp
+            valid:
+            - am3haqnggi
+            - 5ut48yjoqk
+            - 2hjwld5i10
+            - ya2jfgf5lv
+          type: set
+        - attribute: filter_entry_name
+          description: name of filter entry
+          diff_suppress: true
+          required: true
+          subtype: string
+          test_params:
+            invalid:
+            - 10
+            - 12.43
+            multiple_valids:
+            - 9f06oyanfi
+            - 3hst0xrv0b
+            - 9za3j4fhsu
+            - 87liau99cq
+            - tiokqfhdrq
+            - k6pwcxatjs
+            - q5q1hde3ur
+            - d7qy022c62
+            - x60l6b6c91
+            - 52vzg2ftqz
+            - 9nw2slnvr2
+            - qznwrzyqv3
+            - f2ydoew2hx
+            - 5husoxylit
+            - er10mkvbgr
+            valid:
+            - yh3q41svo7
+            - ef1lbalemz
+            - rp2rihlgxt
+            - xtlzccjltp
+          type: string
+        - attribute: ipv6
+          description: ipv6
+          optional: true
+          subtype: ipv6
+          test_params:
+            invalid: &id004
+            - invalidIPv6
+            multiple_valids: &id005
+            - 2001:db8::34f4:0:0:f35a
+            - 2001:db8::34f4:0:0:f345
+            - 2001:db8::34f4:0:0:f3ed
+            - 2001:db8::34f4:0:0:f344
+            - 2001:db8::34f4:0:0:f36a
+            - 2001:db8::34f4:0:0:f33a
+            - 2001:db8::34f4:0:0:f306
+            - 2001:db8::34f4:0:0:f3dc
+            - 2001:db8::34f4:0:0:f3a6
+            - 2001:db8::34f4:0:0:f3a8
+            - 2001:db8::34f4:0:0:f3d6
+            - 2001:db8::34f4:0:0:f302
+            - 2001:db8::34f4:0:0:f38c
+            - 2001:db8::34f4:0:0:f3f0
+            - 2001:db8::34f4:0:0:f333
+            valid: &id006
+            - 2001:db8::34f4:0:0:f35a
+            - 2001:db8::34f4:0:0:f345
+            - 2001:db8::34f4:0:0:f3ed
+            - 2001:db8::34f4:0:0:f344
+          type: string
+          validation:
+            func_name: IsIPv6Address
+        - attribute: apply_to_frag
+          computed: true
+          description: apply to fragment
+          optional: true
+          subtype: string
+          test_params:
+            invalid:
+            - 'yes'
+            - 'no'
+            multiple_valids:
+            - rxc4bo0eqt
+            - hmy17a8w2e
+            - 5y43euprqi
+            - g0uth00tgo
+            - bvwh950u85
+            - xp61bfrqr7
+            - oqrbv87c2p
+            - femsrwr6j5
+            - z6bwvziorw
+            - juuehq38p9
+            - xfqetkdosf
+            - 4hvc4jevhs
+            - zojo2t41xz
+            - kw7uquz67s
+            - 8ekuanybn4
+            valid:
+            - a2sssc5y13
+            - ixam1mj0id
+            - 11a3peg4jq
+            - bvu9o1ebpk
+          type: string
+          validation:
+            func_name: StringNotInSlice
+            ignore_case: 'false'
+            params:
+            - 'yes'
+            - 'no'
+        - attribute: apply_to_frag_liist_schema
+          computed: true
+          description: apply to fragment
+          element:
+            schema:
+              type: bool
+            type: schema
+          optional: true
+          subtype: bool
+          test_params:
+            invalid:
+            - random
+            - 10
+            multiple_valids:
+            - true
+            - false
+            valid:
+            - true
+            - false
+          type: list
+        type: resource
+      max_items: 4
+      min_items: 1
+      required: true
+      type: list
+    type: resource
+  max_items: 10
+  required: true
+  type: list
+types:
+  base64:
+    invalid:
+    - a3+J1b%mFs//
+    multiple_valids:
+    - dnRuNGU3ZjRnbA==
+    - cWlrb3RtZHNqbg==
+    - cmJvaGhuZGlmZQ==
+    - anFxYXFldDJjMA==
+    - bHBzbHJ1bGEwbQ==
+    - ZHl4ZHI0cTF2dQ==
+    - am4xdGUyeXp1bg==
+    - amRxdzRldXhxNQ==
+    - cnk4ZDBrZDdhbA==
+    - NmUxeTBjbXg1dg==
+    - MHM1bmV3emN0dw==
+    - b2tsdG9jOTk4OQ==
+    - aGc3a3NhcTNwYw==
+    - MHUyMXN3bmRncw==
+    - eDRqcTNua2cxdg==
+    valid:
+    - Znl0NW0zOTdsYg==
+    - MTBteWk1azBqcA==
+    - cW1xeW8zODFpbA==
+    - dDQyaHp4NDN5OQ==
+  cidr:
+    invalid:
+    - 285.262.282.275/6
+    multiple_valids:
+    - 31.3.80.0/20
+    - 31.3.32.0/20
+    - 31.3.144.0/20
+    - 31.3.160.0/20
+    - 31.3.208.0/20
+    - 31.3.192.0/20
+    - 31.3.240.0/20
+    - 31.3.128.0/20
+    - 31.3.176.0/20
+    - 31.3.16.0/20
+    - 31.3.48.0/20
+    - 31.3.96.0/20
+    - 31.3.112.0/20
+    - 31.3.0.0/20
+    - 31.3.64.0/20
+    valid:
+    - 31.3.80.0/20
+    - 31.3.32.0/20
+    - 31.3.144.0/20
+    - 31.3.160.0/20
+  ipv4:
+    invalid: *id001
+    multiple_valids: *id002
+    valid: *id003
+  ipv6:
+    invalid: *id004
+    multiple_valids: *id005
+    valid: *id006
+  json:
+    invalid:
+    - 'json({ name : val)'
+    multiple_valids:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+    - 'json({ "attribute" : "value4" })'
+    - 'json({ "attribute" : "value5" })'
+    - 'json({ "attribute" : "value6" })'
+    - 'json({ "attribute" : "value7" })'
+    - 'json({ "attribute" : "value8" })'
+    - 'json({ "attribute" : "value9" })'
+    - 'json({ "attribute" : "value10" })'
+    - 'json({ "attribute" : "value11" })'
+    - 'json({ "attribute" : "value12" })'
+    - 'json({ "attribute" : "value13" })'
+    - 'json({ "attribute" : "value14" })'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+  mac:
+    invalid:
+    - invalidMAC
+    multiple_valids:
+    - e7:7b:59:b8:b9:fc
+    - a5:1b:b1:ca:99:92
+    - 40:b3:c9:50:9d:79
+    - f9:20:5b:f8:f0:f0
+    - c8:fc:5d:69:c5:8a
+    - b5:ba:40:02:f5:7b
+    - d4:ce:7a:8b:cd:d6
+    - a3:b9:c7:c1:08:a0
+    - 76:8a:60:cb:8e:9b
+    - 03:85:0f:82:15:15
+    - 6e:9f:89:ed:01:ee
+    - 49:67:93:52:f2:02
+    - 40:68:a2:74:66:d7
+    - e9:d6:7b:f3:97:8d
+    - 8f:9e:c3:d2:c3:69
+    valid:
+    - 1b:d4:a7:7f:04:c6
+    - 9d:da:9b:c2:82:fe
+    - 94:5b:2c:9a:d5:23
+    - 42:a6:7f:c8:31:bd
+  regex:
+    invalid:
+    - '[0-9)++'
+    multiple_valids:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+    valid:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+  string:
+    invalid:
+    - 12345
+    multiple_valids:
+    - esafesf8ah
+    - 88frkundj4
+    - kkf2vtu12a
+    - 3bbhajoorz
+    - ua47acogfc
+    - 3q2mn9v3tg
+    - tp0ern8b27
+    - cjoxve6qbb
+    - e2siers2r8
+    - hm9x1cepik
+    - q0x2hx9xeq
+    - 4dv35obka9
+    - xqj61alqee
+    - igyhy00omj
+    - dl4onky9bs
+    valid:
+    - yr9tomheah
+    - 4vztrdh1mc
+    - hrfi1lcrto
+    - h21fzzdjrz
+  time:
+    invalid:
+    - '2022-07-15 12:32:43.150657'
+    multiple_valids:
+    - '2022-07-15T07:02:43.150657+00:00'
+    - '2022-08-07T07:02:43.150657+00:00'
+    - '2022-08-30T07:02:43.150657+00:00'
+    - '2022-09-22T07:02:43.150657+00:00'
+    - '2022-10-15T07:02:43.150657+00:00'
+    - '2022-11-07T07:02:43.150657+00:00'
+    - '2022-11-30T07:02:43.150657+00:00'
+    - '2022-12-23T07:02:43.150657+00:00'
+    - '2023-01-15T07:02:43.150657+00:00'
+    - '2023-02-07T07:02:43.150657+00:00'
+    - '2023-03-02T07:02:43.150657+00:00'
+    - '2023-03-25T07:02:43.150657+00:00'
+    - '2023-04-17T07:02:43.150657+00:00'
+    - '2023-05-10T07:02:43.150657+00:00'
+    - '2023-06-02T07:02:43.150657+00:00'
+    valid:
+    - '2022-07-15T07:02:43.150657+00:00'
+    - '2022-08-07T07:02:43.150657+00:00'
+    - '2022-08-30T07:02:43.150657+00:00'
+    - '2022-09-22T07:02:43.150657+00:00'
+  url-http:
+    invalid:
+    - ht:/xh0j70hs9l5h975.com
+    multiple_valids:
+    - http://czx9xsg0cf5c4xy.com
+    - http://48x2mtuu9ak52ba.com
+    - http://kc0jmuk14hwjmra.com
+    - http://ekopw3u7zp0a1jw.com
+    - http://sa5gou1nay603ix.com
+    - http://pc4hruwgm8hfu1x.com
+    - http://c6yaocl8r6nafzq.com
+    - http://siirwbyvz2sless.com
+    - http://7ds19dfvpfiv2zd.com
+    - http://p482et1h4etm3ps.com
+    - http://7v5k1ifsm1uzz9v.com
+    - http://1cv49qj816edoxf.com
+    - http://kmd4inac7lwcrgv.com
+    - http://7nw0i1zl8s4h36l.com
+    - http://bvs317c9ql0z5yh.com
+    valid:
+    - http://mo6xgaywsh38gn8.com
+    - http://a1zllbakblxk4ik.com
+    - http://in3jqz0zwcy40fo.com
+    - http://o08exp5g7a7utdj.com
+  url-https:
+    invalid:
+    - hts:/f4m8l79iq61wd8g.com
+    multiple_valids:
+    - https://wjhjstg3q4yyd44.com
+    - https://p44w8tt7a92mphq.com
+    - https://2z4y33epacscldi.com
+    - https://xppeatwqxoz9y41.com
+    - https://r0l0e0jdz8y92q3.com
+    - https://aeca5y4ak9s4e8r.com
+    - https://01wqkvyz2vsjrkh.com
+    - https://x6usa1o498tej18.com
+    - https://0619hnpuviyd4xc.com
+    - https://fohtyu5qixaz1zc.com
+    - https://43vcqi0kvy7btsb.com
+    - https://kf2y6n6ndt656id.com
+    - https://wc02bif816qdp9v.com
+    - https://pc9dwyrpw4wz3ag.com
+    - https://mzjoyo7dbaqcpep.com
+    valid:
+    - https://0rvllhob5sgadkm.com
+    - https://jjsi1r5m66zfzj2.com
+    - https://aq5cind5ow5gpi0.com
+    - https://94t1x6w1z466cor.com
+  uuid:
+    invalid:
+    - invalid323Uuid12
+    multiple_valids:
+    - 1f69e88f-040c-11ed-865b-7c8ae1979a87
+    - 1f69e890-040c-11ed-8527-7c8ae1979a87
+    - 1f69e891-040c-11ed-8a4f-7c8ae1979a87
+    - 1f69e892-040c-11ed-a771-7c8ae1979a87
+    - 1f69e893-040c-11ed-a29f-7c8ae1979a87
+    - 1f69e894-040c-11ed-b6b0-7c8ae1979a87
+    - 1f69e895-040c-11ed-9db4-7c8ae1979a87
+    - 1f69e896-040c-11ed-a1ce-7c8ae1979a87
+    - 1f69e897-040c-11ed-b5f0-7c8ae1979a87
+    - 1f69e898-040c-11ed-af43-7c8ae1979a87
+    - 1f69e899-040c-11ed-91ad-7c8ae1979a87
+    - 1f69e89a-040c-11ed-94aa-7c8ae1979a87
+    - 1f69e89b-040c-11ed-b859-7c8ae1979a87
+    - 1f69e89c-040c-11ed-bbb2-7c8ae1979a87
+    - 1f69e89d-040c-11ed-881e-7c8ae1979a87
+    valid:
+    - 1f69e88b-040c-11ed-89e4-7c8ae1979a87
+    - 1f69e88c-040c-11ed-82bb-7c8ae1979a87
+    - 1f69e88d-040c-11ed-a0e5-7c8ae1979a87
+    - 1f69e88e-040c-11ed-bf3c-7c8ae1979a87
