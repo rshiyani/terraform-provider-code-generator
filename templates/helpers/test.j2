@@ -14,7 +14,7 @@
 	%v
 	{%- elif schema.type in ["string","bool"] -%}
 	"%v"
-	{%- endif -%}
+	{%- endif -%}  
 {% endmacro %}
 
 
@@ -75,7 +75,7 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(name st
 {% endmacro %}
 
 {% macro printFunctionTestAccResourceDestroy(name,provider_name) %}
-func testAccCheckMoviesMovieDestroy(s *terraform.State) error {
+func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*client.Client)
 
 	for _, rs := range s.RootModule().Resources {
@@ -175,8 +175,9 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{n
 {% endmacro %}
 
 {# +++++ Function will contains self resource block only +++++ #}
-{% macro printBlock(name,provider_name,schemas) %}
+{% macro printBlock(name,provider_name,schemas,unique_attribute) %}
 	func {{name | camelize}}Block() string{
+		rName := makeTestVariable(acctest.RandString(5))
 		return fmt.Sprintf(`
 		resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
 			{% set args = [] %}
@@ -188,8 +189,12 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{n
 					{% else %}
 
 						{{schema.attribute}} = {{getValueType(schema)}}
+						{% if schema.attribute in unique_attribute %}
+						{{- args.append('rName') or ""}}
+						{% else %}
 						{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "0") | quote+')') or ""}}
-					{% endif %}
+						{% endif %}
+						{% endif %}
 				{% elif schema.type in ["list", "set"] %}
                     {% if schema.element.type == "schema" %}
                         {% if schema.element.schema.type not in ["list","set", "map"] %}
@@ -333,9 +338,9 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{n
 	{% endfor %}
 {% endmacro %}
 
-{% macro printStepsForConfig(name,provider_name,schemas) %}
+{% macro printStepsForConfig(name,provider_name,schemas,unique_attribute) %}
 	{
-		Config: CreateAcc{{name | pascalize}}Config(),
+		Config: CreateAcc{{name | pascalize}}Config(rName),
 		Check: resource.ComposeTestCheckFunc(
 			testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_default),
 			{% for schema in schemas %}
@@ -344,7 +349,11 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{n
 						{% if schema.depends_on is defined and schema.depends_on.attribute_name|last != "id" %}
 							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", searchInObject(resource{{schema.depends_on.resource_name | pascalize}}Test, {{schema.depends_on.attribute_name | make_dot_string("valid", "0") | quote}}))),
 						{% elif schema.depends_on is not defined %}
-							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(schema.attribute,"valid", "0") | quote}}))),
+							{% if schema.attribute in unique_attribute %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", rName),
+							{% else %}
+								resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(schema.attribute,"valid", "0") | quote}}))),
+							{% endif %}
 						{% endif %}
 					{% elif schema.type in ["list", "set"] %}
 						{% if schema.element.type == "resource" %}
@@ -436,8 +445,8 @@ func testAccCheck{{provider_name | pascalize}}{{name | pascalize}}IdNotEqual({{n
 {% endmacro %}
 
 
-{% macro printFunctionForConfig(name, provider_name, schemas) %}
-func CreateAcc{{name | pascalize}}Config() string {
+{% macro printFunctionForConfig(name, provider_name, schemas,unique_attribute) %}
+func CreateAcc{{name | pascalize}}Config(rName string) string {
 	var resource string
 	parentResources := getParent{{name | pascalize}}()
 	parentResources = parentResources[:len(parentResources)-1]
@@ -453,8 +462,15 @@ func CreateAcc{{name | pascalize}}Config() string {
 							{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name | make_dot_string}}
 						{% else %}
 
+							{% if schema.attribute in unique_attribute %}
+
+							{{schema.attribute}} = {{getValueType(schema)}}
+							{{- args.append('rName') or "" }}
+							{% else %}
+
 							{{schema.attribute}} = {{getValueType(schema)}}
 							{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "0") | quote+')') or ""}}
+							{% endif %}
 						{% endif %}
 					{% elif schema.type in ["list", "set"] %}
 						{% if schema.element.type == "schema" %}
@@ -501,9 +517,9 @@ func CreateAcc{{name | pascalize}}Config() string {
 	{% endfor %}
 {% endmacro %}
 
-{% macro printStepsForConfigWithOptional(name,provider_name,schemas) %}
+{% macro printStepsForConfigWithOptional(name,provider_name,schemas,unique_attribute) %}
 	{
-		Config: CreateAcc{{name | pascalize}}ConfigWithOptional(),
+		Config: CreateAcc{{name | pascalize}}ConfigWithOptional(rName),
 		Check: resource.ComposeTestCheckFunc(
 			testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_updated),
 			{% for schema in schemas %}
@@ -511,7 +527,11 @@ func CreateAcc{{name | pascalize}}Config() string {
 					{% if schema.depends_on is defined and schema.depends_on.attribute_name|last != "id" %}
                         resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", searchInObject(resource{{schema.depends_on.resource_name | pascalize}}Test, {{schema.depends_on.attribute_name | make_dot_string("valid", "0") | quote}}))),
                     {% elif schema.depends_on is not defined %}
+						{% if schema.required is true and schema.attribute in unique_attribute %}
+						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", rName),
+						{% else %}
 						resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", fmt.Sprintf("%v", searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(schema.attribute,"valid", "0") | quote}}))),
+						{% endif %}
 					{% endif %}
 				{% elif schema.type in ["list", "set"] %}
                     {% if schema.element.type == "resource" %}
@@ -532,9 +552,52 @@ func CreateAcc{{name | pascalize}}Config() string {
 
 
 {# ---------------------------------------------Function for Config With Optional-------------------------------------------- #}
-{% macro printFunctionForConfigWithOptional(name,provider_name,schemas) %}
-func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
-	resource := create{{name | pascalize}}Config(getParent{{name | pascalize}}())
+{% macro printFunctionForConfigWithOptional(name,provider_name,schemas,unique_attribute) %}
+func CreateAcc{{name | pascalize}}ConfigWithOptional(rName string) string {
+	var resource string 
+	parentResources := getParent{{name | pascalize}}()
+	parentResources = parentResources[:len(parentResources)-1]
+
+	resource += create{{name | pascalize}}Config(parentResources)
+
+	resource += fmt.Sprintf(`
+		resource  "{{provider_name | camelize}}_{{name | snakify}}" "test" {
+			{% set args = [] %}
+			{% for schema in schemas %}
+				{% if schema.type not in ["list","set","map"] %}
+					{% if schema.depends_on is defined %}
+
+						{{schema.attribute}} = {{provider_name | camelize}}_{{schema.depends_on.resource_name | snakify}}.test.{{schema.depends_on.attribute_name | make_dot_string}}
+					{% else %}
+						{% if schema.required is true and schema.attribute in unique_attribute %}
+
+						{{schema.attribute}} = {{getValueType(schema)}}
+						{{- args.append('rName') or "" }}
+						{% else %}
+
+						{{schema.attribute}} = {{getValueType(schema)}}
+						{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "0") | quote+')') or ""}}
+						{% endif %}
+					{% endif %}
+				{% elif schema.type in ["list", "set"] %}
+                    {% if schema.element.type == "schema" %}
+                        {% if schema.element.schema.type not in ["list","set", "map"] %}
+
+				        {{schema.attribute}} = [{{getValueType(schema.element.schema)}},{{getValueType(schema.element.schema)}}]
+                            {{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "0") | quote+')') or ""}}
+                            {{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "1") | quote+')') or ""}}
+                        {% endif %}
+                    {% else %}
+
+                        {{schema.attribute}} {
+						{% set indent = []%}    
+                        {{getInternalAttributes(name,provider_name,schema.element.schema,args,schema.attribute,indent)}}
+                        }
+                    {% endif %}
+				{% endif %}
+			{% endfor %}
+		}
+	`,{{args | join(',\n')}})
 	return resource
 }
 {% endmacro %}
@@ -581,7 +644,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 			for _, value := range valid {
 				v := fmt.Sprintf("%v", value)
 				testSteps = append(testSteps,resource.TestStep{
-					Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(value),
+					Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(rName,value),
 					Check: resource.ComposeTestCheckFunc(
 						testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
 						resource.TestCheckResourceAttr(resourceName, {{[] | make_dot_string(parentAttr+ '.0.' +schema.attribute) | quote}}, v),
@@ -595,7 +658,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 				for _, value := range valid {
 					v := fmt.Sprintf("%v", value)
 					testSteps = append(testSteps,resource.TestStep{
-						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(value),
+						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(rName,value),
 						Check: resource.ComposeTestCheckFunc(
 							testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
 							resource.TestCheckResourceAttr(resourceName, {{[] | make_dot_string(parentAttr+ '.0.' +schema.attribute + '.0') | quote}}, v),
@@ -610,8 +673,8 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 	{% endfor %}
 {% endmacro %}
 
-{% macro printGenerateStepsForUpdatedAttr(name,provider_name,schemas) %}
-	func generateStepForUpdatedAttr(resourceName string,{{name | camelize}}_default,{{name | camelize}}_updated *models.{{name | pascalize}}) []resource.TestStep{
+{% macro printGenerateStepsForUpdatedAttr(name,provider_name,schemas,unique_attribute) %}
+	func generateStepForUpdatedAttr{{name|pascalize}}(rName string, resourceName string,{{name | camelize}}_default,{{name | camelize}}_updated *models.{{name | pascalize}}) []resource.TestStep{
 		testSteps := make([]resource.TestStep, 0, 1)
 		var valid []interface{} 
 		{% for schema in schemas %}
@@ -620,7 +683,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 				for _, value := range valid {
 					v := fmt.Sprintf("%v", value)
 					testSteps = append(testSteps,resource.TestStep{
-						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(value),
+						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(rName, value),
 						Check: resource.ComposeTestCheckFunc(
 							testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
 							resource.TestCheckResourceAttr(resourceName, "{{schema.attribute}}", v),
@@ -634,7 +697,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 					for _, value := range valid {
 						v := fmt.Sprintf("%v", value)
 						testSteps = append(testSteps,resource.TestStep{
-							Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(value),
+							Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(rName,value),
 							Check: resource.ComposeTestCheckFunc(
 								testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, {{name | camelize}}_updated),
 								resource.TestCheckResourceAttr(resourceName, {{[] | make_dot_string(schema.attribute+'.0') | quote}}, v),
@@ -708,9 +771,9 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 {% endmacro %}
 
 
-{% macro printFunctionForUpdatedAttr(name,provider_name,schemas)%}
+{% macro printFunctionForUpdatedAttr(name,provider_name,schemas,unique_attribute)%}
 	{% for func in allOptionalFunctions %}
-		func CreateAcc{{name | pascalize}}UpdatedAttr{{func | eliminate_dots_and_capitalize}}(value interface{}) string {
+		func CreateAcc{{name | pascalize}}UpdatedAttr{{func | eliminate_dots_and_capitalize}}(rName string, value interface{}) string {
 			var resource string
 			parentResources := getParent{{name | pascalize}}()
 			parentResources = parentResources[:len(parentResources)-1]
@@ -729,9 +792,15 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 							{{schema.attribute}} = {{getValueType(schema)}}
 							{{- args.append('value') or ""}}
 						{% else %}
+							{% if schema.required is true and schema.attribute in unique_attribute %}
+
+							{{schema.attribute}} = {{getValueType(schema)}}
+							{{- args.append('rName') or ""}}
+							{% else %}
 
 							{{schema.attribute}} = {{getValueType(schema)}}
 							{{- args.append('searchInObject(resource'+name|pascalize+'Test, '+ [] | make_dot_string(schema.attribute, "valid", "0") | quote+')') or ""}}
+							{% endif %}
 						{% endif %}
 					{% endif %}
 				{% elif schema.type in ["list", "set"] %}
@@ -783,7 +852,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 			invalid = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(parentAttr | eliminate_zeroes+ '.' +schema.attribute,"invalid") | quote}}).([]interface{})
 			for _, value := range invalid {
 				testSteps = append(testSteps,resource.TestStep{
-					Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(value),
+					Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(rName,value),
 					{% if schema.validation is defined %}
 					ExpectError: regexp.MustCompile(expectErrorMap["{{schema.validation.func_name}}"]),
 					{% else %}
@@ -796,7 +865,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 				invalid = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(parentAttr | eliminate_zeroes + '.' +schema.attribute,"invalid") | quote}}).([]interface{})
 				for _, value := range invalid {
 					testSteps = append(testSteps,resource.TestStep{
-						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(value),
+						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{parentAttr|eliminate_zeroes_and_capitalize+schema.attribute|pascalize}}(rName,value),
 						{% if schema.validation is defined %}
 						ExpectError: regexp.MustCompile(expectErrorMap["{{schema.validation.func_name}}"]),
 						{% else %}
@@ -812,8 +881,8 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 {% endmacro %}
 
 
-{% macro printGenerateNegativeSteps(name,provider_name,schemas) %}
-	func generateNegativeSteps(resourceName string) []resource.TestStep{
+{% macro printGenerateNegativeSteps(name,provider_name,schemas, unique_attribute) %}
+	func generateNegativeSteps{{name|pascalize}}(rName string, resourceName string) []resource.TestStep{
 		//Use Update Config Function with false value 
 		testSteps := make([]resource.TestStep, 0, 1)
 		var invalid []interface{} 
@@ -822,7 +891,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 				invalid = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string(schema.attribute,"invalid") | quote}}).([]interface{})
 				for _, value := range invalid {
 					testSteps = append(testSteps,resource.TestStep{
-						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(value),
+						Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(rName, value),
 						{% if schema.validation is defined %}
 						ExpectError: regexp.MustCompile(expectErrorMap["{{schema.validation.func_name}}"]),
 						{% else %}
@@ -835,7 +904,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 					invalid = searchInObject(resource{{name | pascalize}}Test, {{[] | make_dot_string( schema.attribute,"invalid") | quote}}).([]interface{})
 					for _, value := range invalid {
 						testSteps = append(testSteps,resource.TestStep{
-							Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(value),
+							Config: CreateAcc{{name | pascalize}}UpdatedAttr{{schema.attribute|pascalize}}(rName,value),
 							{% if schema.validation is defined %}
 							ExpectError: regexp.MustCompile(expectErrorMap["{{schema.validation.func_name}}"]),
 							{% else %}
@@ -849,7 +918,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 			{% endif %}
 		{% endfor %}
 		testSteps = append(testSteps, resource.TestStep{
-			Config: CreateAccMovieConfig(),
+			Config: CreateAcc{{name | pascalize}}Config(rName),
 		})
 		return testSteps
 	}
@@ -1100,8 +1169,9 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 	{% endfor %}
 {% endmacro %}
 
+
 {% macro printGenerateStepsForUpdatedRequiredAttr(name,provider_name,schemas) %}
-	func generateStepForUpdatedRequiredAttr(resourceName string,{{name | camelize}}_default,{{name | camelize}}_updated *models.{{name | pascalize}}) []resource.TestStep{
+	func generateStepForUpdatedRequiredAttr{{name|pascalize}}(resourceName string,{{name | camelize}}_default,{{name | camelize}}_updated *models.{{name | pascalize}}) []resource.TestStep{
 		testSteps := make([]resource.TestStep, 0, 1)
 		var value interface{} 
 		{% for schema in schemas %}
@@ -1133,10 +1203,10 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 		{% endfor %}
 		return testSteps
 	}
-{% endmacro %}	
-
+{% endmacro %}
 
 {# -------------------------------------------Function for Update Required Attribute---------------------------------------------- #}
+
 {% macro printFunctionForUpdateRequiredAttribute(name,provider_name,schemas) %}
 	{% for attr in allRequiredAttr %}
 		func CreateAcc{{name | pascalize}}UpdateRequired{{attr|eliminate_dots_and_capitalize}}() string {
@@ -1218,7 +1288,7 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 	{% for schema in schemas %}
 		{% if schema.required is true %}
 		{
-			Config: CreateAcc{{name | pascalize}}DataSourceWithout{{schema.attribute | pascalize}}(),
+			Config: CreateAcc{{name | pascalize}}DataSourceWithout{{schema.attribute | pascalize}}(rName),
 			ExpectError: regexp.MustCompile(`Missing required argument`),
 		},
 		{% endif %}
@@ -1231,8 +1301,8 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 {% macro printFunctionWithoutRequiredArgumentsDS(name, provider_name, schemas) %}
 	{% for schema in schemas %}
 		{% if schema.required is true and schema.type != "map" %}
-		func CreateAcc{{name | pascalize}}DataSourceWithout{{schema.attribute | pascalize}}() string{
-			resource := CreateAcc{{name | pascalize}}ConfigWithOptional()
+		func CreateAcc{{name | pascalize}}DataSourceWithout{{schema.attribute | pascalize}}(rName string) string{
+			resource := CreateAcc{{name | pascalize}}ConfigWithOptional(rName)
 			resource += fmt.Sprintf(`
 			data "{{provider_name | camelize}}_{{name | snakify}}" "test" {
 				{% set args = [] %}
@@ -1286,8 +1356,8 @@ func CreateAcc{{name | pascalize}}ConfigWithOptional() string {
 {# --------------------------------------------------Function for data source config---------------------------------------- ---#}
 
 {% macro printFunctionForDataSourceConfig(name, provider_name, schemas) %}
-func CreateAcc{{name | pascalize}}DataSourceConfig() string{
-	resource := CreateAcc{{name | pascalize}}ConfigWithOptional()
+func CreateAcc{{name | pascalize}}DataSourceConfig(rName string) string{
+	resource := CreateAcc{{name | pascalize}}ConfigWithOptional(rName)
 	resource += fmt.Sprintf(`
 	data "{{provider_name | camelize}}_{{name | snakify}}" "test" {
 		{% set args = [] %}
@@ -1404,8 +1474,8 @@ func CreateAcc{{name | pascalize}}DataSourceConfig() string{
 {#--------------------------------------------Function for data source Random Attr------------------------------------------------#}
 
 {% macro printFuncUpdatedConfigDataSourceRandomAttr(name, provider_name, schemas) %}
-func CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(key, value string) string {
-	resource := CreateAcc{{name | pascalize}}ConfigWithOptional()
+func CreateAcc{{name | pascalize}}UpdatedConfigDataSourceRandomAttr(key, value, rName string) string {
+	resource := CreateAcc{{name | pascalize}}ConfigWithOptional(rName)
 	resource += fmt.Sprintf(`
 	data "{{provider_name | camelize}}_{{name | snakify}}" "test" {
 		{% set args = [] %}

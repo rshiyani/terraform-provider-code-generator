@@ -4,6 +4,9 @@ imports:
   - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
   - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
+unique_attribute: 
+  - "title"
+ 
 schemas:
   - attribute: "title"
     type: "string"

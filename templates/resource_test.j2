@@ -36,23 +36,26 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 	var {{name | camelize}}_updated models.{{name | pascalize}}
 	resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
 	
-	resource.Test(t, resource.TestCase{
+	rName := makeTestVariable(acctest.RandString(5))
+	// rOther := makeTestVariable(acctest.RandString(5))
+	
+	resource.{% if unique_attribute | length > 0%}Parallel{% endif %}Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
 		Steps: append([]resource.TestStep{
 			{{testHelper.printStepsWithoutRequiredArguments(name, schemas)-}}
-			{{testHelper.printStepsForConfig(name, provider_name, schemas)-}}
-			{{testHelper.printStepsForConfigWithOptional(name, provider_name, schemas)-}}
+			{{testHelper.printStepsForConfig(name, provider_name, schemas, unique_attribute)-}}
+			{{testHelper.printStepsForConfigWithOptional(name, provider_name, schemas, unique_attribute)-}}
 			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
 			{
-				Config: CreateAcc{{name | pascalize}}Config(),
+				Config: CreateAcc{{name | pascalize}}Config(rName),
 			},
-		}, generateStepForUpdatedRequiredAttr(resourceName, &{{name | camelize}}_default, &{{name | camelize}}_updated)...),
+		}, generateStepForUpdatedRequiredAttr{{name | pascalize}}(resourceName, &{{name | camelize}}_default, &{{name | camelize}}_updated)...),
 	})
 }
 
@@ -61,17 +64,18 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Update(t *testing.
 	var {{name | camelize}}_default models.{{name | pascalize}}
 	var {{name | camelize}}_updated models.{{name | pascalize}}
 	resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
-	
-	resource.Test(t, resource.TestCase{
+	rName := makeTestVariable(acctest.RandString(5))
+
+	resource.{% if unique_attribute | length > 0%}Parallel{% endif %}Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
 		Steps: append([]resource.TestStep{
 			{
-				Config: CreateAcc{{name | pascalize}}Config(),
+				Config: CreateAcc{{name | pascalize}}Config(rName),
 				Check: testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Exists(resourceName, &{{name | camelize}}_default),
 			},
-		},generateStepForUpdatedAttr(resourceName, &{{name | camelize}}_default, &{{name | camelize}}_updated)...),
+		},generateStepForUpdatedAttr{{name | pascalize}}(rName, resourceName, &{{name | camelize}}_default, &{{name | camelize}}_updated)...),
 	})
 }
 
@@ -80,18 +84,17 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_NegativeCases(t *t
 	resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
 	
 	// [TODO]: Add makeTestVariable() to utils.go file
-	// rName := makeTestVariable(acctest.RandString(5))
-	// rOther := makeTestVariable(acctest.RandString(5))
+	rName := makeTestVariable(acctest.RandString(5))
 	
-	resource.Test(t, resource.TestCase{
+	resource.{% if unique_attribute | length > 0%}Parallel{% endif %}Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
 		Steps: append([]resource.TestStep{
 			{
-				Config: CreateAcc{{name | pascalize}}Config(),
+				Config: CreateAcc{{name | pascalize}}Config(rName),
 			},
-		},generateNegativeSteps(resourceName)...),
+		},generateNegativeSteps{{name | pascalize}}(rName, resourceName)...),
 	})
 }
 
@@ -100,13 +103,13 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_NegativeCases(t *t
 
 {% if testHelper.multipleCreateDeleteAttr.value != "" %}
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_MultipleCreateDelete(t *testing.T) {
-	resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
+	// resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
 	
 	// [TODO]: Add makeTestVariable() to utils.go file
 	// rName := makeTestVariable(acctest.RandString(5))
 	// rOther := makeTestVariable(acctest.RandString(5))
 	
-	resource.Test(t, resource.TestCase{
+	resource.{% if unique_attribute | length > 0 %}Parallel{% endif %}Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
@@ -123,19 +126,19 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_MultipleCreateDele
 {# --------------------------------Print Functions for Basic Test Cases-------------------------------------------------- #}
 {{testHelper.genAllRequiredAttr(name,provider_name,schemas)}}
 {{testHelper.printFunctionWithoutRequiredArguments(name, provider_name, schemas)}}
-{{testHelper.printFunctionForConfig(name, provider_name, schemas)}}
-{{testHelper.printFunctionForConfigWithOptional(name,provider_name,schemas)}}
+{{testHelper.printFunctionForConfig(name, provider_name, schemas, unique_attribute)}}
+{{testHelper.printFunctionForConfigWithOptional(name,provider_name,schemas, unique_attribute)}}
 {{testHelper.printGenerateStepsForUpdatedRequiredAttr(name,provider_name,schemas) -}}
 {{testHelper.printFunctionForUpdateRequiredAttribute(name,provider_name,schemas)}}
 
 
 {# --------------------------------Print Functions for Update Test Cases------------------------------------------------- #}
 {{testHelper.genUpdateFunction(name, provider_name, schemas)}}
-{{testHelper.printFunctionForUpdatedAttr(name, provider_name, schemas)}}
-{{testHelper.printGenerateStepsForUpdatedAttr(name,provider_name,schemas)}}
+{{testHelper.printFunctionForUpdatedAttr(name, provider_name, schemas, unique_attribute)}}
+{{testHelper.printGenerateStepsForUpdatedAttr(name,provider_name,schemas, unique_attribute)}}
 
 {# --------------------------------Print Functions for Negative Test Cases----------------------------------------------- #}
-{{testHelper.printGenerateNegativeSteps(name,provider_name,schemas)}}
+{{testHelper.printGenerateNegativeSteps(name,provider_name,schemas, unique_attribute)}}
 
 {# --------------------------------Print Functions for Multiple Create Delete Test Cases--------------------------------- #}
 {{testHelper.printFunctionForMultipleConfig(name,provider_name,schemas)}}
@@ -148,7 +151,7 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_MultipleCreateDele
 
 {# --------------------------------Print Functions to Get Parent Blocks alongwith Self Block----------------------------- #}
 {{testHelper.printGetParent(name,provider_name,schemas)}}
-{{testHelper.printBlock(name,provider_name,schemas)}}
+{{testHelper.printBlock(name,provider_name,schemas,unique_attribute)}}
 
 
 // To eliminate duplicate resource block from slice of resource blocks

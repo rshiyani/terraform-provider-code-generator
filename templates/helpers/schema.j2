@@ -39,7 +39,7 @@
 
 {% macro checkDefault(default) %}
     {% if default is defined  %}
-        Default: {{default}},
+        Default: "{{default}}",
     {% endif %}
 {% endmacro %}
 
