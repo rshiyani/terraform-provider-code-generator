@@ -33,7 +33,7 @@ def generate_resource_file(file, provider_name):
 
     # to save the results
     try:
-        with open(f"output/resources/{provider_name}_resource_{file}.go", "w") as fh:
+        with open(f"output/resources/resource_{provider_name}_{file}.go", "w") as fh:
             fh.write(template.render(config))
     except Exception as e:
         print("Error: ", e)
@@ -140,7 +140,7 @@ def generate_datasource_test_file(file, provider_name):
 
     # to save the results
     try:
-        with open(f"output/datasources/{provider_name}_datasource_{file}_test.go", "w") as fh:
+        with open(f"output/datasources/datasource_{provider_name}_{file}_test.go", "w") as fh:
             fh.write(template.render(config))
     except Exception as e:
         print("Error: ", e)
@@ -181,7 +181,7 @@ def generate_datasource_file(file,provider_name):
 
     # to save the results
     try:
-        with open(f"output/datasources/{provider_name}_datasource_{file}.go", "w") as fh:
+        with open(f"output/datasources/datasource_{provider_name}_{file}.go", "w") as fh:
             fh.write(template.render(config))
     except Exception as e:
         print("Error: ", e)

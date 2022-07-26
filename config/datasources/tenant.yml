@@ -1,0 +1,25 @@
+name: Tenant
+provider_name: Aci
+imports:
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+unique_attribute:
+  - "name"
+schemas:
+- attribute: name
+  type: string
+  description: Name of Tenant
+  forcenew: true
+  required: true
+- attribute: name_alias
+  type: string
+  description: annotation for Tenant
+  computed: true
+- attribute: description
+  type: string
+  description: description for Tenant
+  computed: true
+- attribute: annotation
+  type: string
+  description: Annotation for Tenant
+  computed: true

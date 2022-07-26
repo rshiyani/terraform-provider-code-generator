@@ -75,6 +75,10 @@ var providerFactories = map[string]func() (*schema.Provider, error){
 	},
 }
 
+func makeTestVariable(s string) string {
+	return fmt.Sprintf("TestAcc_%v", s)
+}
+
 
 func searchInObject(testMap map[string]interface{}, attr string) interface{} {
 	jsonStr, _ := json.Marshal(testMap)

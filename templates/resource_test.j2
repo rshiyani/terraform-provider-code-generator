@@ -55,7 +55,7 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_Basic(t *testing.T
 			{
 				Config: CreateAcc{{name | pascalize}}Config(rName),
 			},
-		}, generateStepForUpdatedRequiredAttr{{name | pascalize}}(resourceName, &{{name | camelize}}_default, &{{name | camelize}}_updated)...),
+		}, generateStepForUpdatedRequiredAttr{{name | pascalize}}(rName,resourceName, &{{name | camelize}}_default, &{{name | camelize}}_updated)...),
 	})
 }
 
@@ -103,11 +103,9 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_NegativeCases(t *t
 
 {% if testHelper.multipleCreateDeleteAttr.value != "" %}
 func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_MultipleCreateDelete(t *testing.T) {
-	// resourceName := "{{provider_name | camelize}}_{{name | snakify}}.test"
 	
 	// [TODO]: Add makeTestVariable() to utils.go file
-	// rName := makeTestVariable(acctest.RandString(5))
-	// rOther := makeTestVariable(acctest.RandString(5))
+	rName := makeTestVariable(acctest.RandString(5))
 	
 	resource.{% if unique_attribute | length > 0 %}Parallel{% endif %}Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -115,7 +113,7 @@ func TestAcc{{provider_name | pascalize}}{{name | pascalize}}_MultipleCreateDele
 		CheckDestroy:      testAccCheck{{provider_name | pascalize}}{{name | pascalize}}Destroy,
 		Steps: []resource.TestStep{
 			{
-				Config: CreateAcc{{name | pascalize}}MultipleConfig(),
+				Config: CreateAcc{{name | pascalize}}MultipleConfig(rName),
 			},
 		},
 	})

@@ -451,7 +451,7 @@ def generate_resource_test_file(filename,provider_name):
 
     # to save the results
     try:
-        with open(f"output/resources/{provider_name}_resource_{filename}_test.go", "w") as fh:
+        with open(f"output/resources/resource_{provider_name}_{filename}_test.go", "w") as fh:
             fh.write(template.render(config))
     except Exception as e:
         print("Error: ", e)
