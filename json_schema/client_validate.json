@@ -19,19 +19,6 @@
       }
     },
     
-    "baseURL": {
-      "title": "Base URL",
-      "description": "(required) The Base URL to which all of the HTTP calls will be made",
-      "examples": [
-        "http://example.com",
-        "http://localhost:8000"
-      ],
-      "default": "http://localhost:8000",
-      "type": "string",
-      "format": "uri",
-      "qt-uri-protocols": ["http"]
-    },
-    
     "endpoints": {
       "title": "endpoints",
       "description": "(conditional) Defines the path, name, overwriteBaseURL, params and the http methods (GET, POST, PUT, and DELETE). At least one of the HTTP method must be present for every item in this array. One of the endpoints, data, or both should be defined.",
@@ -47,7 +34,6 @@
     }
   },
 
-  "required": ["baseURL"],
   "anyOf": [
     { "required": ["endpoints"] },
     { "required": ["data"] }

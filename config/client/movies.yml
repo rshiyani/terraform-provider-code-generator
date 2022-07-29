@@ -1,15 +1,7 @@
-kind: client
-
-# optional
-# third-party libraries that can't be included automatically.
 include:
   - "github.com/RutvikS-crest/movies-go-client/client"
   - "github.com/RutvikS-crest/movies-go-client/models"
 
-# required
-baseURL: "http://localhost:8000"
-
-# required
 endpoints: 
   - path: "/movies"
     name: movie
@@ -27,14 +19,14 @@ endpoints:
           value: m
       unique: id
         
-  - path: /movies/id                            # required
-    overwriteBaseURL: "http://localhost:1234"   # optional
-    name: movie                                 # required !?
+  - path: /movies/id   
+    overwriteBaseURL: "http://localhost:1234"
+    name: movie
     params:
-      - id                                      # any dynamic attribute of the path
+      - id
     GET:
-      funcName: GetMovieById                    # optional, if omitted, will be <methodname><name> eg: getMovie in this case
-      args:                                     # arguments to the function 
+      funcName: GetMovieById
+      args:
         - name: id
           type: string
           fromPostResponse: true
