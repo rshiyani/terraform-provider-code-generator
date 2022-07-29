@@ -1,0 +1,131 @@
+kind: client
+
+# optional
+# third-party libraries that can't be included automatically.
+include:
+  - "github.com/RutvikS-crest/movies-go-client/client"
+  - "github.com/RutvikS-crest/movies-go-client/models"
+
+# required
+baseURL: "http://localhost:8000"
+
+# required
+endpoints: 
+  - path: "/movies"
+    name: movie
+    GET:
+      funcName: GetAllMovies
+
+  - path: "/movies"
+    name: movie
+    POST:
+      args:
+        - name: movie
+          type: models.MovieAttributes
+          send: true
+          pointer: true
+          value: m
+      unique: id
+        
+  - path: /movies/id                            # required
+    overwriteBaseURL: "http://localhost:1234"   # optional
+    name: movie                                 # required !?
+    params:
+      - id                                      # any dynamic attribute of the path
+    GET:
+      funcName: GetMovieById                    # optional, if omitted, will be <methodname><name> eg: getMovie in this case
+      args:                                     # arguments to the function 
+        - name: id
+          type: string
+          fromPostResponse: true
+    PUT:
+      args:
+        - name: id
+          type: string
+          fromPostResponse: true
+        - name: movie
+          type: models.MovieAttributes
+          send: true
+          pointer: true
+          value: mu
+    DELETE:
+      args:
+        - name: id
+          type: string
+          fromPostResponse: true
+
+data:
+  - name: r
+    type: models.Rating
+    attributes:
+      Rater:
+        type: string
+        value: someone
+      Rating:
+        type: float64
+        value: 8.4
+
+  - name: d
+    type: models.Director
+    attributes:
+      Firstname:
+        type: string
+        value: Victor
+      Lastname:
+        type: string
+        value: Fleming
+
+  - name: m 
+    type: models.MovieAttributes
+    attributes:
+      Title:
+        type: string
+        value: The Wizard of Ox
+      Isbn:
+        type: string
+        value: tt0032138
+      Director:
+        type: struct
+        struct: models.Director
+        reference: true
+        value: d
+      CastIDs:
+        type: list
+        subtype: string
+        values: 
+          - "12dff08d6c3643b594a2b6030a1f83f5"
+          - "c746e1ab577a431d9957ed32c79164e6"
+      Ratings:
+        type: list
+        subtype: models.Rating
+        values:
+          - r
+      Genre:
+        type: string
+        value: comedy
+
+  - name: mu 
+    type: models.MovieAttributes
+    attributes:
+      Title:
+        type: string
+        value: The Wizard of Ox
+      Isbn:
+        type: string
+        value: tt0032138
+      Director:
+        type: struct
+        struct: models.Director
+        reference: true
+        value: d
+      CastIDs:
+        type: list
+        subtype: string
+        values: 
+          - "12dff08d6c3643b594a2b6030a1f83f5"
+          - "c746e1ab577a431d9957ed32c79164e6"
+      Ratings:
+        type: list
+        subtype: models.Rating
+        values:
+          - r
