@@ -21,89 +21,60 @@ generate = args.generate.split(",")
 inputs = args.input.split(",")
 pname=args.pname
 
+dirs = ['./output', './output/resources', './output/datasources', './output/models', './output/client']
+for dir in dirs:
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
 
-isDir = os.path.isdir('./output')
-if not isDir:
-    os.mkdir('./output')
-isDirResources = os.path.isdir('./output/resources')
-if not isDirResources:
-    os.mkdir('./output/resources')
-isDirDatasources = os.path.isdir('./output/datasources')
-if not isDirDatasources:
-    os.mkdir('./output/datasources')
-isDirModels = os.path.isdir('./output/models')
-if not isDirModels:
-    os.mkdir('./output/models')
+isConfigResources = os.path.isdir('./config/resources')
+isConfigProvider = os.path.isfile("./config/provider.yml")
+isConfigDatasources = os.path.isdir('./config/datasources')
+isConfigClient = os.path.isdir('./config/client')
 
+resourceInputs = None
+datasourceInput = None
+clientInputs = None
 
 if "all" in inputs:
-    if "all" in generate:
-        isConfigResources = os.path.isdir('./config/resources')
-        if isConfigResources:
-            inputs = os.listdir("./config/resources")
-            generate_resource(inputs, pname)
-            generate_resource_test(inputs, pname)
-            generate_model(inputs,pname)  
-        isConfigProvider = os.path.isfile("./config/provider.yml")
-        if isConfigProvider:
-            generate_provider_test()
-            generate_provider()  
-        isConfigDatasources = os.path.isdir('./config/datasources')
-        if isConfigDatasources:
-            inputs = os.listdir("./config/datasources")
-            generate_datasource(inputs,pname)
-            generate_datasource_test(inputs,pname)    
-    else:
-        if "resource" in generate and os.path.isdir("./config/resources"):
-            inputs = os.listdir("./config/resources")
-            generate_resource(inputs, pname)
-        if "resource_test" in  generate and os.path.isdir("./config/resources"):
-            inputs = os.listdir("./config/resources")
-            generate_resource_test(inputs, pname)
-        if "provider_test" in generate and os.path.isfile("./config/provider.yml"):
-            generate_provider_test()
-        if "provider" in generate and os.path.isfile("./config/provider.yml"):
-            generate_provider()    
-        if "datasource" in generate and os.path.isdir("./config/datasources"):
-            inputs = os.listdir("./config/datasources")
-            generate_datasource(inputs,pname)
-        if "datasource_test" in generate and os.path.isdir("./config/datasources"):
-            inputs = os.listdir("./config/datasources")
-            generate_datasource_test(inputs,pname)    
-        if "model" in generate and os.path.isdir("./config/resources"):
-            inputs = os.listdir("./config/resources")
-            generate_model(inputs,pname)
-            
+    resourceInputs = os.listdir("./config/resources")
+    datasourceInput = os.listdir("./config/datasources")
+    clientInputs = os.listdir('./config/client')
 else:
-    if "all" in generate:
-        isConfigResources = os.path.isdir('./config/resources')
-        if isConfigResources:
-            generate_resource(inputs, pname)
-            generate_resource_test(inputs, pname)
-            generate_model(inputs,pname)  
-        isConfigProvider = os.path.isfile("./config/provider.yml")
-        if isConfigProvider:
-            generate_provider_test()
-            generate_provider()  
-        isConfigDatasources = os.path.isdir('./config/datasources')
-        if isConfigDatasources:
-            generate_datasource(inputs,pname)
-            generate_datasource_test(inputs,pname) 
-    else:
-        if "resource" in generate and os.path.isdir("./config/resources"):
-            generate_resource(inputs, pname)
-        if "resource_test" in  generate and os.path.isdir("./config/resources"):
-            generate_resource_test(inputs, pname)
-        if "provider_test" in generate and os.path.isfile("./config/provider.yml"):
-            generate_provider_test()
-        if "provider" in generate and os.path.isfile("./config/provider.yml"):
-            generate_provider()    
-        if "datasource" in generate and os.path.isdir("./config/datasources"):
-            generate_datasource(inputs,pname)
-        if "datasource_test" in generate and os.path.isdir("./config/datasources"):
-            generate_datasource_test(inputs,pname)
-        if "model" in generate and os.path.isdir("./config/resources"):
-            generate_model(inputs,pname)
+    resourceInputs = datasourceInput = clientInputs = inputs
+   
+if "all" in generate:
+    if isConfigResources:
+        generate_resource(resourceInputs, pname)
+        generate_resource_test(resourceInputs, pname)
+        generate_model(resourceInputs, pname)
+    if isConfigProvider:
+        generate_provider_test()
+        generate_provider()
+    if isConfigDatasources:
+        generate_datasource(datasourceInput, pname)
+        generate_datasource_test(datasourceInput, pname)
+    if isConfigClient:
+        generate_client(clientInputs)
+        generate_client_test(clientInputs)
+else:
+    if "resource" in generate and isConfigResources:
+        generate_resource(resourceInputs, pname)
+    if "resource_test" in generate and isConfigResources:
+        generate_resource_test(resourceInputs, pname)
+    if "provider_test" in generate and isConfigProvider:
+        generate_provider_test()
+    if "provider" in generate and isConfigProvider:
+        generate_provider()    
+    if "datasource" in generate and isConfigDatasources:
+        generate_datasource(datasourceInput, pname)
+    if "datasource_test" in generate and isConfigDatasources:
+        generate_datasource_test(datasourceInput, pname)    
+    if "model" in generate and isConfigResources:
+        generate_model(resourceInputs, pname)
+    if "client" in generate and isConfigClient:
+        generate_client(clientInputs)
+    if "client_test" in generate and isConfigClient:
+        generate_client_test(clientInputs)
 
 # Formatting the go files created
 format_all_files()

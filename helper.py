@@ -248,3 +248,41 @@ def generate_model(files,provider_name):
         if not status:
             exit()
     
+def generate_client_test(inputs):
+    generate_client(inputs, "client_test.j2", "_test.go", " test")
+
+def generate_client(inputs, template="client.j2", postfix=".go", test = ""):
+    for file in inputs:
+        # check that file exists
+        file = file.split(".")[0] + ".yml"
+        fileExists = os.path.isfile(f"./config/client/{file}")
+        if not fileExists:
+            print(f"=== WARNING: ./config/client/{file} does not exist, skipping.")
+            continue
+        
+        # parse yaml
+        print(f"=== INFO: Beginning creation of client{test} for {file}")
+        try:
+            config = yaml.full_load(open(f'./config/client/{file}'))
+        except Exception as e:
+            print(f"=== ERROR: Error parsing {file}. skipping.")
+            print(e)
+            continue
+        
+        # load jinja environment
+        env = Environment(loader=FileSystemLoader('./templates'),
+                    trim_blocks=True, lstrip_blocks=True)
+        template = env.get_template(f'{template}')
+
+        # render the template
+        filename = file.split(".")[0]
+        try:
+            with open(f"output/client/{filename}{postfix}", "w") as fh:
+                fh.write(template.render(config))
+        except Exception as e:
+            print(f"=== ERROR: This error may have happened due to insufficient write permissions or due to some syntatical error in the jinja template. Refer the error below for more info.")
+            print(e)
+            continue
+
+        print(f"=== INFO: Created - client{test} for {file}")
+        return
