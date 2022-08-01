@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "title": "Resource Schema",
     "description": "It include provider_name,name,imports and schemas.",
-    "required": [ "provider_name","name","imports","unique_attributes","schemas" ],
+    "required": [ "provider_name","name","imports","unique_attribute","schemas" ],
     "type" :"object",
     "additionalProperties": false,
     "properties": {
@@ -30,7 +30,7 @@
                           "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
                         ]
         },
-        "unique_attributes":{
+        "unique_attribute":{
             "type":"array",
             "title": "Unique Attributes",
             "description": "Enter unique attributes for parallel testing.",
@@ -86,7 +86,7 @@
                         "enum":[true]
                     },
                     "default":{
-                        "type": "number",
+                        "type": ["number","string"],
                         "title": "Default",
                         "description": "Terraform will use that value when this item is not set in the configuration."
                     },
@@ -449,7 +449,7 @@
                         "enum":[true]
                     },
                     "default":{
-                        "type": "number",
+                        "type": ["number","string"],
                         "title": "Default",
                         "description": "Terraform will use that value when this item is not set in the configuration."
                     },

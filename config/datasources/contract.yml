@@ -1,9 +1,11 @@
+# yaml-language-server: $schema=../../json_schema/datasource_validate.json
 provider_name: "Aci"
 name: "Contract"
 imports:
   - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
   - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-
+unique_attribute:
+  - "name"
 schemas:
   - attribute: "name"
     type: "string"

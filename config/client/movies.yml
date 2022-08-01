@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../json_schema/client_validate.json
 include:
   - "github.com/RutvikS-crest/movies-go-client/client"
   - "github.com/RutvikS-crest/movies-go-client/models"

@@ -1,5 +1,6 @@
-name: Tenant
+# yaml-language-server: $schema=../../json_schema/datasource_validate.json
 provider_name: Aci
+name: Tenant
 imports:
   - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 

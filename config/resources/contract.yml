@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../json_schema/resource_validate.json
 provider_name: "Aci"
 name: "Contract"
 imports:
