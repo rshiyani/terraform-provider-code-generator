@@ -20,9 +20,9 @@ schemas:
       - id
 - attribute: name
   type: string
+  computed: true
   description: Name of Application Profile
-  forcenew: true
-  required: true
+    
 - attribute: name_alias
   type: string
   description: Name Alias for Application Profile

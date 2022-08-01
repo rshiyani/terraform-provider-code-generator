@@ -37,98 +37,98 @@ types:
     invalid:
     - a3+J1b%mFs//
     multiple_valids:
-    - aHVqNGQzcHlmcQ==
-    - ajA1ODE4a2ltOA==
-    - NnJsbzVjemFmNQ==
-    - bmU3bzA2enRydQ==
-    - YXJxb21lOTZpbg==
-    - cnhtMWRsaTRibw==
-    - d2UwYTN6d296OQ==
-    - d2NndjFjNTVuMg==
-    - NmViZnljd2V0NQ==
-    - amQ0bWt4N3MydA==
-    - bjZ0NHZteTV3MQ==
-    - dXJsdHQxemhrbQ==
-    - cnhwMjVsbzJtcw==
-    - bzZrODMzZDdicg==
-    - NDk5aHoyY2ZtMg==
+    - aDQ5NnIybDNnYg==
+    - bzZpZml5ZnBlaQ==
+    - bHhkOHV3Mzc5Zw==
+    - azRlbG13bTkyZA==
+    - ZTQ4a2F1enZuMQ==
+    - YWNiN3BsaWhqbQ==
+    - ODMxbGF0eXVndw==
+    - Mjl2Ym5ldjQ1bg==
+    - bGRsYTI2amlmMA==
+    - MTIxdDhkazB6eg==
+    - bm5mZHI3dm9yYw==
+    - ZWI5M2d3d2t3OA==
+    - b2Jmcmc5MzN6NQ==
+    - MW9vZmk4OHZubQ==
+    - b3VvMGk3Nm85aQ==
     valid:
-    - bGFoMGp2c2o3ZA==
-    - NWhpY2xrbDZ5Zg==
-    - aTNwZTVkNzJ3ZA==
-    - MG1sMTNuczk1MQ==
+    - YTZtZDB0dTdoZg==
+    - OGRycTRmbGJpNw==
+    - ZndieTkzcWFkdg==
+    - Ymk3MWZqODBsOQ==
   cidr:
     invalid:
-    - 264.290.269.260/23
+    - 263.276.290.281/12
     multiple_valids:
-    - 253.99.32.0/20
-    - 253.99.160.0/20
-    - 253.99.176.0/20
-    - 253.99.0.0/20
-    - 253.99.192.0/20
-    - 253.99.128.0/20
-    - 253.99.16.0/20
-    - 253.99.80.0/20
-    - 253.99.112.0/20
-    - 253.99.208.0/20
-    - 253.99.96.0/20
-    - 253.99.144.0/20
-    - 253.99.48.0/20
-    - 253.99.64.0/20
-    - 253.99.224.0/20
+    - 58.25.160.0/20
+    - 58.25.112.0/20
+    - 58.25.240.0/20
+    - 58.25.192.0/20
+    - 58.25.0.0/20
+    - 58.25.48.0/20
+    - 58.25.16.0/20
+    - 58.25.64.0/20
+    - 58.25.32.0/20
+    - 58.25.96.0/20
+    - 58.25.176.0/20
+    - 58.25.208.0/20
+    - 58.25.224.0/20
+    - 58.25.80.0/20
+    - 58.25.144.0/20
     valid:
-    - 253.99.32.0/20
-    - 253.99.160.0/20
-    - 253.99.176.0/20
-    - 253.99.0.0/20
+    - 58.25.160.0/20
+    - 58.25.112.0/20
+    - 58.25.240.0/20
+    - 58.25.192.0/20
   ipv4:
     invalid:
-    - 271.276.257.293
+    - 292.279.299.298
     multiple_valids:
-    - 253.99.29.58
-    - 253.99.21.65
-    - 253.99.143.169
-    - 253.99.49.65
-    - 253.99.189.47
-    - 253.99.22.6
-    - 253.99.14.255
-    - 253.99.166.18
-    - 253.99.248.97
-    - 253.99.138.116
-    - 253.99.150.163
-    - 253.99.176.200
-    - 253.99.222.109
-    - 253.99.198.59
-    - 253.99.215.246
+    - 58.25.97.146
+    - 58.25.234.54
+    - 58.25.184.167
+    - 58.25.96.86
+    - 58.25.137.198
+    - 58.25.11.60
+    - 58.25.55.8
+    - 58.25.36.88
+    - 58.25.119.124
+    - 58.25.121.81
+    - 58.25.190.158
+    - 58.25.150.207
+    - 58.25.19.211
+    - 58.25.78.17
+    - 58.25.70.52
     valid:
-    - 253.99.29.58
-    - 253.99.21.65
-    - 253.99.143.169
-    - 253.99.49.65
+    - 58.25.97.146
+    - 58.25.234.54
+    - 58.25.184.167
+    - 58.25.96.86
   ipv6:
     invalid:
     - invalidIPv6
     multiple_valids:
-    - 2001:db8::34f4:0:0:f32c
-    - 2001:db8::34f4:0:0:f314
     - 2001:db8::34f4:0:0:f317
-    - 2001:db8::34f4:0:0:f3d5
-    - 2001:db8::34f4:0:0:f38b
-    - 2001:db8::34f4:0:0:f36e
-    - 2001:db8::34f4:0:0:f3a9
-    - 2001:db8::34f4:0:0:f34e
-    - 2001:db8::34f4:0:0:f335
-    - 2001:db8::34f4:0:0:f39a
-    - 2001:db8::34f4:0:0:f383
-    - 2001:db8::34f4:0:0:f380
-    - 2001:db8::34f4:0:0:f325
-    - 2001:db8::34f4:0:0:f324
+    - 2001:db8::34f4:0:0:f36b
+    - 2001:db8::34f4:0:0:f30e
+    - 2001:db8::34f4:0:0:f310
+    - 2001:db8::34f4:0:0:f3e4
+    - 2001:db8::34f4:0:0:f36d
+    - 2001:db8::34f4:0:0:f323
+    - 2001:db8::34f4:0:0:f391
+    - 2001:db8::34f4:0:0:f363
     - 2001:db8::34f4:0:0:f345
+    - 2001:db8::34f4:0:0:f3a2
+    - 2001:db8::34f4:0:0:f3f0
+    - 2001:db8::34f4:0:0:f313
+    - 2001:db8::34f4:0:0:f3a8
+    - 2001:db8::34f4:0:0:f332
     valid:
-    - 2001:db8::34f4:0:0:f32c
-    - 2001:db8::34f4:0:0:f314
     - 2001:db8::34f4:0:0:f317
-    - 2001:db8::34f4:0:0:f3d5
+    - 2001:db8::34f4:0:0:f36b
+    - 2001:db8::34f4:0:0:f30e
+    - 2001:db8::34f4:0:0:f310
   json:
     invalid:
     - 'json({ name : val)'
@@ -157,26 +157,26 @@ types:
     invalid:
     - invalidMAC
     multiple_valids:
-    - 03:11:85:fe:63:a5
-    - 35:bd:b5:41:20:fe
-    - c6:5f:71:61:25:70
-    - d1:ae:18:ea:27:e6
-    - 42:63:dc:bb:66:82
-    - 31:c7:87:fd:d5:10
-    - 47:97:9c:b7:3d:34
-    - 65:29:7f:71:4a:97
-    - 57:d5:5a:0d:bb:b7
-    - ca:bf:1e:03:25:41
-    - e9:c9:ba:b0:a1:22
-    - 1e:f4:ab:12:1c:9b
-    - 6a:f2:53:4d:c4:8e
-    - 7a:27:d7:51:b7:00
-    - cc:7e:03:94:0b:74
+    - 89:af:41:a2:53:d5
+    - 5f:1f:a4:a8:99:24
+    - e5:4e:ff:70:37:8a
+    - 29:b2:53:61:98:bf
+    - 9c:8c:f9:21:26:ef
+    - 5c:a4:bc:67:c8:45
+    - 11:7a:c1:fd:ec:91
+    - 9c:56:3b:5d:8b:86
+    - 3e:76:43:0f:1b:3c
+    - 46:ed:f3:b2:43:b1
+    - 43:36:53:bd:8e:d2
+    - dd:a3:3f:ba:49:d8
+    - f9:53:bb:af:eb:7d
+    - 54:be:05:27:84:e4
+    - 23:33:ab:87:13:a8
     valid:
-    - 1e:c7:0d:8f:8b:03
-    - 26:ca:aa:64:ca:66
-    - 39:9e:3e:fb:f5:a9
-    - 9c:36:6a:cd:21:3a
+    - 78:42:fb:b2:d8:87
+    - 0c:42:82:e4:59:53
+    - da:0e:2d:6f:e9:f8
+    - 92:91:c6:f3:25:af
   regex:
     invalid:
     - '[0-9)++'
@@ -190,119 +190,119 @@ types:
     invalid:
     - 12345
     multiple_valids:
-    - e59x5eptnc
-    - vqmvgnwyg8
-    - 0ci1vfeihh
-    - 09p8r4hkh4
-    - fooejn4wl5
-    - 2hpi34mhwu
-    - hn5t1zvc8g
-    - fpk288rjf8
-    - ntaye5na53
-    - 74r6rq295z
-    - 89cpjjixxq
-    - v8l7a9ejm2
-    - 5dj4550xku
-    - 83idjda7ck
-    - gnbhtsmxu0
+    - t67yrlhg05
+    - vwpvik5teo
+    - 6vfcgf8rtl
+    - fw9qa3uimo
+    - 0rsmr8mkt3
+    - agx9e6bz6o
+    - 7u4g52f36c
+    - f97gx28sh6
+    - 8adoldxh9u
+    - zfh04in5so
+    - 3scuace8se
+    - ab8lbpyvye
+    - 7zvcsdxasd
+    - uns0cfsv0i
+    - r5lstronqj
     valid:
-    - coo2t07lgd
-    - c4yur05oh7
-    - l575lv2p7f
-    - 7dg5j5dtdl
+    - kixql3a8ir
+    - m3oii1aeps
+    - hhon7mdeqt
+    - jbaor4jpd7
   time:
     invalid:
-    - '2022-07-29 11:24:23.431555'
+    - '2022-08-01 17:50:46.328843'
     multiple_valids:
-    - '2022-07-29T05:54:23.431555+00:00'
-    - '2022-08-21T05:54:23.431555+00:00'
-    - '2022-09-13T05:54:23.431555+00:00'
-    - '2022-10-06T05:54:23.431555+00:00'
-    - '2022-10-29T05:54:23.431555+00:00'
-    - '2022-11-21T05:54:23.431555+00:00'
-    - '2022-12-14T05:54:23.431555+00:00'
-    - '2023-01-06T05:54:23.431555+00:00'
-    - '2023-01-29T05:54:23.431555+00:00'
-    - '2023-02-21T05:54:23.431555+00:00'
-    - '2023-03-16T05:54:23.431555+00:00'
-    - '2023-04-08T05:54:23.431555+00:00'
-    - '2023-05-01T05:54:23.431555+00:00'
-    - '2023-05-24T05:54:23.431555+00:00'
-    - '2023-06-16T05:54:23.431555+00:00'
+    - '2022-08-01T12:20:46.328843+00:00'
+    - '2022-08-24T12:20:46.328843+00:00'
+    - '2022-09-16T12:20:46.328843+00:00'
+    - '2022-10-09T12:20:46.328843+00:00'
+    - '2022-11-01T12:20:46.328843+00:00'
+    - '2022-11-24T12:20:46.328843+00:00'
+    - '2022-12-17T12:20:46.328843+00:00'
+    - '2023-01-09T12:20:46.328843+00:00'
+    - '2023-02-01T12:20:46.328843+00:00'
+    - '2023-02-24T12:20:46.328843+00:00'
+    - '2023-03-19T12:20:46.328843+00:00'
+    - '2023-04-11T12:20:46.328843+00:00'
+    - '2023-05-04T12:20:46.328843+00:00'
+    - '2023-05-27T12:20:46.328843+00:00'
+    - '2023-06-19T12:20:46.328843+00:00'
     valid:
-    - '2022-07-29T05:54:23.431555+00:00'
-    - '2022-08-21T05:54:23.431555+00:00'
-    - '2022-09-13T05:54:23.431555+00:00'
-    - '2022-10-06T05:54:23.431555+00:00'
+    - '2022-08-01T12:20:46.328843+00:00'
+    - '2022-08-24T12:20:46.328843+00:00'
+    - '2022-09-16T12:20:46.328843+00:00'
+    - '2022-10-09T12:20:46.328843+00:00'
   url-http:
     invalid:
-    - ht:/ztth0onlnq01e8y.com
+    - ht:/ceyz1n2z8oe8vti.com
     multiple_valids:
-    - http://4151iigpc2rp73r.com
-    - http://qy922td6xe5a4o4.com
-    - http://lsryw4rj9dot02r.com
-    - http://htk27litib6yhxc.com
-    - http://35vijzd98r1y6s5.com
-    - http://dx9yb6zzxqg90tr.com
-    - http://axf9cfo15owbrn8.com
-    - http://vtg57xoni7s9sc0.com
-    - http://ed9x1r28qzhxykv.com
-    - http://ty1vkwnuj6bsg61.com
-    - http://g502e6r52yxww2v.com
-    - http://q35xaj5mped2psk.com
-    - http://ki65h83l8zg81le.com
-    - http://7iymap2cp3rbil5.com
-    - http://9n6viaholnvslii.com
+    - http://bk9ezoccu5ddjim.com
+    - http://ibmfdkf9vk7bfdi.com
+    - http://k7exh41jv5sbf9c.com
+    - http://0f2t7dq22lbxa5i.com
+    - http://s7qsvfw8vikb179.com
+    - http://g1i69hmugigq4ox.com
+    - http://nf3tiq2d2fvesbq.com
+    - http://0c59lvlbq7y3x53.com
+    - http://kfe3k5b8wfzsj1g.com
+    - http://vogh0x3vxnncwqg.com
+    - http://lqnkoyn5yxxdk4o.com
+    - http://ickbjth8xwa3n8u.com
+    - http://t9ipjne770ec4hm.com
+    - http://0u5izde3xi384o3.com
+    - http://cvdkjkbzmq5wulh.com
     valid:
-    - http://fu17ppqpw8hhbol.com
-    - http://mehb1nku4orcscb.com
-    - http://r2d3fxnxdfhj3qc.com
-    - http://6tcs6jxkgcuznf2.com
+    - http://dbrmrg6g7athb8i.com
+    - http://e882wzlxe4wmd9l.com
+    - http://r0e9s1qc91rzwpk.com
+    - http://lrrzazk0sjgraok.com
   url-https:
     invalid:
-    - hts:/axtvut05pv2axot.com
+    - hts:/d3dy0s8ydizz13b.com
     multiple_valids:
-    - https://i114j9fc6m9p5yk.com
-    - https://c6pehpwhqluk9py.com
-    - https://usab2j4akgu2wsr.com
-    - https://j9yy4gnwt9htr6o.com
-    - https://089gkvi07h0cqsf.com
-    - https://6m085ghz67y0jcx.com
-    - https://uc4nc2iok8r7kgv.com
-    - https://qwsjtjs4m1a03wc.com
-    - https://166zgq41fh8eymb.com
-    - https://um3b0hb0c25ivqz.com
-    - https://49xkyffb2b22vxo.com
-    - https://m1l8cxksy38sx82.com
-    - https://3otwi4i3o70sq0s.com
-    - https://lezmgeb12j3hm1h.com
-    - https://5hp4818vjoiep31.com
+    - https://0824wcyvzyu3o4y.com
+    - https://11oaxhx2n4psqos.com
+    - https://k4jiq76uerltw6f.com
+    - https://sq5bm7z88c0sh11.com
+    - https://tc9jvbealbnplzh.com
+    - https://npi4d2nggbgtg3m.com
+    - https://o1wb9ji0plkhv3a.com
+    - https://975mlgyw54z65m2.com
+    - https://gum3y1obu1izlc2.com
+    - https://4247ljn3tuxsatr.com
+    - https://68nn3k2s5raqbip.com
+    - https://4377irjr4kgr955.com
+    - https://jhcrnwim8cluv4g.com
+    - https://l0xbuq5acsyert7.com
+    - https://z8fsaoa72swecp3.com
     valid:
-    - https://z8hhnk988k4a154.com
-    - https://3lcd8983b3ciyz5.com
-    - https://a3dyv5fw9wojsow.com
-    - https://gw3pj3l4g5zlvor.com
+    - https://92suw6shxag54op.com
+    - https://7ae7s90gch3cszk.com
+    - https://4ocwovvns74683n.com
+    - https://eu9t1cmfzhbn9vv.com
   uuid:
     invalid:
     - invalid323Uuid12
     multiple_valids:
-    - e592eb25-0f02-11ed-b073-7c8ae1979a87
-    - e592eb26-0f02-11ed-a8f9-7c8ae1979a87
-    - e592eb27-0f02-11ed-b9e4-7c8ae1979a87
-    - e592eb28-0f02-11ed-84ae-7c8ae1979a87
-    - e592eb29-0f02-11ed-8817-7c8ae1979a87
-    - e592eb2a-0f02-11ed-88ba-7c8ae1979a87
-    - e592eb2b-0f02-11ed-9701-7c8ae1979a87
-    - e592eb2c-0f02-11ed-8e00-7c8ae1979a87
-    - e592eb2d-0f02-11ed-9c25-7c8ae1979a87
-    - e592eb2e-0f02-11ed-920f-7c8ae1979a87
-    - e592eb2f-0f02-11ed-a66a-7c8ae1979a87
-    - e592eb30-0f02-11ed-b312-7c8ae1979a87
-    - e592eb31-0f02-11ed-9964-7c8ae1979a87
-    - e592eb32-0f02-11ed-a1c3-7c8ae1979a87
-    - e592eb33-0f02-11ed-bd2b-7c8ae1979a87
+    - 5ee5907b-1194-11ed-93d3-dc214861057a
+    - 5ee5907c-1194-11ed-9c54-dc214861057a
+    - 5ee5907d-1194-11ed-8778-dc214861057a
+    - 5ee5907e-1194-11ed-8637-dc214861057a
+    - 5ee5907f-1194-11ed-a7c4-dc214861057a
+    - 5ee59080-1194-11ed-9cbd-dc214861057a
+    - 5ee59081-1194-11ed-8b30-dc214861057a
+    - 5ee59082-1194-11ed-9d37-dc214861057a
+    - 5ee59083-1194-11ed-8eba-dc214861057a
+    - 5ee59084-1194-11ed-98a0-dc214861057a
+    - 5ee59085-1194-11ed-ab4c-dc214861057a
+    - 5ee59086-1194-11ed-a19e-dc214861057a
+    - 5ee59087-1194-11ed-9f83-dc214861057a
+    - 5ee59088-1194-11ed-8ab5-dc214861057a
+    - 5ee59089-1194-11ed-acc7-dc214861057a
     valid:
-    - e592eb21-0f02-11ed-8272-7c8ae1979a87
-    - e592eb22-0f02-11ed-af56-7c8ae1979a87
-    - e592eb23-0f02-11ed-af7d-7c8ae1979a87
-    - e592eb24-0f02-11ed-a7b2-7c8ae1979a87
+    - 5ee59077-1194-11ed-bb7f-dc214861057a
+    - 5ee59078-1194-11ed-b98c-dc214861057a
+    - 5ee59079-1194-11ed-802b-dc214861057a
+    - 5ee5907a-1194-11ed-8f00-dc214861057a
