@@ -51,16 +51,18 @@ optional arguments:
   --pname PNAME        Enter the provider name Eg. "aws"
 ```
 
-   -> --pname(Provider Name): This flag is a required.
-   -> --generate: Here the comma seperated string is provided. By default the value of this is "all".
-      Supported Values: resource, resource_test, datasource, datasource_test, provider, provider_test, model
-   -> --input: Here the comma seperated string is provided. By default the value of this is "all".
+   - `--pname`(Provider Name): This flag is a required.
+   - `--generate`: Here the comma seperated string is provided. By default the value of this is "all". Supported Values: `resource`, `resource_test`, `datasource`, `datasource_test`, `provider`, `provider_test`, `model`, `client` and `client_test`
+   - `--input`: Comma separated list of input files, default value is `all`.
+
+   > Note: `.yaml` extension may not work. Prefer using `.yml`
    
-3. Examples:
+### Examples:
    ```
    terrajinja --pname="YourProviderName"
    ```
    Above command will generate all the terraform provider files for the ymls provided in config.
+
    ```
    terrajinja --pname="YourProviderName" --input="contract,tenant"
    ```
@@ -79,10 +81,46 @@ optional arguments:
    Above command will generate the terraform provider.go and provider_test.go file for the provider yaml provided in config.
 
 
+### YAML Guide:
 
+**client**<br/>
+For generating the terraform go client, the yaml files will go to the `/config/client` directory. An example `movies.yml` is already provided for the reference. Here's the description of every attribute of why it exists and how it will be used in the generated file.
 
+| Attribute | Description | 
+| --- | ---------- |
+| `include` | *`list of strings`* <br/>Include contains all the third party packages that needs to be imported for the execution of the go file. Built in packages will be automatically imported. Listing the packages here does not essentially do anything helpful but you can simply hover over them in vs code and install them with one click. Kinda makes the work easier. |
+| `endpoint` | *`list of objects`*<br/>Endpoints consists of the properties `path`, `name`, `GET / POST / PUT / DELETE` and `params`. At least one of the HTTP Method is required to be present. |
+| `endpoint.path` | *`string`*<br/> path is a string that holds the path to where the specified HTTP request needs to be made. |
+| `endpoint.name` | *`string`*<br/> name will be used in conjuction with the HTTP Method to generate the function name. |
+| `endpoint.params` | *`list of strings`*<br/> params is an array of strings that contains the query params from the path. for example, if the path is */movies/id* and *id* is a query param, then you can specify it in the params and it will be handled accordingly. |
+| `endpoint.overwriteBaseURL`| This is not ready to use yet, can be ignored. |
+| `endpoint.METHOD`| *`object`* <br/> Every method will contain 2 properties. `funcName` and `args`. POST Method can contain one additional property `unique`. the value for unique attribute can be set the unique identifier variable name of the resource from the response. |
+| `endpoint.METHOD.funcName`| *`string`*<br/>`funcName` is a string denoting the function name. In case you'd like to specify a name yourself, or in conflicting scenarios, such as when there exists multiple methods of the same type on endpoints who have same value for the `name` attribute.|
+| `endpoint.METHOD.args`| *`string`*<br/>Args refers to the arguments the function created will have. it will have the following properties: `name`, `type`, `send`, `pointer`, and `value`. The first two are self-explanatory. `send` indicates if this argument is to be sent as payload when making the request, pointer indicates that this argument will be a pointer, and value can be statically defined if its a primitive variable otherwise will be a reference to one of the item from the `data` section. Value will be used for the testing purposes when calling the  function. Other methods can also contain `fromPostResponse`, that will us the id of the resource acquired from POST call as value.|
+| `data`| *`list of objects`*<br/> This contains all the non-primitive values for variables such as structs. This section is very much similar to args hence not explained in depth.|
+
+It is recommended to create endpoints in the particular order of `POST -> GET -> PUT -> DELETE`. This way, you can use the `fromPostRequest` attribute in the subsequent endpoints to perform the GET, PUT and DELETE operations on the same resource created with the POST call.
+
+This ensures that the resource will be deleted every time and ensures that the same test can be run successfully multiple times without worrying that resource with the same value would be already existing that rather expects some unique value.
+
+The data and endpoints part of the yaml have some inconsistencies. Such as when defining the args and data attributes. Of course this can be made more uniform, but it was a lazy decision, and the efforts were better to be put at completing the features rather than refactoring for the aesthetics.
+
+You can find the example config at /config/client/movies.yml
+
+```
+endpoints: 
+  - path: "/movies"
+    name: movie
+    GET:
+      funcName: GetAllMovies
+   ...
+```
 
 ## Contributor Guide
+
+Jinja Templates are contained in the templates directory. Any change for the existing resources are to be made there. You can create a new template or modify the existing ones as per the requirements. Make sure that the new changes does not break the existing resources generated using the current state of the product. For major updates, if possible maintain another branch, repo or version. Merge only after thoroughly testing and making sure that the new updates does not introduct any breaking updates.
+
+JSON Schema for validating the YAMLs will go in the json_schema folder. If you introduce any new attribute and change any exising ones, you can modify the schema there. Comments are provided whenever seemed necessary. The same is expected for future changes, to doucment the code using comments whenever necessary and to keep the readme updated.
 
 ```
 YourWorkplace
@@ -94,12 +132,29 @@ YourWorkplace
 |   README.md    // README contains the information related to use of terrajinja
 |   requirements.txt    // Contains the names of the dependencies
 |   terrajinja.py    // Contains the Logic of the CLI. It's the main file which leads to the execution of the terrajinja CLI.
+|   terrajinja.spec    // Autogenerated when we build the execuatable(.exe file) of the terrajinja
 |   utils.py    // Contains the Function for Custom JINJA Filters used in templating.
 |   
 +---.vscode    // Contains the Workplace Settings, User Settings
 |       launch.json    // File Controls the run/debug settings of your Vistual Studio Code Project
 |       move_binary.sh    // Contains the script for movoing the executable generated to the path of directory where the system environment variable is set.
-|       tasks.json    // Workplace or Folder Specific Tasks are configured in tasks.json file.     
+|       tasks.json    // Workplace or Folder Specific Tasks are configured in tasks.json file.
+|       
++---build    // This Folder is created automatically when you build the executable for the project
+|   \---terrajinja
+|           Analysis-00.toc
+|           base_library.zip
+|           EXE-00.toc
+|           PKG-00.toc
+|           PYZ-00.pyz
+|           PYZ-00.toc
+|           terrajinja.exe.manifest
+|           terrajinja.pkg
+|           Tree-00.toc
+|           Tree-01.toc
+|           Tree-02.toc
+|           warn-terrajinja.txt
+|           xref-terrajinja.html
 |           
 +---config // Config folder is created by user contains the configuration specified by user in yaml form which leads to the generation of Terraform Provider Files.
 |   |   provider.yml    // You have to write Configuration Required for creation of provider.go file for Terraform Provider. 
@@ -116,6 +171,8 @@ YourWorkplace
 |       \---preprocess // This Folder is generated by Terrajinja which preprocess the user configuration and is used for generation by Terrajinja.
 |               resource_name_generated.yml    // Contains preprocessed resource configuration of the resource.
 |               other_resource_name_generated.yml    // Contains preprocessed resource configuration of the resource.
+|               
++---dist    // The Generated Executable File is stored in the dist Folder.
 |
 +---json_schema    // This folder contains the file which is responsible to display autocomplete suggestions for configuration files in YAML Format.
 |       client_validate.json    // Contains the json_schema responsible for autocomplete suggestions for Client YAML Files.
@@ -139,5 +196,14 @@ YourWorkplace
 |           resource_crud.j2    // Contains the Helper Macros for Resource File.
 |           schema.j2    // Contains the Helper Macros for Schema Generation.
 |           test.j2    // Contains the Helper Macros for Resource Test and Datasource Test File.
+|           
+\---__pycache__    // This Folder is created automatically Contains the bytecode-compiled and optimised bytecode-compiled versions of program files.
+        helper.cpython-39.pyc
+        loading_animation.cpython-39.pyc
+        main.cpython-39.pyc
+        preprocess.cpython-39.pyc
+        utils.cpython-310.pyc
+        utils.cpython-39.pyc
         
+
 ```
