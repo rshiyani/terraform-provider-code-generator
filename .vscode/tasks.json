@@ -4,7 +4,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "pyinstaller -F terrajinja.py",
+            "command": "pyinstaller --icon=terrajinja.ico -F terrajinja.py",
             "group": "build",
             "presentation": {
                 "reveal": "silent",

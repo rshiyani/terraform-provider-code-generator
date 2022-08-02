@@ -37,98 +37,98 @@ types:
     invalid:
     - a3+J1b%mFs//
     multiple_valids:
-    - aDQ5NnIybDNnYg==
-    - bzZpZml5ZnBlaQ==
-    - bHhkOHV3Mzc5Zw==
-    - azRlbG13bTkyZA==
-    - ZTQ4a2F1enZuMQ==
-    - YWNiN3BsaWhqbQ==
-    - ODMxbGF0eXVndw==
-    - Mjl2Ym5ldjQ1bg==
-    - bGRsYTI2amlmMA==
-    - MTIxdDhkazB6eg==
-    - bm5mZHI3dm9yYw==
-    - ZWI5M2d3d2t3OA==
-    - b2Jmcmc5MzN6NQ==
-    - MW9vZmk4OHZubQ==
-    - b3VvMGk3Nm85aQ==
+    - bThkMm9sYjJ4cw==
+    - Z3psNHNteTM4dg==
+    - OWZiZ3l0dWZpYg==
+    - Z3lkbzVzc3Y4bg==
+    - MmVlYmpuOWd0Yw==
+    - c2k3empseGMzeA==
+    - cGR5Y3E2MGxncQ==
+    - bmtmM2hvb2tvOA==
+    - N2FlcnZyMWU2bA==
+    - aG9wbmZjOWdqMQ==
+    - MWV0cG96ZGdmYg==
+    - ODYzZ2QxbHN5OA==
+    - b2U5a3hjdWNnZw==
+    - N3o1MW51MGVicg==
+    - M2Y1eXp6cWhlYQ==
     valid:
-    - YTZtZDB0dTdoZg==
-    - OGRycTRmbGJpNw==
-    - ZndieTkzcWFkdg==
-    - Ymk3MWZqODBsOQ==
+    - dmZ3eXV4NnJ4OA==
+    - cHRnb2RnYWR1NQ==
+    - MHZmdHRqNjA0eA==
+    - ZWhjaDJpaGJxaA==
   cidr:
     invalid:
-    - 263.276.290.281/12
+    - 299.276.298.271/14
     multiple_valids:
-    - 58.25.160.0/20
-    - 58.25.112.0/20
-    - 58.25.240.0/20
-    - 58.25.192.0/20
-    - 58.25.0.0/20
-    - 58.25.48.0/20
-    - 58.25.16.0/20
-    - 58.25.64.0/20
-    - 58.25.32.0/20
-    - 58.25.96.0/20
-    - 58.25.176.0/20
-    - 58.25.208.0/20
-    - 58.25.224.0/20
-    - 58.25.80.0/20
-    - 58.25.144.0/20
+    - 9.118.96.0/20
+    - 9.118.208.0/20
+    - 9.118.16.0/20
+    - 9.118.240.0/20
+    - 9.118.112.0/20
+    - 9.118.144.0/20
+    - 9.118.64.0/20
+    - 9.118.32.0/20
+    - 9.118.224.0/20
+    - 9.118.176.0/20
+    - 9.118.0.0/20
+    - 9.118.80.0/20
+    - 9.118.128.0/20
+    - 9.118.48.0/20
+    - 9.118.160.0/20
     valid:
-    - 58.25.160.0/20
-    - 58.25.112.0/20
-    - 58.25.240.0/20
-    - 58.25.192.0/20
+    - 9.118.96.0/20
+    - 9.118.208.0/20
+    - 9.118.16.0/20
+    - 9.118.240.0/20
   ipv4:
     invalid:
-    - 292.279.299.298
+    - 300.270.282.266
     multiple_valids:
-    - 58.25.97.146
-    - 58.25.234.54
-    - 58.25.184.167
-    - 58.25.96.86
-    - 58.25.137.198
-    - 58.25.11.60
-    - 58.25.55.8
-    - 58.25.36.88
-    - 58.25.119.124
-    - 58.25.121.81
-    - 58.25.190.158
-    - 58.25.150.207
-    - 58.25.19.211
-    - 58.25.78.17
-    - 58.25.70.52
+    - 9.118.15.22
+    - 9.118.161.143
+    - 9.118.156.77
+    - 9.118.44.19
+    - 9.118.126.86
+    - 9.118.175.71
+    - 9.118.248.92
+    - 9.118.241.142
+    - 9.118.160.239
+    - 9.118.52.155
+    - 9.118.216.43
+    - 9.118.48.39
+    - 9.118.129.103
+    - 9.118.37.85
+    - 9.118.158.2
     valid:
-    - 58.25.97.146
-    - 58.25.234.54
-    - 58.25.184.167
-    - 58.25.96.86
+    - 9.118.15.22
+    - 9.118.161.143
+    - 9.118.156.77
+    - 9.118.44.19
   ipv6:
     invalid:
     - invalidIPv6
     multiple_valids:
-    - 2001:db8::34f4:0:0:f317
-    - 2001:db8::34f4:0:0:f36b
-    - 2001:db8::34f4:0:0:f30e
-    - 2001:db8::34f4:0:0:f310
-    - 2001:db8::34f4:0:0:f3e4
-    - 2001:db8::34f4:0:0:f36d
-    - 2001:db8::34f4:0:0:f323
-    - 2001:db8::34f4:0:0:f391
-    - 2001:db8::34f4:0:0:f363
-    - 2001:db8::34f4:0:0:f345
-    - 2001:db8::34f4:0:0:f3a2
-    - 2001:db8::34f4:0:0:f3f0
-    - 2001:db8::34f4:0:0:f313
-    - 2001:db8::34f4:0:0:f3a8
-    - 2001:db8::34f4:0:0:f332
+    - 2001:db8::34f4:0:0:f3e2
+    - 2001:db8::34f4:0:0:f3f9
+    - 2001:db8::34f4:0:0:f340
+    - 2001:db8::34f4:0:0:f39c
+    - 2001:db8::34f4:0:0:f30c
+    - 2001:db8::34f4:0:0:f3a3
+    - 2001:db8::34f4:0:0:f3dd
+    - 2001:db8::34f4:0:0:f309
+    - 2001:db8::34f4:0:0:f32b
+    - 2001:db8::34f4:0:0:f39f
+    - 2001:db8::34f4:0:0:f3ec
+    - 2001:db8::34f4:0:0:f3e3
+    - 2001:db8::34f4:0:0:f3c8
+    - 2001:db8::34f4:0:0:f308
+    - 2001:db8::34f4:0:0:f36c
     valid:
-    - 2001:db8::34f4:0:0:f317
-    - 2001:db8::34f4:0:0:f36b
-    - 2001:db8::34f4:0:0:f30e
-    - 2001:db8::34f4:0:0:f310
+    - 2001:db8::34f4:0:0:f3e2
+    - 2001:db8::34f4:0:0:f3f9
+    - 2001:db8::34f4:0:0:f340
+    - 2001:db8::34f4:0:0:f39c
   json:
     invalid:
     - 'json({ name : val)'
@@ -157,26 +157,26 @@ types:
     invalid:
     - invalidMAC
     multiple_valids:
-    - 89:af:41:a2:53:d5
-    - 5f:1f:a4:a8:99:24
-    - e5:4e:ff:70:37:8a
-    - 29:b2:53:61:98:bf
-    - 9c:8c:f9:21:26:ef
-    - 5c:a4:bc:67:c8:45
-    - 11:7a:c1:fd:ec:91
-    - 9c:56:3b:5d:8b:86
-    - 3e:76:43:0f:1b:3c
-    - 46:ed:f3:b2:43:b1
-    - 43:36:53:bd:8e:d2
-    - dd:a3:3f:ba:49:d8
-    - f9:53:bb:af:eb:7d
-    - 54:be:05:27:84:e4
-    - 23:33:ab:87:13:a8
+    - 8a:d3:fc:5d:94:a5
+    - 47:e2:57:d8:15:3c
+    - 3b:63:97:f3:45:05
+    - 94:05:79:13:17:3d
+    - ea:0a:f8:25:59:fb
+    - 5e:d7:cc:9d:c8:36
+    - 63:04:c4:69:58:6f
+    - 50:09:e5:b0:95:7b
+    - 49:07:00:fe:0d:98
+    - 9c:91:21:35:ad:bf
+    - 25:a4:17:4d:17:7a
+    - 8f:71:73:c6:2a:91
+    - 9d:f3:f6:e4:c8:12
+    - 9f:52:eb:4a:f3:99
+    - 67:52:d3:f9:73:d0
     valid:
-    - 78:42:fb:b2:d8:87
-    - 0c:42:82:e4:59:53
-    - da:0e:2d:6f:e9:f8
-    - 92:91:c6:f3:25:af
+    - 92:4e:46:bb:43:8b
+    - 82:30:67:9d:b9:68
+    - 8c:41:bf:49:e3:da
+    - 63:95:b1:ea:7c:3b
   regex:
     invalid:
     - '[0-9)++'
@@ -190,119 +190,119 @@ types:
     invalid:
     - 12345
     multiple_valids:
-    - t67yrlhg05
-    - vwpvik5teo
-    - 6vfcgf8rtl
-    - fw9qa3uimo
-    - 0rsmr8mkt3
-    - agx9e6bz6o
-    - 7u4g52f36c
-    - f97gx28sh6
-    - 8adoldxh9u
-    - zfh04in5so
-    - 3scuace8se
-    - ab8lbpyvye
-    - 7zvcsdxasd
-    - uns0cfsv0i
-    - r5lstronqj
+    - wnnzd0rjmn
+    - l353hqgnbl
+    - 392d1v7yjh
+    - 8r2j74hgds
+    - 0q2xm77nge
+    - l328ll5nsf
+    - 11y16o0gvq
+    - jlui3hf9gq
+    - q24wslx2vq
+    - pjxby0fp61
+    - 8luxeq0xrt
+    - 3anaisb0hp
+    - sh80gdz94q
+    - tp7jh7rn84
+    - 2kz3rhula3
     valid:
-    - kixql3a8ir
-    - m3oii1aeps
-    - hhon7mdeqt
-    - jbaor4jpd7
+    - r5y77ot4w8
+    - 6o1uei3g1t
+    - momkjncezv
+    - 3lb6ik6wpm
   time:
     invalid:
-    - '2022-08-01 17:50:46.328843'
+    - '2022-08-02 10:47:54.531832'
     multiple_valids:
-    - '2022-08-01T12:20:46.328843+00:00'
-    - '2022-08-24T12:20:46.328843+00:00'
-    - '2022-09-16T12:20:46.328843+00:00'
-    - '2022-10-09T12:20:46.328843+00:00'
-    - '2022-11-01T12:20:46.328843+00:00'
-    - '2022-11-24T12:20:46.328843+00:00'
-    - '2022-12-17T12:20:46.328843+00:00'
-    - '2023-01-09T12:20:46.328843+00:00'
-    - '2023-02-01T12:20:46.328843+00:00'
-    - '2023-02-24T12:20:46.328843+00:00'
-    - '2023-03-19T12:20:46.328843+00:00'
-    - '2023-04-11T12:20:46.328843+00:00'
-    - '2023-05-04T12:20:46.328843+00:00'
-    - '2023-05-27T12:20:46.328843+00:00'
-    - '2023-06-19T12:20:46.328843+00:00'
+    - '2022-08-02T05:17:54.531832+00:00'
+    - '2022-08-25T05:17:54.531832+00:00'
+    - '2022-09-17T05:17:54.531832+00:00'
+    - '2022-10-10T05:17:54.531832+00:00'
+    - '2022-11-02T05:17:54.531832+00:00'
+    - '2022-11-25T05:17:54.531832+00:00'
+    - '2022-12-18T05:17:54.531832+00:00'
+    - '2023-01-10T05:17:54.531832+00:00'
+    - '2023-02-02T05:17:54.531832+00:00'
+    - '2023-02-25T05:17:54.531832+00:00'
+    - '2023-03-20T05:17:54.531832+00:00'
+    - '2023-04-12T05:17:54.531832+00:00'
+    - '2023-05-05T05:17:54.531832+00:00'
+    - '2023-05-28T05:17:54.531832+00:00'
+    - '2023-06-20T05:17:54.531832+00:00'
     valid:
-    - '2022-08-01T12:20:46.328843+00:00'
-    - '2022-08-24T12:20:46.328843+00:00'
-    - '2022-09-16T12:20:46.328843+00:00'
-    - '2022-10-09T12:20:46.328843+00:00'
+    - '2022-08-02T05:17:54.531832+00:00'
+    - '2022-08-25T05:17:54.531832+00:00'
+    - '2022-09-17T05:17:54.531832+00:00'
+    - '2022-10-10T05:17:54.531832+00:00'
   url-http:
     invalid:
-    - ht:/ceyz1n2z8oe8vti.com
+    - ht:/tbm7q4dg2j44gh2.com
     multiple_valids:
-    - http://bk9ezoccu5ddjim.com
-    - http://ibmfdkf9vk7bfdi.com
-    - http://k7exh41jv5sbf9c.com
-    - http://0f2t7dq22lbxa5i.com
-    - http://s7qsvfw8vikb179.com
-    - http://g1i69hmugigq4ox.com
-    - http://nf3tiq2d2fvesbq.com
-    - http://0c59lvlbq7y3x53.com
-    - http://kfe3k5b8wfzsj1g.com
-    - http://vogh0x3vxnncwqg.com
-    - http://lqnkoyn5yxxdk4o.com
-    - http://ickbjth8xwa3n8u.com
-    - http://t9ipjne770ec4hm.com
-    - http://0u5izde3xi384o3.com
-    - http://cvdkjkbzmq5wulh.com
+    - http://7suogtucgvm0pbz.com
+    - http://p5osv7v6rhd62j5.com
+    - http://jhxy8n4xn136nb7.com
+    - http://4mehe1w15pewk4y.com
+    - http://wv5hlacnzazdax7.com
+    - http://aiiq3olfns8eedn.com
+    - http://5olmynwtam7nkua.com
+    - http://gr4iu4l48x2y6xt.com
+    - http://nkzgyaogc7u8nuu.com
+    - http://rduubvljj9mm210.com
+    - http://k78ph36gk9h32pn.com
+    - http://waukz32g9r6zyzv.com
+    - http://d6eexh0tz5nzkss.com
+    - http://c9elmm3fhwmqnud.com
+    - http://09hs2ywxuxiar28.com
     valid:
-    - http://dbrmrg6g7athb8i.com
-    - http://e882wzlxe4wmd9l.com
-    - http://r0e9s1qc91rzwpk.com
-    - http://lrrzazk0sjgraok.com
+    - http://lrjg0a2e4s0rxr1.com
+    - http://pvz9bwgrly3ku1x.com
+    - http://fot7iqw1c8ymztp.com
+    - http://5fed0w002m4xzvw.com
   url-https:
     invalid:
-    - hts:/d3dy0s8ydizz13b.com
+    - hts:/09aox9vsydgghtb.com
     multiple_valids:
-    - https://0824wcyvzyu3o4y.com
-    - https://11oaxhx2n4psqos.com
-    - https://k4jiq76uerltw6f.com
-    - https://sq5bm7z88c0sh11.com
-    - https://tc9jvbealbnplzh.com
-    - https://npi4d2nggbgtg3m.com
-    - https://o1wb9ji0plkhv3a.com
-    - https://975mlgyw54z65m2.com
-    - https://gum3y1obu1izlc2.com
-    - https://4247ljn3tuxsatr.com
-    - https://68nn3k2s5raqbip.com
-    - https://4377irjr4kgr955.com
-    - https://jhcrnwim8cluv4g.com
-    - https://l0xbuq5acsyert7.com
-    - https://z8fsaoa72swecp3.com
+    - https://9ha6xca43acciq4.com
+    - https://4asogn650f0pfxm.com
+    - https://buewzj5k9kt9xod.com
+    - https://3zorry4tg3rxbqk.com
+    - https://bpuib3rs7ijv3hq.com
+    - https://ohznl1x6lmtii8o.com
+    - https://s5p95vj1pycozl4.com
+    - https://xveisbz4ezxppvr.com
+    - https://8h8rv568efcffl4.com
+    - https://0sb36o51k7zz7ha.com
+    - https://jif3u8ngoyijrki.com
+    - https://r9em3x4r8cr6kmv.com
+    - https://fi497rh8vcjs6r7.com
+    - https://f5x2fqkw6tcxl4d.com
+    - https://uuljmo9zh0el93l.com
     valid:
-    - https://92suw6shxag54op.com
-    - https://7ae7s90gch3cszk.com
-    - https://4ocwovvns74683n.com
-    - https://eu9t1cmfzhbn9vv.com
+    - https://kk1kwhippatne04.com
+    - https://5w9ydtgigtvpqoo.com
+    - https://x27wnvo5cot4au9.com
+    - https://l8hfx463y3yagy1.com
   uuid:
     invalid:
     - invalid323Uuid12
     multiple_valids:
-    - 5ee5907b-1194-11ed-93d3-dc214861057a
-    - 5ee5907c-1194-11ed-9c54-dc214861057a
-    - 5ee5907d-1194-11ed-8778-dc214861057a
-    - 5ee5907e-1194-11ed-8637-dc214861057a
-    - 5ee5907f-1194-11ed-a7c4-dc214861057a
-    - 5ee59080-1194-11ed-9cbd-dc214861057a
-    - 5ee59081-1194-11ed-8b30-dc214861057a
-    - 5ee59082-1194-11ed-9d37-dc214861057a
-    - 5ee59083-1194-11ed-8eba-dc214861057a
-    - 5ee59084-1194-11ed-98a0-dc214861057a
-    - 5ee59085-1194-11ed-ab4c-dc214861057a
-    - 5ee59086-1194-11ed-a19e-dc214861057a
-    - 5ee59087-1194-11ed-9f83-dc214861057a
-    - 5ee59088-1194-11ed-8ab5-dc214861057a
-    - 5ee59089-1194-11ed-acc7-dc214861057a
+    - 768a53bc-1222-11ed-ad5f-dc214861057a
+    - 768a53bd-1222-11ed-bece-dc214861057a
+    - 768a53be-1222-11ed-9a84-dc214861057a
+    - 768a53bf-1222-11ed-affc-dc214861057a
+    - 768a53c0-1222-11ed-bdb6-dc214861057a
+    - 768a53c1-1222-11ed-836b-dc214861057a
+    - 768a53c2-1222-11ed-89bd-dc214861057a
+    - 768a53c3-1222-11ed-bee5-dc214861057a
+    - 768a53c4-1222-11ed-9a26-dc214861057a
+    - 768a53c5-1222-11ed-b058-dc214861057a
+    - 768a53c6-1222-11ed-b0e2-dc214861057a
+    - 768a53c7-1222-11ed-b8d5-dc214861057a
+    - 768a53c8-1222-11ed-b377-dc214861057a
+    - 768a53c9-1222-11ed-90d9-dc214861057a
+    - 768a53ca-1222-11ed-932b-dc214861057a
     valid:
-    - 5ee59077-1194-11ed-bb7f-dc214861057a
-    - 5ee59078-1194-11ed-b98c-dc214861057a
-    - 5ee59079-1194-11ed-802b-dc214861057a
-    - 5ee5907a-1194-11ed-8f00-dc214861057a
+    - 768a53b8-1222-11ed-a555-dc214861057a
+    - 768a53b9-1222-11ed-8193-dc214861057a
+    - 768a53ba-1222-11ed-83a3-dc214861057a
+    - 768a53bb-1222-11ed-8c4e-dc214861057a

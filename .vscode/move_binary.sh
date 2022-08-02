@@ -1,4 +1,4 @@
-mv ./dist/terrajinja.exe C:/terraform
+cp ./dist/terrajinja.exe ./
 rm -rf ./build
 rm -rf ./dist
 rm terrajinja.spec

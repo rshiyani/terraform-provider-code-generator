@@ -130,3 +130,6 @@ dmypy.json
 
 # Generated Go files
 # *.go
+
+#EXE
+*.exe
