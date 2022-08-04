@@ -1,0 +1,359 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "title": "Client Schema",
+  "description": "Schema to Auto Generate the Go Client for Terraform Provider",
+  
+  "type": "object",
+  "properties": {    
+    "include": {
+      "title": "include",
+      "description": "(optional) Any third party imports that are used here needs to be included",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "examples": [
+          "https://github.com/gorilla/mux",
+          "https://github.com/tsenart/vegeta"
+        ],
+        "default": "https://github.com/user/repo"
+      }
+    },
+    
+    "endpoints": {
+      "title": "endpoints",
+      "description": "(conditional) Defines the path, name, overwriteBaseURL, params and the http methods (GET, POST, PUT, and DELETE). At least one of the HTTP method must be present for every item in this array. One of the endpoints, data, or both should be defined.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/Endpoints" }
+    },
+ 
+    "data": {
+      "title": "data",
+      "description": "(conditional) Values other than primitive types (struct, list) needs to be defined here to be sent when running tests. At least one of the data, endpoints, or both should be defined.",
+      "type": "array",
+      "items": { "$ref": "#/definitions/Datum" }
+    }
+  },
+
+  "anyOf": [
+    { "required": ["endpoints"] },
+    { "required": ["data"] }
+  ],
+
+  "definitions": {
+    "Endpoints": {
+      "type": "object",
+      
+      "additionalProperties": false,
+      
+      "properties": {
+        "path": {
+          "title": "path",
+          "description": "(required) The path to which the defined HTTP requests will be sent",
+          "examples": [
+            "/movies/id",
+            "/casts"
+          ],
+          "default": "/object",
+          "type": "string"
+        },
+       
+        "name": {
+          "title": "name",
+          "description": "(required) The name will be used in conjunction with the HTTP method to generate function name if funcName is not defined",
+          "type": "string"
+        },
+      
+        "overwriteBaseURL": {
+          "title": "overwriteBaseURL",
+          "description": "(optional) If the URL for some specific path is different than the base URL, then overwriteBaseURL can be used.",
+          "examples": [
+            "http://example.com",
+            "http://localhost:8000"
+          ],
+          "type": "string",
+          "format": "uri",
+          "qt-uri-protocols": ["http"]
+        },
+      
+        "params": {
+          "title": "parameters",
+          "description": "(optional) describes the part of the path that are query params, for example, /movies/id and id is dynamically constructed from the argument passed. then one of the variable in args should be id and params array should have id as an element. Supports multiple query params, on a condition that they are defined in the args for it to work.",
+          "type": "array",
+          "items": {
+            "examples": ["id"],
+            "type": "string"
+          }
+        },
+       
+        "GET": { "$ref": "#/definitions/Get" },
+        "POST": { "$ref": "#/definitions/Post" },
+        "PUT": { "$ref": "#/definitions/Get" },
+        "DELETE": { "$ref": "#/definitions/Get" }
+      },
+
+      "required": [
+        "path",
+        "name"
+      ],
+      "anyOf": [
+        { "required": [ "GET" ] },
+        { "required": [ "POST" ] },
+        { "required": [ "PUT" ] },
+        { "required": [ "DELETE" ] }
+      ]
+    },
+
+    "Post": {
+      "title": "HTTP Methods [GET / POST / PUT / DELETE]",
+      "description": "Defines the function name and the arguments to be used in the code",
+      "type": "object",
+
+      "properties": {
+        "funcName": {
+          "title": "function name",
+          "description": "(optional) Defines the function name as to be used in the code.",
+          "type": "string",
+          "examples": ["GetAllMovies"]
+        },
+       
+        "args": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Args"
+          }
+        },
+
+        "unique": {
+          "title": "unique",
+          "description": "(optional) Indicates that this field is the unique identifier for the resource being created. It will be stored and can be further used in the PUT and DELETE calls to clean up after running the tests. Can only be used with POST.",
+          "examples": ["id", "dn"],
+          "type": "string",
+          "default": "id"
+        }
+      },
+
+      "additionalProperties": false
+    },
+
+    "Get": {
+      "title": "HTTP Methods [GET / POST / PUT / DELETE]",
+      "description": "Defines the function name and the arguments to be used in the code",
+      "type": "object",
+      
+      "additionalProperties": false,
+      
+      "properties": {
+        "funcName": {
+          "title": "function name",
+          "description": "(optional) Defines the function name as to be used in the code.",
+          "type": "string",
+          "examples": ["GetAllMovies"]
+        },
+       
+        "args": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Args"
+          },
+          "minItems": 1
+        }
+      }
+    },
+   
+    "Args": {
+      "title": "arguments",
+      "description": "(optional) The arguments that the function expects when being called",
+      "type": "object",
+      
+      "additionalProperties": false,
+      
+      "properties": {
+        "name": {
+          "title": "name",
+          "description": "(required) The name of the variable as to be defined in code",
+          "type": "string",
+          "examples": [
+            "movieTest",
+            "temp"
+          ],
+          "default": "movieToPost"
+        },
+       
+        "type": {
+          "title": "type",
+          "description": "(required) The data type of the variable",
+          "type": "string",
+          "examples": ["string", "int", "float64", "models.Example"],
+          "default": "string"
+        },
+       
+        "value": {
+          "title": "value",
+          "description": "(conditional) The value of the variable as to be used for running tests, can be static value or the name of the variable from the data. use values (array) when type is set to list.",
+          "type": ["string", "number", "integer", "boolean"],
+          "examples": ["FooBar", 123, 2.5],
+          "default": "Some Value"
+        },
+
+        "send": {
+          "title": "send",
+          "description": "(optional) Indicates that this argument should be sent as payload with the request body. Only accepts true as a value. Omit if not required.",
+          "type": "boolean",
+          "const": true
+        },
+
+        "pointer": {
+          "title": "pointer",
+          "description": "(optional) Indicates if the argument is to be sent as a pointer/reference. Only accepts true as a value. Omit if not required.",
+          "type": "boolean",
+          "const": true
+        },
+
+        "fromPostResponse": {
+          "title": "fromPostResponse",
+          "description": "(optional) indicates if the arg should utilize the unique property that we got from the POST call response. It helps to clear up the resources created during tests as the same resource can be updated and deleted. otherwise value can be provided. Only accepts true as a value. Omit if not required.",
+          "type": "boolean",
+          "const": true
+        }
+      },
+
+      "required": ["name", "type"],
+
+      "anyOf": [
+        {"required": ["value"], "not": {"required": ["fromPostResponse"]}},
+        {"required": ["fromPostResponse"], "not": {"required": ["value"]}}
+      ]
+    },
+
+    "Datum": {
+      "type": "object",
+      
+      "additionalProperties": false,
+      
+      "properties": {
+        "name": {
+          "title": "name",
+          "description": "The name of the test variable that will be created",
+          "examples": ["testMovie", "temp"],
+          "type": "string",
+          "default": "var"
+        },
+      
+        "type": {
+          "title": "type",
+          "description": "The data type of the test variable",
+          "default": "models.Movie",
+          "examples": [
+            "models.Movie",
+            "models.Person"
+          ],
+          "type": "string"
+        },
+
+        "attributes": {
+          "title": "attributes",
+          "description": "Attributes of the defined type (struct mostly)",
+          "type": "object",
+          
+          "patternProperties": {
+            ".*": {
+              "title": "attribute",
+              "description": "(required) The name of the test variable that will be created",
+              "examples": ["testMovie", "temp"],
+
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": false,
+
+              "properties": {
+                "type": {
+                  "title": "type",
+                  "description": "(required) Data type of the attribute",
+                  "type": "string",
+                  "default": "string",
+                  "enum": ["string", "boolean", "int", "float64", "struct", "list"]
+                },
+
+                "subtype": {
+                  "title": "subtype",
+                  "description": "(conditional) The subtype of the items given that the type is set to list",
+                  "type": "string"
+                },
+
+                "struct": {
+                  "title": "struct",
+                  "description": "(conditional) Name of the struct given that the type is set to struct",
+                  "type": "string",
+                  "default": "Models.Something",
+                  "examples": [
+                    "models.Movie",
+                    "Person"
+                  ]
+                },
+              
+                "reference": {
+                  "title": "reference",
+                  "description": "(optional) Indicates that this field references to some other variable in the data.",
+                  "type": "boolean",
+                  "const": true
+                },
+             
+                "value": {
+                  "title": "value",
+                  "description": "(conditional) value to be used for the given variable.",
+                  "type": ["string", "number", "integer", "boolean"]
+                },
+
+                "values": {
+                  "title": "values",
+                  "description": "(conditional) values to be used given that the type is array..",
+                  "type": "array"
+                }
+              },
+
+              "required": ["type"],
+
+              "allOf": [
+                {
+                  "if": {
+                    "properties": { "type": { "const": "list" } }
+                  },
+                  "then": {
+                    "required": ["subtype", "values"],
+                    "allOf": [
+                      {"not": {"required": ["value"]}},
+                      {"not": {"required": ["struct"]}}
+                    ]
+                  },
+                  "else": {
+                    "if": {
+                      "properties": { "type": { "const": "struct" } }
+                    },
+                    "then": {
+                      "required": ["struct", "value"],
+                      "allOf": [
+                        { "not": {"required": ["values"]} },
+                        { "not": {"required": ["subtype"]} }
+                      ]
+                    },
+                    "else": {
+                      "required": ["value"],
+                      "allOf": [
+                        { "not": {"required": ["values"]} },
+                        { "not": {"required": ["subtype"]} },
+                        { "not": {"required": ["struct"]} }
+                      ]
+                    }
+                  }
+                }
+              ]
+              
+            }
+          }
+        }
+      },
+
+      "required": ["name", "type", "attributes"]
+    }
+  }
+}

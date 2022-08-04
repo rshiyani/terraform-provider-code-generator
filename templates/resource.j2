@@ -1,5 +1,5 @@
 {% import './helpers/schema.j2' as schemaHelper %}
-{% import './helpers/create.j2' as createHelper %}
+{% import './helpers/resource_crud.j2' as crudHelper %}
 {% set PrimitiveTypeList = ["string","bool","int"]%}
 package {{provider_name | camelize}}
 
@@ -58,7 +58,7 @@ func get{{name | pascalize}}Attributes(client *client.Client, id string)(*models
 	return {{name | camelize}},nil 
 }
 
-func getIdFrom{{name | pascalize}}Model({{name | camelize}} *models.{{name | pascalize}}){
+func getIdFrom{{name | pascalize}}Model({{name | camelize}} *models.{{name | pascalize}})(string,error){
 	// [TODO]: Write your code to get Id ,here
 }
 
@@ -93,7 +93,7 @@ func resource{{provider_name | pascalize}}{{name | pascalize}}Create(ctx context
 							{{name | camelize}}.{{schema.attribute | pascalize}}s = d.Get("{{schema.attribute}}").([]float64)
 						{% endif %}
 					{% else %}
-						{{createHelper.genCreateElementRequired(schema, name)}}
+						{{crudHelper.genCreateElementRequired(schema, name)}}
 					{% endif %}
 				{% endif %}
 			{% endif %}
@@ -113,7 +113,7 @@ func resource{{provider_name | pascalize}}{{name | pascalize}}Create(ctx context
 			{% elif schema.type == "list" or schema.type == "set"%}
 				{% if schema.element is defined %}
 					{% if schema.element.type == "resource" %}
-						{{createHelper.genCreateElement(schema, name)}}
+						{{crudHelper.genCreateElement(schema, name)}}
 					{% else %}
 						if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
 							{% if schema.type== "list" %}
@@ -168,7 +168,7 @@ func resource{{provider_name | pascalize}}{{name | pascalize}}Update(ctx context
 							{{name | camelize}}.{{schema.attribute | pascalize}}s = d.Get("{{schema.attribute}}").([]float64)
 						{% endif %}
 					{% else %}
-						{{createHelper.genCreateElementRequired(schema, name)}}
+						{{crudHelper.genCreateElementRequired(schema, name)}}
 					{% endif %}
 				{% endif %}
 			{% endif %}
@@ -188,7 +188,7 @@ func resource{{provider_name | pascalize}}{{name | pascalize}}Update(ctx context
 			{% elif schema.type == "list" or schema.type == "set"%}
 				{% if schema.element is defined %}
 					{% if schema.element.type == "resource" %}
-						{{createHelper.genCreateElement(schema, name)}}
+						{{crudHelper.genCreateElement(schema, name)}}
 					{% else %}
 						if {{schema.attribute | pascalize}}, ok := d.GetOk("{{schema.attribute}}"); ok {
 							{% if schema.type== "list" %}

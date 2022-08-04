@@ -12,7 +12,11 @@ package models
         {% elif schema.type == "map" %}
             {{schema.attribute | pascalize}} map[string]interface{}
         {%- else %}
+        {% if schema.type == "float" %}
+            {{schema.attribute | pascalize}} {{schema.type+'64'-}}
+        {% else %}
             {{schema.attribute | pascalize}} {{schema.type-}}
+        {% endif %}
         {% endif %}
     {% endif %}
 {% endmacro %}
