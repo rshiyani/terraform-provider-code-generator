@@ -286,3 +286,47 @@ def generate_client(inputs, template="client.j2", postfix=".go", test = ""):
 
         print(f"=== INFO: Created - client{test} for {file}")
         return
+
+# Generate the Terraformer File
+def generate_terraformer_file(file, provider_name):
+    print(f"=== Started Creation of Terraformer File named {file}")
+    try:
+        config = yaml.full_load(open(f'./config/terraformer/{file}.yml'))
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Creation of Terraformer File")
+        return False
+    env = Environment(loader=FileSystemLoader('./templates'),
+                    trim_blocks=True, lstrip_blocks=True)
+    set_filter(env)
+
+    template = env.get_template('terraformer.j2')
+
+    # to save the results
+    try:
+        with open(f"output/terraformer/{file}.go", "w") as fh:
+            fh.write(template.render(config))
+    except Exception as e:
+        print("Error: ", e)
+        print(f"=== Error in Creation of Terraformer File named {file}")
+        return False
+
+    print(f"=== Completed Creation of Terraformer File named {file}")
+    return True
+
+
+# Function will be called by cli, which is responsible for generation of Terraformer File
+def generate_terraformer(files, provider_name):
+    isDir = os.path.isdir('./output/terraformer')
+    if not isDir:
+        os.mkdir('./output/terraformer')
+
+    for file in files:
+        if file[-4:] == ".yml":
+            file = file[:-4]
+        status = generate_terraformer_file(file, provider_name)
+        if not status:
+           exit()
+
+
+    

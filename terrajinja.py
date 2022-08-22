@@ -21,7 +21,7 @@ generate = args.generate.split(",")
 inputs = args.input.split(",")
 pname=args.pname
 
-dirs = ['./output', './output/resources', './output/datasources', './output/models', './output/client']
+dirs = ['./output', './output/resources', './output/datasources', './output/models', './output/client','./output/terraformer']
 for dir in dirs:
     if not os.path.isdir(dir):
         os.mkdir(dir)
@@ -30,17 +30,21 @@ isConfigResources = os.path.isdir('./config/resources')
 isConfigProvider = os.path.isfile("./config/provider.yml")
 isConfigDatasources = os.path.isdir('./config/datasources')
 isConfigClient = os.path.isdir('./config/client')
+isConfigTerraformer = os.path.isdir('./config/terraformer')
+
 
 resourceInputs = None
 datasourceInput = None
 clientInputs = None
+terraformerInputs=None
 
 if "all" in inputs:
     resourceInputs = os.listdir("./config/resources")
     datasourceInput = os.listdir("./config/datasources")
     clientInputs = os.listdir('./config/client')
+    terraformerInputs = os.listdir('./config/terraformer')
 else:
-    resourceInputs = datasourceInput = clientInputs = inputs
+    resourceInputs = datasourceInput = clientInputs = terraformerInputs = inputs
    
 if "all" in generate:
     if isConfigResources:
@@ -56,6 +60,8 @@ if "all" in generate:
     if isConfigClient:
         generate_client(clientInputs)
         generate_client_test(clientInputs)
+    if isConfigTerraformer:
+        generate_terraformer(terraformerInputs, pname)
 else:
     if "resource" in generate and isConfigResources:
         generate_resource(resourceInputs, pname)
@@ -75,6 +81,8 @@ else:
         generate_client(clientInputs)
     if "client_test" in generate and isConfigClient:
         generate_client_test(clientInputs)
+    if "terraformer" in generate and isConfigTerraformer:
+        generate_terraformer(terraformerInputs, pname)    
 
 # Formatting the go files created
 format_all_files()
