@@ -1,0 +1,150 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Provider Schema",
+    "description": "It include provider_name,imports,imports_for_test,resources,datasources and schemas.",
+    "required": [ "provider_name","imports","imports_for_test","resources","datasources","schemas" ],
+    "type" :"object",
+    "additionalProperties": false,
+    "properties": {
+        "provider_name":{
+            "type":"string",
+            "title": "Provider Name",
+            "description": "Enter Provider name.",
+            "examples": ["Aws","Gcp"]
+        },
+        "imports":{
+            "type":"array",
+            "title": "Import Links",
+            "description": "Enter import links of modules.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [ "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema",
+                          "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+                        ]
+        },
+        "imports_for_test":{
+            "type":"array",
+            "title": "Import Links for test",
+            "description": "Enter import links for test of modules.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [  "os", "testing","github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema","github.com/Jeffail/gabs/v2"]
+        },
+        "resources":{
+            "type":"array",
+            "title": "Resources",
+            "description": "Enter all Resources name.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [ "tenant","application_profile"]
+        },
+        "datasources":{
+            "type":"array",
+            "title": "Datasources",
+            "description": "Enter all Datasources name.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [ "tenant","application_profile"]
+        },
+        "schemas":{
+            "type":"array",
+            "items": {
+                "type": "object",
+                "title": "Schemas",
+                "description": "Resource Schema",
+                "required": ["attribute","type"],
+                "properties": {
+                    "attribute": {
+                        "type": "string",
+                        "title": "attribute",
+                        "description": "Enter attribute name."
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Type",
+                        "description": "Type of the attribute.",
+                        "pattern": "string|bool|float|int|list|set|map",
+                        "enum": ["string","bool","float","int","list","set","map"]
+                    },
+                    "forcenew": {
+                        "type": "boolean",
+                        "title": "ForceNew",
+                        "description": "ForceNew indicates that any change in this field requires the resource to be destroyed and recreated.",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    "computed": {
+                        "type": "boolean",
+                        "title": "Computed",
+                        "description": "Computed is used to represent values that are not user configurable.",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    "default_func": {
+                        "type": "boolean",
+                        "title": "Computed",
+                        "description": "Default function for schema.EnvDefaultFunc",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    "sensitive": {
+                        "type": "boolean",
+                        "title": "Sensitive",
+                        "description": "When working with a field that contains information likely to be considered sensitive, it is best to set the Sensitive property on its schema to true. This will prevent the field's values from showing up in CLI output and in Terraform Cloud.",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    "default":{
+                        "type": "number",
+                        "title": "Default",
+                        "description": "Terraform will use that value when this item is not set in the configuration."
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "Enter description of attribute"
+                    },
+                    "envvar": {
+                        "type": "string",
+                        "title": "Environment Variable",
+                        "description": "Enter Environment Variable"
+                    }
+                },
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "optional": { 
+                                "type": "boolean",
+                                "title": "Optional",
+                                "description": "Indicates that this element is optional to include in the configuration.",
+                                "pattern": "true",
+                                "enum":[true]
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "required": { 
+                                "type": "boolean",
+                                "title": "Required",
+                                "description": "Indicates that this element must be provided in the configuration.",
+                                "pattern": "true",
+                                "enum":[true]
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

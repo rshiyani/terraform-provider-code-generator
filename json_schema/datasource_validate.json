@@ -1,0 +1,463 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "DataSource Schema",
+    "description": "It include provider_name,name,imports and schemas.",
+    "required": [ "provider_name","name","imports","unique_attribute","schemas" ],
+    "type" :"object",
+    "additionalProperties": false,
+    "properties": {
+        "provider_name":{
+            "type":"string",
+            "title": "Provider Name",
+            "description": "Enter Provider name.",
+            "examples": ["Aws","Gcp"]
+        },
+        "name":{
+            "type":"string",
+            "title": "DataSource Name",
+            "description": "Enter DataSource name.",
+            "examples": ["tenant","application_profile"]
+        },
+        "imports":{
+            "type":"array",
+            "title": "Import Links",
+            "description": "Enter import links of modules.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [ "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema",
+                          "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+                        ]
+        },
+        "unique_attribute":{
+            "type":"array",
+            "title": "Unique Attributes",
+            "description": "Enter unique attributes for parallel testing.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [ "contract",
+                          "filter",
+                          "filter_entry"
+                        ]
+        },
+        "schemas":{
+            "type":"array",
+            "items": {
+                "type": "object",
+                "title": "Schemas",
+                "description": "Resource Schema",
+                "required": ["attribute","type"],
+                "properties": {
+                    "attribute": {
+                        "type": "string",
+                        "title": "attribute",
+                        "description": "Enter attribute name."
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Type",
+                        "description": "Type of the attribute.",
+                        "pattern": "string|bool|float|int|list|set|map",
+                        "enum": ["string","bool","float","int","list","set","map"]
+                    },
+                    "forcenew": {
+                        "type": "boolean",
+                        "title": "ForceNew",
+                        "description": "ForceNew indicates that any change in this field requires the resource to be destroyed and recreated.",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    "sensitive": {
+                        "type": "boolean",
+                        "title": "Sensitive",
+                        "description": "When working with a field that contains information likely to be considered sensitive, it is best to set the Sensitive property on its schema to true. This will prevent the field's values from showing up in CLI output and in Terraform Cloud.",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    "default":{
+                        "type": ["number","string"],
+                        "title": "Default",
+                        "description": "Terraform will use that value when this item is not set in the configuration."
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "Enter description of attribute"
+                    },
+                    "depends_on":{
+                        "type":"object",
+                        "title": "Dependency",
+                        "description": "Enter dependent resource name with hierarchy of attributes",
+                        "required": ["resource_name","attribute_name"],
+                        "properties": {
+                            "resource_name": {
+                                "type": "string",
+                                "title": "Dependent resource",
+                                "description": "Enter Dependent Resource Name "
+                            },
+                            "attribute_name":{
+                                "type":"array",
+                                "title": "Dependent attributes",
+                                "description": "Enter attributes hierarchy of the dependent resource in array form.",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "uniqueItems": true
+                            }
+                        }
+                    }
+                },
+                "if": {
+                        "properties": { "type": { "pattern":"list|set|map"} }                        
+                },
+                "then":{
+                        "title": "Element",
+                        "properties": { 
+                            "element":{
+                                "type":"object",
+                                "title": "Internal Elem",
+                                "description": "Internal Elem for Type(List/Set/Map).",
+                                "properties": {
+                                    "type":{
+                                        "type":"string",
+                                        "title": "Schema Type",
+                                        "description": "Schema type as Resource/Schema for Elem in Type(List/Set/Map).",
+                                        "pattern": "resource|schema",
+                                        "enum": ["resource", "schema"]
+                                    }
+                                },
+                                "required":["type","schema"],
+                                "if":{
+                                    "properties": { "type": { "pattern":"resource"} }
+                                },
+                                "then":{
+                                    "properties": {
+                                        "schema":{
+                                            "type":"array",
+                                            "title": "Internal Schema Resource for Type(List/Set/Map).",
+                                            "description": "Resource",
+                                            "items": {
+                                                "type": "object",
+                                                "$ref": "#/$defs/resource"
+                                            }
+                                        }
+                                    },
+                                    "required": ["schema"]
+                                },
+                                "else":{
+                                    "properties": {
+                                        "schema":{
+                                            "type": "object",
+                                            "title": "Internal Schema Schema for Type(List/Set/Map).",
+                                            "description": "Schema",
+                                            "$ref": "#/$defs/schema"
+                                        }
+                                    },
+                                    "required": ["schema"]
+                                }
+                            }
+                        },
+                        "required": ["element"]
+                },
+                "else": {
+                    "not": {
+                        "properties": { 
+                            "element":{
+                                "type":"object",
+                                "properties": {
+                                    "type":{
+                                        "type":"string",
+                                        "enum": ["resource", "schema"]
+                                    },
+                                    "schema":{
+                                        "type":"array",
+                                        "items": {
+                                            "type": "object",
+                                            "$ref": "#/$defs/resource"
+                                        }
+                                    }
+                                }
+                            }
+                        } ,
+                        "required": ["element"]
+                    }
+                },
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "computed": {
+                                "type": "boolean",
+                                "title": "Computed",
+                                "description": "Computed is used to represent values that are not user configurable.",
+                                "pattern": "true",
+                                "enum":[true]
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "required": { 
+                                "type": "boolean",
+                                "title": "Required",
+                                "description": "Indicates that this element must be provided in the configuration.",
+                                "pattern": "true",
+                                "enum":[true]
+                            }
+                        }
+                    }
+                ],
+                "allOf": [
+                    {                   
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "max_items":{
+                                        "type": "number",
+                                        "title": "Maximum Items",
+                                        "description": "MaxItems defines a maximum amount of items that can exist within a TypeSet or TypeList."
+                                    }
+                                }
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "min_items":{
+                                        "type": "number",
+                                        "title": "Minimum Items",
+                                        "description": "MinItems defines a minimum amount of items that can exist within a TypeSet or TypeList."
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "$defs":{
+        "schema":{
+            "$id":"https://example.com/schema",
+            "$schema": "http://json-schema.org/draft-07/schema",
+            "type": "object",
+                "title": "Schemas",
+                "description": "Internal Schema Schema",
+                "required": ["type"],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "title": "Type",
+                        "description": "Type of the attribute.",
+                        "pattern": "string|bool|float|int",
+                        "enum": ["string","bool","float","int"]
+                    },
+                    "default":{
+                        "type": "number",
+                        "title": "Default",
+                        "description": "Terraform will use that value when this item is not set in the configuration."
+                    }
+                }
+        },
+        "resource":{
+            "$id":"https://example.com/resource",
+            "$schema": "http://json-schema.org/draft-07/schema",
+            "type": "object",
+                "title": "Internal Resource Schema",
+                "description": "Resource Schema",
+                "required": ["attribute","type"],
+                "properties": {
+                    "attribute": {
+                        "type": "string",
+                        "title": "attribute",
+                        "description": "Enter attribute name."
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Type",
+                        "description": "Type of the attribute.",
+                        "pattern": "string|bool|float|int|list|set|map",
+                        "enum": ["string","bool","float","int","list","set","map"]
+                    },
+                    "forcenew": {
+                        "type": "boolean",
+                        "title": "ForceNew",
+                        "description": "ForceNew indicates that any change in this field requires the resource to be destroyed and recreated.",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    
+                    "sensitive": {
+                        "type": "boolean",
+                        "title": "Sensitive",
+                        "description": "When working with a field that contains information likely to be considered sensitive, it is best to set the Sensitive property on its schema to true. This will prevent the field's values from showing up in CLI output and in Terraform Cloud.",
+                        "pattern": "true",
+                        "enum":[true]
+                    },
+                    "default":{
+                        "type": ["number","string"],
+                        "title": "Default",
+                        "description": "Terraform will use that value when this item is not set in the configuration."
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "Enter description of attribute"
+                    },
+                    "depends_on":{
+                        "type":"object",
+                        "title": "Dependency",
+                        "description": "Enter dependent resource name with hierarchy of attributes",
+                        "required": ["resource_name","attribute_name"],
+                        "properties": {
+                            "resource_name": {
+                                "type": "string",
+                                "title": "Dependent resource",
+                                "description": "Enter Dependent Resource Name "
+                            },
+                            "attribute_name":{
+                                "type":"array",
+                                "title": "Dependent attributes",
+                                "description": "Enter attributes hierarchy of the dependent resource in array form.",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "uniqueItems": true
+                            }
+                        }
+                    }
+                },
+                "if": {
+                        "properties": { "type": { "pattern":"list|set|map"} }                        
+                },
+                "then":{
+                        "title": "Element",
+                        "properties": { 
+                            "element":{
+                                "type":"object",
+                                "title": "Internal Elem",
+                                "description": "Internal Elem for Type(List/Set/Map).",
+                                "properties": {
+                                    "type":{
+                                        "type":"string",
+                                        "title": "Schema Type",
+                                        "description": "Schema type as Resource/Schema for Elem in Type(List/Set/Map).",
+                                        "pattern": "resource|schema",
+                                        "enum": ["resource", "schema"]
+                                    }
+                                },
+                                "required":["type","schema"],
+                                "if":{
+                                    "properties": { "type": { "pattern":"resource"} }
+                                },
+                                "then":{
+                                    "properties": {
+                                        "schema":{
+                                            "type":"array",
+                                            "title": "Internal Schema Resource for Type(List/Set/Map).",
+                                            "description": "Resource",
+                                            "items": {
+                                                "type": "object",
+                                                "$ref": "#/$defs/resource"
+                                            }
+                                        }
+                                    },
+                                    "required": ["schema"]
+                                },
+                                "else":{
+                                    "properties": {
+                                        "schema":{
+                                            "type": "object",
+                                            "title": "Internal Schema Schema for Type(List/Set/Map).",
+                                            "description": "Schema",
+                                            "$ref": "#/$defs/schema"
+                                        }
+                                    },
+                                    "required": ["schema"]
+                                }
+                            }
+                        },
+                        "required": ["element"]
+                },
+                "else": {
+                    "not": {
+                        "properties": { 
+                            "element":{
+                                "type":"object",
+                                "properties": {
+                                    "type":{
+                                        "type":"string",
+                                        "enum": ["resource", "schema"]
+                                    },
+                                    "schema":{
+                                        "type":"array",
+                                        "items": {
+                                            "type": "object",
+                                            "$ref": "#/$defs/resource"
+                                        }
+                                    }
+                                }
+                            }
+                        } ,
+                        "required": ["element"]
+                    }
+                },
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "computed": {
+                                "type": "boolean",
+                                "title": "Computed",
+                                "description": "Computed is used to represent values that are not user configurable.",
+                                "pattern": "true",
+                                "enum":[true]
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "required": { 
+                                "type": "boolean",
+                                "title": "Required",
+                                "description": "Indicates that this element must be provided in the configuration.",
+                                "pattern": "true",
+                                "enum":[true]
+                            }
+                        }
+                    }
+                ],
+                "allOf": [
+                    {                   
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "max_items":{
+                                        "type": "number",
+                                        "title": "Maximum Items",
+                                        "description": "MaxItems defines a maximum amount of items that can exist within a TypeSet or TypeList."
+                                    }
+                                }
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "min_items":{
+                                        "type": "number",
+                                        "title": "Minimum Items",
+                                        "description": "MinItems defines a minimum amount of items that can exist within a TypeSet or TypeList."
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+        }
+    }
+}

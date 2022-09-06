@@ -1,0 +1,308 @@
+datasources:
+- tenant
+- application_profile
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/ciscoecosystem/aci-go-client/client
+imports_for_test:
+- os
+- testing
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+- github.com/Jeffail/gabs/v2
+provider_name: Aci
+resources:
+- tenant
+- application_profile
+schemas:
+- attribute: username
+  default_func: true
+  description: Username of the ACI user
+  envvar: ACI_USERNAME
+  required: true
+  type: string
+- attribute: password
+  default_func: true
+  description: Password of the ACI user
+  envvar: ACI_PASSWORD
+  required: true
+  type: string
+- attribute: url
+  default_func: true
+  description: URL of the ACI server
+  envvar: ACI_URL
+  required: true
+  type: string
+types:
+  base64:
+    invalid:
+    - a3+J1b%mFs//
+    multiple_valids:
+    - eGFjeXF5enZwMg==
+    - c3p4M2tsYmJ6NQ==
+    - YTFtOXJhODZyNg==
+    - a3U4c2J3ZWpycA==
+    - ZTRjbGMxeDA4dQ==
+    - eTZrNTUxcm8yZQ==
+    - MG41NTZ4cHBleg==
+    - N29qcDRqZjBseQ==
+    - eXh5bDh1OTcxeg==
+    - MTBiNnl6Z2M4Ng==
+    - aW9lOHE5bDl1dA==
+    - dTI0Z2d6NnkyMg==
+    - NnZkc2w3aXMweg==
+    - Z2RoaHZvNHd0bA==
+    - bnQwYTVoc2Q5bQ==
+    valid:
+    - d2I5eW9lczc4MQ==
+    - OW9icjRyMWlzMQ==
+    - YWxvenR6YjNpMA==
+    - dHQzMGF1eGRoaA==
+  cidr:
+    invalid:
+    - 257.292.260.288/8
+    multiple_valids:
+    - 99.155.176.0/20
+    - 99.155.80.0/20
+    - 99.155.0.0/20
+    - 99.155.128.0/20
+    - 99.155.16.0/20
+    - 99.155.64.0/20
+    - 99.155.160.0/20
+    - 99.155.96.0/20
+    - 99.155.208.0/20
+    - 99.155.192.0/20
+    - 99.155.48.0/20
+    - 99.155.240.0/20
+    - 99.155.144.0/20
+    - 99.155.32.0/20
+    - 99.155.112.0/20
+    valid:
+    - 99.155.176.0/20
+    - 99.155.80.0/20
+    - 99.155.0.0/20
+    - 99.155.128.0/20
+  ipv4:
+    invalid:
+    - 299.266.284.271
+    multiple_valids:
+    - 99.155.208.240
+    - 99.155.82.188
+    - 99.155.163.159
+    - 99.155.126.247
+    - 99.155.215.240
+    - 99.155.101.197
+    - 99.155.0.206
+    - 99.155.222.179
+    - 99.155.60.158
+    - 99.155.69.241
+    - 99.155.0.28
+    - 99.155.72.163
+    - 99.155.184.255
+    - 99.155.255.108
+    - 99.155.132.91
+    valid:
+    - 99.155.208.240
+    - 99.155.82.188
+    - 99.155.163.159
+    - 99.155.126.247
+  ipv6:
+    invalid:
+    - invalidIPv6
+    multiple_valids:
+    - 2001:db8::34f4:0:0:f3f4
+    - 2001:db8::34f4:0:0:f3df
+    - 2001:db8::34f4:0:0:f3de
+    - 2001:db8::34f4:0:0:f31b
+    - 2001:db8::34f4:0:0:f3eb
+    - 2001:db8::34f4:0:0:f321
+    - 2001:db8::34f4:0:0:f3b7
+    - 2001:db8::34f4:0:0:f38c
+    - 2001:db8::34f4:0:0:f336
+    - 2001:db8::34f4:0:0:f3ec
+    - 2001:db8::34f4:0:0:f33e
+    - 2001:db8::34f4:0:0:f324
+    - 2001:db8::34f4:0:0:f3be
+    - 2001:db8::34f4:0:0:f32a
+    - 2001:db8::34f4:0:0:f3aa
+    valid:
+    - 2001:db8::34f4:0:0:f3f4
+    - 2001:db8::34f4:0:0:f3df
+    - 2001:db8::34f4:0:0:f3de
+    - 2001:db8::34f4:0:0:f31b
+  json:
+    invalid:
+    - 'json({ name : val)'
+    multiple_valids:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+    - 'json({ "attribute" : "value4" })'
+    - 'json({ "attribute" : "value5" })'
+    - 'json({ "attribute" : "value6" })'
+    - 'json({ "attribute" : "value7" })'
+    - 'json({ "attribute" : "value8" })'
+    - 'json({ "attribute" : "value9" })'
+    - 'json({ "attribute" : "value10" })'
+    - 'json({ "attribute" : "value11" })'
+    - 'json({ "attribute" : "value12" })'
+    - 'json({ "attribute" : "value13" })'
+    - 'json({ "attribute" : "value14" })'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+  mac:
+    invalid:
+    - invalidMAC
+    multiple_valids:
+    - 8b:1d:7e:63:2d:03
+    - b6:ed:85:f6:76:09
+    - 95:20:c0:70:d6:d2
+    - 84:94:f0:f0:e5:2f
+    - c8:8f:29:25:84:4f
+    - ee:89:92:83:61:39
+    - a4:68:b6:04:7e:76
+    - 22:41:5a:94:e0:d2
+    - 75:68:02:a8:d3:8f
+    - 57:8b:0c:e7:79:5b
+    - f7:84:0a:f5:7c:63
+    - 2b:69:9d:2f:c5:5c
+    - aa:c5:36:5c:ff:0f
+    - 8a:c2:71:89:95:37
+    - 15:15:80:4c:50:04
+    valid:
+    - ac:e4:9d:32:5f:65
+    - 49:36:9b:c5:b5:84
+    - 9e:45:20:d9:c0:68
+    - 09:ba:fb:e1:55:76
+  regex:
+    invalid:
+    - '[0-9)++'
+    multiple_valids:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+    valid:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+  string:
+    invalid:
+    - 12345
+    multiple_valids:
+    - w7bd6zt89y
+    - huf7hiw1g2
+    - 4m79mp5xws
+    - g116bduldx
+    - qjkmbzskc2
+    - erl0yy05u2
+    - 2yr99jctw3
+    - n0xzzks2qv
+    - 82tgajmxr9
+    - 7bycig1zyd
+    - mrfsr7z0l1
+    - 19d6ul2se6
+    - 78am9g4qqo
+    - ly9rxd7pe1
+    - bvus6bjklh
+    valid:
+    - zcfq2o1sjn
+    - enom3df2z3
+    - 9u3cjyka5c
+    - dukxuhyiyt
+  time:
+    invalid:
+    - '2022-08-02 15:53:37.574540'
+    multiple_valids:
+    - '2022-08-02T10:23:37.574540+00:00'
+    - '2022-08-25T10:23:37.574540+00:00'
+    - '2022-09-17T10:23:37.574540+00:00'
+    - '2022-10-10T10:23:37.574540+00:00'
+    - '2022-11-02T10:23:37.574540+00:00'
+    - '2022-11-25T10:23:37.574540+00:00'
+    - '2022-12-18T10:23:37.574540+00:00'
+    - '2023-01-10T10:23:37.574540+00:00'
+    - '2023-02-02T10:23:37.574540+00:00'
+    - '2023-02-25T10:23:37.574540+00:00'
+    - '2023-03-20T10:23:37.574540+00:00'
+    - '2023-04-12T10:23:37.574540+00:00'
+    - '2023-05-05T10:23:37.574540+00:00'
+    - '2023-05-28T10:23:37.574540+00:00'
+    - '2023-06-20T10:23:37.574540+00:00'
+    valid:
+    - '2022-08-02T10:23:37.574540+00:00'
+    - '2022-08-25T10:23:37.574540+00:00'
+    - '2022-09-17T10:23:37.574540+00:00'
+    - '2022-10-10T10:23:37.574540+00:00'
+  url-http:
+    invalid:
+    - ht:/6qhe6xfdpx29ti9.com
+    multiple_valids:
+    - http://24jqy82lgyxtnfi.com
+    - http://1nw0hzhb6en8s1r.com
+    - http://eqbje7541isiz4r.com
+    - http://ctealj3prm4ke7d.com
+    - http://9fhvhslekj992dn.com
+    - http://if5opy1evvo5pee.com
+    - http://fywh8p6yd80arrz.com
+    - http://xkq0w9vcfiu61sj.com
+    - http://vtmh9mhlvoa83u3.com
+    - http://6rl9oybyzds0zd1.com
+    - http://h6kukyvot107lh4.com
+    - http://g15t4l8bltds397.com
+    - http://bfh1v2h2p02yel6.com
+    - http://xt1uufkz4noyrky.com
+    - http://i4wdc3b45g56x02.com
+    valid:
+    - http://kgw6y878u2x6aev.com
+    - http://5hpzmqhjjrpzv1w.com
+    - http://6j8mwfvlkdaumc7.com
+    - http://bb51iawzbb2hjqn.com
+  url-https:
+    invalid:
+    - hts:/asvrylikc39my6h.com
+    multiple_valids:
+    - https://ns7j3ytqnaqa3hu.com
+    - https://f0v8yt89ze0r7e1.com
+    - https://9ek469bkd9bc8vf.com
+    - https://97gbwjpjzkfopi4.com
+    - https://5dbq4drpob8yvhp.com
+    - https://vu5mz6aoo5uz9u7.com
+    - https://ufzvk6a0sjlds0w.com
+    - https://n8dxc05x060pu2i.com
+    - https://rb86vu20sdf9yg0.com
+    - https://s8fw24y311z1o01.com
+    - https://kfhqm4xaxgxjwfx.com
+    - https://09gjqhkecdkxuau.com
+    - https://sfu5p3pappazmgj.com
+    - https://29qdoeogwyqmodn.com
+    - https://pw7stzat1wwz8ni.com
+    valid:
+    - https://qt3bgmo5isedcpd.com
+    - https://bzydt1pd16yh7mn.com
+    - https://67i6m7wmfsgkm9o.com
+    - https://zswdc4ye94zlvgx.com
+  uuid:
+    invalid:
+    - invalid323Uuid12
+    multiple_valids:
+    - 2bd8b4bd-124d-11ed-90db-7c8ae1979a87
+    - 2bd8b4be-124d-11ed-89e5-7c8ae1979a87
+    - 2bd8b4bf-124d-11ed-b9a9-7c8ae1979a87
+    - 2bd8b4c0-124d-11ed-b06d-7c8ae1979a87
+    - 2bd8b4c1-124d-11ed-9848-7c8ae1979a87
+    - 2bd8b4c2-124d-11ed-9518-7c8ae1979a87
+    - 2bd8b4c3-124d-11ed-ac33-7c8ae1979a87
+    - 2bd8b4c4-124d-11ed-a578-7c8ae1979a87
+    - 2bd8b4c5-124d-11ed-907d-7c8ae1979a87
+    - 2bd8b4c6-124d-11ed-9b91-7c8ae1979a87
+    - 2bd8b4c7-124d-11ed-b043-7c8ae1979a87
+    - 2bd8b4c8-124d-11ed-a1cd-7c8ae1979a87
+    - 2bd8b4c9-124d-11ed-b1bb-7c8ae1979a87
+    - 2bd8b4ca-124d-11ed-86e1-7c8ae1979a87
+    - 2bd8b4cb-124d-11ed-9be0-7c8ae1979a87
+    valid:
+    - 2bd8857b-124d-11ed-92f2-7c8ae1979a87
+    - 2bd8b4ba-124d-11ed-9ad4-7c8ae1979a87
+    - 2bd8b4bb-124d-11ed-99e8-7c8ae1979a87
+    - 2bd8b4bc-124d-11ed-b32b-7c8ae1979a87

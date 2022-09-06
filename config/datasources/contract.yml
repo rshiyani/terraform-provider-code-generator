@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../../json_schema/datasource_validate.json
+provider_name: "Aci"
+name: "Contract"
+imports:
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+unique_attribute:
+  - "name"
+schemas:
+  - attribute: "name"
+    type: "string"
+    required: true
+    forcenew: true
+    description: "name of someone"
+    depends_on:
+      resource_name: "tenant"
+      attribute_name:
+        - "filter"
+        - "filter_entry"
+        - "name"
+
+  - attribute: "temp"
+    type: "int"
+    required: true
+    forcenew: true
+    description: "temp of some resource"
+    depends_on:
+      resource_name: "application_profile"
+      attribute_name:
+        - "application_dn"
+
+  - attribute: "weight"
+    type: "float"
+    required: true
+    description: "weight of someone"
+
+  - attribute: "ipv4_for"
+    type: "bool"
+    computed: true
+    description: "IP-address v4"
+
+  - attribute: "port_number"
+    type: "int"
+    computed: true
+
+  - attribute: "temp_schema_list"
+    type: "set"
+    required: true
+    element:
+      type: "schema"
+      schema:
+        type: "string"
+
+  - attribute: "test_score"
+    type: "int"
+    computed: true
+    description: "range"
+
+  - attribute: "string_in_some_names"
+    type: "string"
+    computed: true
+    description: "string in valid list"
+    default: "test_default"
+
+  - attribute: "percentage"
+    type: "float"
+    computed: true
+
+  - attribute: "testingmap"
+    type: "map"
+    computed: true
+    element:
+      type: "schema"
+      schema:
+        type: "int"   
+
+  - attribute: "filter"
+    type: "list"
+    # required: true
+    computed: true
+    description: "filter list"
+    max_items: 10
+    element:
+      type: "resource"
+      schema:
+        - attribute: "filter_name"
+          type: "string"
+          required: true
+          description: "name of filter"
+        - attribute: "id"
+          type: "string"
+          computed: true
+          description: "id of filter"
+        - attribute: "description"
+          type: "string"
+          computed: true
+          description: "description of filter"
+        - attribute: "filter_entry"
+          type: "list"
+          required: true
+          # computed: true
+          description: "list of filter_entry"
+          element:
+            type: "resource"
+            schema:
+              - attribute: "id_list"
+                type: "set"
+                required: true
+                element:
+                  type: "schema"
+                  schema:
+                    type: "string"
+              - attribute: "filter_entry_name"
+                type: "string"
+                required: true
+                description: "name of filter entry"
+                diff_suppress: true
+              - attribute: "ipv6"
+                type: "string"
+                computed: true
+                description: "ipv6"
+
+              - attribute: "apply_to_frag"
+                type: "string"
+                computed: true
+
+                description: "apply to fragment"
+              - attribute: "apply_to_frag_liist_schema"
+                type: "list"
+                computed: true
+                description: "apply to fragment"
+                element:
+                  type: schema
+                  schema:
+                    type: "bool"

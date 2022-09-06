@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=../../json_schema/resource_validate.json
+provider_name: "Movies"
+name: "movie"
+imports:
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+unique_attribute: 
+  - "title"
+ 
+schemas:
+  - attribute: "title"
+    type: "string"
+    required: true
+    forcenew: true
+    description: "Title of the Movie"
+    test_params:
+      valid:
+        - "Hello"
+        - "World"
+      invalid:
+        - 234
+        - 987
+
+  - attribute: "isbn"
+    type: "string"
+    optional: true
+    description: "ISBN of the Movie"
+    test_params:
+      valid:
+        - "Hello"
+        - "World"
+      invalid:
+        - 234
+        - 987
+
+  - attribute: "genre"
+    type: "string"
+    optional: true
+    description: "Genre of the movie"
+    default: "thriller"
+    validation:
+      func_name: "StringInSlice"
+      params:
+        - "thriller"
+        - "action"
+        - "horror"
+        - "fiction"
+        - "comedy"
+      ignore_case: false
+  - attribute: "director"
+    type: "list"
+    optional: true
+    description: "Director of the Movie"
+    max_items: 1
+    element:
+      type: "resource"
+      schema:
+        - attribute: "firstname"
+          type: "string"
+          required: true
+          description: "Firstname of the Director"
+        - attribute: "lastname"
+          type: "string"
+          optional: true
+          description: "Lastname of the Director"
+  - attribute: rating
+    type: "list"
+    optional: true
+    element:
+      type: "resource"
+      schema:
+        - attribute: rater
+          type: "string"
+          required: true
+          description: "Rater that provide rating"
+        - attribute: rating
+          type: "float"
+          optional: true
+          default: 1
+          validation:
+            func_name: "FloatBetween"
+            params:
+              - 1
+              - 10
+  - attribute: casts
+    type: set
+    optional: true
+    element:
+      type: schema
+      schema:
+        type: string

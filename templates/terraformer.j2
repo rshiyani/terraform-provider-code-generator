@@ -1,0 +1,70 @@
+package {{provider_name | camelize}}
+
+import(
+    {% for import in imports  %}
+    "{{ import }}"
+    {% endfor %}
+)
+
+type {{name | pascalize}}Generator struct {
+	{{provider_name | pascalize}}Service
+}
+
+func (a *{{name | pascalize}}Generator) InitResources() error {
+    
+    if clientImpl == nil {
+		_, err := a.createClient()
+		if err != nil {
+			return err
+		}
+	}
+
+    client := clientImpl
+
+    {{name | camelize}}URL:= "{{getURL}}"
+
+    {{name | camelize}}Data,err := client.GetViaURL({{name | camelize}}URL) 
+
+    if err != nil {
+		return err
+	}
+
+    var total interface{}
+
+	json.Unmarshal({{name | camelize}}Data, &total)
+
+	totalSlice, ok := total.([]interface{})
+
+	if !ok {
+		return fmt.Errorf("%s", "Error while convert to slice.")
+	}
+
+	cont, err := gabs.ParseJSON({{name | camelize}}Data)
+	if err != nil {
+		return err
+	}
+    
+    for i := 0; i < len(totalSlice); i++ {
+        //TODO : Below is example of ID Field.
+		{{name | camelize}}ID := stripQuotes(cont.Index(i).S("id").String())
+
+		resource := terraformutils.NewResource(
+			{{name | camelize}}ID,
+			fmt.Sprintf("%s_%s_%d","{{provider_name | snakify}}",{{name | camelize}}ID, i),
+			"{{provider_name | snakify}}_{{name | snakify}}",
+			"{{provider_name | snakify}}",
+			map[string]string{},
+			[]string{
+                {% for attribute in resource_allowed_empty_attributes %}
+                        "{{attribute}}",
+                {% endfor %}
+            },
+			map[string]interface{}{},
+		)
+
+		resource.SlowQueryRequired = true
+		a.Resources = append(a.Resources, resource)
+	}
+
+	return nil
+}

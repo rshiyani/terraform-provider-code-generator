@@ -1,0 +1,42 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package {{provider_name | snakify}}
+
+import(
+    {% for import in imports  %}
+    "{{ import }}"
+    {% endfor %}
+) 
+
+func Provider() *schema.Provider {
+	return &schema.Provider{
+		Schema: map[string]*schema.Schema{
+			{% for schema in schemas %}
+				{{ schemaHelper.getSchemaEle(schema) }}
+			{% endfor %}
+		},
+
+		ResourcesMap: map[string]*schema.Resource{
+            {% for resource in resources %}
+            "{{provider_name |snakify +"_"+resource}}": resource{{provider_name | pascalize}}{{schemaHelper.genFuncName(resource)}}(),
+            {% endfor %}
+        },
+		
+		DataSourcesMap: map[string]*schema.Resource{
+            {% for ds in datasources %}
+            "{{provider_name |snakify +"_"+ds}}": dataSource{{provider_name | pascalize}}{{schemaHelper.genFuncName(ds)}}(),
+            {% endfor %}
+        },
+
+		ConfigureFunc: configureClient,
+	}
+}
+
+func configureClient(d *schema.ResourceData) (interface{}, error) {
+    {% for schema in schemas %}
+    {{schema.attribute}} := d.Get("{{schema.attribute}}").({{schema.type}})
+    {% endfor %}
+	return nil, nil
+}
+
+
+

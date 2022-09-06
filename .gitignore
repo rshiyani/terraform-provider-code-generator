@@ -72,7 +72,7 @@ instance/
 docs/_build/
 
 # PyBuilder
-target/
+# target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Generated Go files
+# *.go
+
+#EXE
+*.exe

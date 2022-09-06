@@ -1,0 +1,84 @@
+package client
+
+import (
+	"bytes"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
+
+type Client struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+// Creates Client with base URL and Timeout of 1 minute
+func newClient(url string) *Client {
+	return &Client{
+		BaseURL: url,
+		HTTPClient: &http.Client{
+			Timeout: time.Minute,
+		},
+	}
+}
+
+//For Authentication of Client using Credentials
+func GetClient(username, password, url string) (*Client, error) {
+
+	log.Println("[DEBUG] Beginning of Authentication using GetClient")
+
+	//Generate Client
+	client := newClient(url)
+
+	//Credentials
+	payload := fmt.Sprintf(`
+    {
+        "username": "%s",
+        "password": "%s"
+    }
+    `, username, password)
+
+	loginURL := client.BaseURL + "/login"
+
+	//Request with Credentials as payload
+	req, err := http.NewRequest("POST", loginURL, bytes.NewReader([]byte(payload)))
+	if err != nil {
+		return nil, err
+	}
+
+	//Setting Headers for JSON
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	//Getting Response
+	res, err := client.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	log.Println("[DEBUG] Setting the Cookie")
+
+	//Setting Token from cookie
+	cookie := res.Cookies()
+
+	//if cookie is empty
+	if len(cookie) == 0 {
+		return nil, fmt.Errorf("authentication error")
+	}
+
+	//Searching for cookie named "token"
+	for i := 0; i < len(cookie); i++ {
+		if cookie[i].Name == "token" {
+			Token = cookie[i].Value
+			log.Println("[DEBUG] End of Authentication using GetClient")
+			return client, nil
+		}
+	}
+
+	//if cookie named "token" is not found
+	return nil, fmt.Errorf("authentication error")
+
+}

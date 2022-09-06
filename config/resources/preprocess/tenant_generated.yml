@@ -1,0 +1,406 @@
+imports:
+- github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema
+name: Tenant
+provider_name: Aci
+schemas:
+- attribute: name
+  description: Name of Tenant
+  forcenew: true
+  required: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - voj21d42qp
+    - zd1nndszyz
+    - wdg6yetkp0
+    - h6sqzp318d
+    - la0ofc193b
+    - 4cph5e37f2
+    - cqe7uby4xx
+    - 3d9c7m1ds5
+    - hwpxes2e00
+    - ztlnvw123u
+    - vonvg2px1a
+    - c6gnbunl8m
+    - r6l932zxr4
+    - l4v373aksv
+    - po10o6kbbv
+    valid:
+    - 66n8mmnrrn
+    - dts7le60ix
+    - kn4lfv4mbx
+    - svnfrf46ju
+  type: string
+- attribute: name_alias
+  computed: true
+  description: annotation for Tenant
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - o82wm6sntp
+    - 8ooyasm6yy
+    - 52atrcvwyz
+    - fi4e9hn2m6
+    - cz1wa8j6pj
+    - p2odq51xlm
+    - iz0qqhjonp
+    - aixitobsh4
+    - 8y6rkpo37p
+    - eqr3kipq56
+    - spg7xzu799
+    - z0t53ny4ad
+    - msqbn7xvew
+    - n7vorytuon
+    - m4imjcgbz6
+    valid:
+    - 8ywo2guvkk
+    - 4yy9qv20s1
+    - fsxlyp3dhn
+    - 3jvjiipq1m
+  type: string
+- attribute: description
+  computed: true
+  description: description for Tenant
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - 0vy00edssq
+    - 0tzcc2wx4e
+    - qlvh37grkg
+    - 6zp3srk17b
+    - hurszv6xef
+    - m80l0z8rh8
+    - xaftp8i9k2
+    - ptmug3itfs
+    - pb9ukpo982
+    - 82v31drlms
+    - 664kvjma7e
+    - nkqzfguuyc
+    - myrepy2dut
+    - vhml90vrx3
+    - ymliigehj8
+    valid:
+    - rbiewyr9jg
+    - gr48oczefn
+    - 2odbg46jye
+    - 88nytq2mtn
+  type: string
+- attribute: annotation
+  computed: true
+  default: orchestrator:terraform
+  description: Annotation for Tenant
+  optional: true
+  subtype: string
+  test_params:
+    invalid:
+    - 10
+    - 12.43
+    multiple_valids:
+    - ut32xrp8xf
+    - 9axxlpm09d
+    - 7bmset0d1y
+    - uj2jn0z7y9
+    - sdx9zy56av
+    - lnakd8yb73
+    - uc5ic5o3y9
+    - 7lg65rnj7d
+    - 0jym5i18kr
+    - kiyfrej5xl
+    - m152m74u66
+    - b2uhgh5awz
+    - rlugcy8in8
+    - vdtv1p16z1
+    - 0tisa2klq3
+    valid:
+    - hjl2cn6a7d
+    - 9edezpd8k4
+    - dw6hy6ltj9
+    - djgxp2icsh
+  type: string
+types:
+  base64:
+    invalid:
+    - a3+J1b%mFs//
+    multiple_valids:
+    - cmVuYm4wcmFtdw==
+    - Y3NxM2Vhc3VycA==
+    - eTdsNHJobDBjaw==
+    - bDQ0dHdpOGUyaw==
+    - MzhpbnlzZzlxdA==
+    - bmIyZmVhODM5Zw==
+    - dmRmOXV1cXo0bw==
+    - YmMxams4NWU2ZQ==
+    - bjF0NHh3aWwxYw==
+    - amp4dThzYmtjZQ==
+    - MHBycmF2ZzNqMg==
+    - aGFqdW4zMmFmag==
+    - cXlrczM3dGtucA==
+    - d2I2Z2dnb2Fweg==
+    - OWltdXlnN3V0eQ==
+    valid:
+    - Y282bmNzYWV2ag==
+    - ZWIxMmowNmtqeg==
+    - cHV2Y3lyMGxhNQ==
+    - bGtpcG5jYWFnOQ==
+  cidr:
+    invalid:
+    - 259.279.286.282/13
+    multiple_valids:
+    - 1.221.48.0/20
+    - 1.221.192.0/20
+    - 1.221.176.0/20
+    - 1.221.224.0/20
+    - 1.221.80.0/20
+    - 1.221.96.0/20
+    - 1.221.32.0/20
+    - 1.221.208.0/20
+    - 1.221.128.0/20
+    - 1.221.160.0/20
+    - 1.221.64.0/20
+    - 1.221.16.0/20
+    - 1.221.112.0/20
+    - 1.221.240.0/20
+    - 1.221.0.0/20
+    valid:
+    - 1.221.48.0/20
+    - 1.221.192.0/20
+    - 1.221.176.0/20
+    - 1.221.224.0/20
+  ipv4:
+    invalid:
+    - 262.271.269.268
+    multiple_valids:
+    - 1.221.54.230
+    - 1.221.62.97
+    - 1.221.101.235
+    - 1.221.132.245
+    - 1.221.188.108
+    - 1.221.154.209
+    - 1.221.55.44
+    - 1.221.225.30
+    - 1.221.76.199
+    - 1.221.169.202
+    - 1.221.58.118
+    - 1.221.185.49
+    - 1.221.232.219
+    - 1.221.144.49
+    - 1.221.223.119
+    valid:
+    - 1.221.54.230
+    - 1.221.62.97
+    - 1.221.101.235
+    - 1.221.132.245
+  ipv6:
+    invalid:
+    - invalidIPv6
+    multiple_valids:
+    - 2001:db8::34f4:0:0:f374
+    - 2001:db8::34f4:0:0:f3ae
+    - 2001:db8::34f4:0:0:f3b9
+    - 2001:db8::34f4:0:0:f3ea
+    - 2001:db8::34f4:0:0:f3fe
+    - 2001:db8::34f4:0:0:f353
+    - 2001:db8::34f4:0:0:f364
+    - 2001:db8::34f4:0:0:f352
+    - 2001:db8::34f4:0:0:f3a5
+    - 2001:db8::34f4:0:0:f31b
+    - 2001:db8::34f4:0:0:f3c9
+    - 2001:db8::34f4:0:0:f369
+    - 2001:db8::34f4:0:0:f3a0
+    - 2001:db8::34f4:0:0:f34c
+    - 2001:db8::34f4:0:0:f3fc
+    valid:
+    - 2001:db8::34f4:0:0:f374
+    - 2001:db8::34f4:0:0:f3ae
+    - 2001:db8::34f4:0:0:f3b9
+    - 2001:db8::34f4:0:0:f3ea
+  json:
+    invalid:
+    - 'json({ name : val)'
+    multiple_valids:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+    - 'json({ "attribute" : "value4" })'
+    - 'json({ "attribute" : "value5" })'
+    - 'json({ "attribute" : "value6" })'
+    - 'json({ "attribute" : "value7" })'
+    - 'json({ "attribute" : "value8" })'
+    - 'json({ "attribute" : "value9" })'
+    - 'json({ "attribute" : "value10" })'
+    - 'json({ "attribute" : "value11" })'
+    - 'json({ "attribute" : "value12" })'
+    - 'json({ "attribute" : "value13" })'
+    - 'json({ "attribute" : "value14" })'
+    valid:
+    - 'json({ "attribute" : "value0" })'
+    - 'json({ "attribute" : "value1" })'
+    - 'json({ "attribute" : "value2" })'
+    - 'json({ "attribute" : "value3" })'
+  mac:
+    invalid:
+    - invalidMAC
+    multiple_valids:
+    - 5d:9b:27:49:2d:9f
+    - 25:96:32:a2:08:b8
+    - a8:27:9e:27:08:8c
+    - 05:77:fc:58:e1:ed
+    - de:0d:f3:bc:ec:cb
+    - 02:c6:af:41:5c:cb
+    - ab:d4:8b:f6:29:63
+    - f7:ac:fb:b2:4d:ab
+    - ba:00:a7:1d:65:92
+    - 52:cb:1b:02:29:d8
+    - 27:8e:d9:6d:02:0a
+    - bf:b0:07:db:c5:1e
+    - 34:19:d8:4b:13:c9
+    - 3b:9a:5c:b3:f8:5f
+    - 0b:4c:13:b3:cd:5a
+    valid:
+    - 8c:5d:e6:d1:a2:00
+    - 93:9f:7d:ce:50:7f
+    - fa:49:a8:6c:c7:87
+    - 95:b9:bf:c8:cc:4b
+  regex:
+    invalid:
+    - '[0-9)++'
+    multiple_valids:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+    valid:
+    - (?m)^[0-9]{2}$
+    - ^(\$)(\d)+
+  string:
+    invalid:
+    - 12345
+    multiple_valids:
+    - flln7kb3ad
+    - wpx4c9efi4
+    - lm0hx6nfxh
+    - puryimpwks
+    - xrb1xebarb
+    - 5q01nb5rm0
+    - osy45dp2sa
+    - 1vzteuxqn6
+    - zwfmp2qsgj
+    - ne46t9nyhf
+    - 0tugzcxtqg
+    - 2patu07uv9
+    - vnkfmrvdi4
+    - lfi9c25h27
+    - t1wxitgx22
+    valid:
+    - x6ov6p5jpk
+    - aw7t6t4p2b
+    - lc27o1xa3o
+    - d26mk5sbhe
+  time:
+    invalid:
+    - '2022-08-02 15:53:33.800697'
+    multiple_valids:
+    - '2022-08-02T10:23:33.800697+00:00'
+    - '2022-08-25T10:23:33.800697+00:00'
+    - '2022-09-17T10:23:33.800697+00:00'
+    - '2022-10-10T10:23:33.800697+00:00'
+    - '2022-11-02T10:23:33.800697+00:00'
+    - '2022-11-25T10:23:33.800697+00:00'
+    - '2022-12-18T10:23:33.800697+00:00'
+    - '2023-01-10T10:23:33.800697+00:00'
+    - '2023-02-02T10:23:33.800697+00:00'
+    - '2023-02-25T10:23:33.800697+00:00'
+    - '2023-03-20T10:23:33.800697+00:00'
+    - '2023-04-12T10:23:33.800697+00:00'
+    - '2023-05-05T10:23:33.800697+00:00'
+    - '2023-05-28T10:23:33.800697+00:00'
+    - '2023-06-20T10:23:33.800697+00:00'
+    valid:
+    - '2022-08-02T10:23:33.800697+00:00'
+    - '2022-08-25T10:23:33.800697+00:00'
+    - '2022-09-17T10:23:33.800697+00:00'
+    - '2022-10-10T10:23:33.800697+00:00'
+  url-http:
+    invalid:
+    - ht:/ruuip343vpo5uyf.com
+    multiple_valids:
+    - http://p28d8gq9u4i3g4h.com
+    - http://iw1wvq89t8xab2p.com
+    - http://w5zquiggzwu4kdu.com
+    - http://t8ev0ngxucopjcz.com
+    - http://nyakmvu90elpisr.com
+    - http://bgh5sig538bfmsq.com
+    - http://r6c8ra9frplfuul.com
+    - http://hwat5z8e72s1cfw.com
+    - http://61722c58fw9ozzy.com
+    - http://lcsxh5wfp1athir.com
+    - http://vauxt4spsnm4i4i.com
+    - http://zxiphc515c1sqxj.com
+    - http://62yajhpuxszten7.com
+    - http://s2yd4zqfcxw78qi.com
+    - http://3jewe8hkdr74tbn.com
+    valid:
+    - http://ey9wlp6cmtuokde.com
+    - http://tpv3ebg0hichnog.com
+    - http://ekq10aja80cn4rt.com
+    - http://qi6t4zq0ox6p0ic.com
+  url-https:
+    invalid:
+    - hts:/lq8zwn1fgmbyg3v.com
+    multiple_valids:
+    - https://tv0sxbg1r5811zn.com
+    - https://txjf696z84gs17i.com
+    - https://732hcy9zmvocec8.com
+    - https://rj75wt7lrp3sg5z.com
+    - https://4wwrxl2alnij2pg.com
+    - https://kywpze2183g9c3z.com
+    - https://b5sxiqxa34eyr0i.com
+    - https://3be5z4tznslv1w0.com
+    - https://wa7ubutrti4os1n.com
+    - https://3ewerenduwyldxz.com
+    - https://7tadhqn739c6my5.com
+    - https://va2fy177wwd48yd.com
+    - https://84wjtr6qyaz6324.com
+    - https://a596nx8eirwmnf5.com
+    - https://70ux0f3o93fsio1.com
+    valid:
+    - https://dmj7c4qe7973v1b.com
+    - https://gpeogka61qllcil.com
+    - https://2x0n1ebc9972l5j.com
+    - https://emucqat75pw054q.com
+  uuid:
+    invalid:
+    - invalid323Uuid12
+    multiple_valids:
+    - 2998adc6-124d-11ed-b1eb-7c8ae1979a87
+    - 2998adc7-124d-11ed-8960-7c8ae1979a87
+    - 2998adc8-124d-11ed-9e86-7c8ae1979a87
+    - 2998adc9-124d-11ed-a006-7c8ae1979a87
+    - 2998adca-124d-11ed-90d4-7c8ae1979a87
+    - 2998adcb-124d-11ed-96ea-7c8ae1979a87
+    - 2998adcc-124d-11ed-ba74-7c8ae1979a87
+    - 2998adcd-124d-11ed-a04f-7c8ae1979a87
+    - 2998adce-124d-11ed-acd6-7c8ae1979a87
+    - 2998adcf-124d-11ed-8485-7c8ae1979a87
+    - 2998add0-124d-11ed-8518-7c8ae1979a87
+    - 2998add1-124d-11ed-b952-7c8ae1979a87
+    - 2998add2-124d-11ed-8110-7c8ae1979a87
+    - 2998add3-124d-11ed-ac81-7c8ae1979a87
+    - 2998add4-124d-11ed-b0e8-7c8ae1979a87
+    valid:
+    - 2998adc2-124d-11ed-bd35-7c8ae1979a87
+    - 2998adc3-124d-11ed-aa3a-7c8ae1979a87
+    - 2998adc4-124d-11ed-873d-7c8ae1979a87
+    - 2998adc5-124d-11ed-983e-7c8ae1979a87
+unique_attribute:
+- name

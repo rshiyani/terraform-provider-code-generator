@@ -1,0 +1,87 @@
+{% import './helpers/schema.j2' as schemaHelper %}
+package {{provider_name | snakify}}
+
+import (
+	{% for import in imports_for_test %}
+    "{{ import }}"
+    {% endfor %}
+)
+
+var expectErrorMap = map[string]string{
+	"IsCIDR": "expected (.)+ to be a valid IPv4 Value, got (.)+: (.)+",
+	"IsIPAddress":"expected (.)+ to contain a valid IP, got: (.)+",
+	"IsIPv4Address": "expected (.)+ to contain a valid IPv4 address, got: (.)+",
+	"IsIPv6Address": "expected (.)+ to contain a valid IPv6 address, got: (.)+",
+	"IsMACAddress":"expected (.)+ to be a valid MAC address, got (.)+: (.)+",
+	"IsRFC3339Time": "expected (.)+ to be a valid RFC3339 date, got (.)+: (.)+",
+	"IsURLWithHTTPS": "",
+	"IsURLWithHTTPorHTTPS": "",
+	"IsUUID": "expected (.)+ to be a valid UUID, got (.)+",
+	"StringIsBase64": "expected (.)+ to be a base64 string, got (.)+",
+	"StringIsJSON": "(.)+ contains an invalid JSON: (.)+",
+	"StringIsValidRegExp":"(.)+: (.)+" ,
+	"StringInSlice": "expected (.)+ to be one of (.)+, got (.)+",
+	"StringNotInSlice": "expected (.)+ to not be any of (.)+, got (.)+",
+	"IsCIDRNetwork": "expected (.)+ to contain a network Value with between (.)+ and (.)+ significant bits, got: (.)+",
+	"IntBetween": "expected (.)+ to be in the range ((.)+ - (.)+), got (.)+",
+	"IsPortNumber": "expected (.)+ to be a valid port number, got: (.)+",
+	"IsPortNumberOrZero": "expected (.)+ to be a valid port number or 0, got: (.)+",
+	"FloatBetween": "expected (.)+ to be in the range ((.)+ - (.)+), got (.)+",
+}
+
+var Test = map[string]interface{}{
+	{% for type, value in types.items() %}
+		"{{type}}": map[string]interface{}{
+			"valid": []interface{}{ {{ value.valid | map("tojson") | join(', ')}} },
+			"invalid": []interface{}{ {{ value.invalid | map("tojson") | join(', ')}} },
+			"multiple_valids": []interface{}{ {{ value.multiple_valids | map("tojson") | join(', ')}} },
+		},
+	{% endfor %}
+}
+
+var testAccProviders map[string]*schema.Provider
+var testAccProvider *schema.Provider
+
+func init() {
+	testAccProvider = Provider()
+	testAccProviders = map[string]*schema.Provider{
+		"{{provider_name | snakify}}": testAccProvider,
+	}
+}
+
+func TestProvider(t *testing.T) {
+	if err := Provider().InternalValidate(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+}
+
+func TestProvider_impl(t *testing.T) {
+	var _ *schema.Provider = Provider()
+}
+
+func testAccPreCheck(t *testing.T) {
+    {% for schema in schemas %}
+        {% if schema.default_func is true and schema.envvar is defined%}
+            if v := os.Getenv("{{schema.envvar}}"); v == "" {
+                t.Fatal("{{schema.envvar}} env variable must be set for acceptance tests")
+            }
+        {% endif %}
+    {% endfor %}
+}
+
+var providerFactories = map[string]func() (*schema.Provider, error){
+	"{{provider_name | snakify}}": func() (*schema.Provider, error) {
+		return testAccProvider, nil
+	},
+}
+
+func makeTestVariable(s string) string {
+	return fmt.Sprintf("TestAcc_%v", s)
+}
+
+
+func searchInObject(testMap map[string]interface{}, attr string) interface{} {
+	jsonStr, _ := json.Marshal(testMap)
+	jsonParsed, _ := gabs.ParseJSON([]byte(jsonStr))
+	return jsonParsed.Path(attr).Data()
+}

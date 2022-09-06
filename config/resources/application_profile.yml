@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../json_schema/resource_validate.json
+name: application_profile
+provider_name: Aci
+imports:
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+  - "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+unique_attribute:
+  - "name"
+schemas:
+- attribute: tenant_dn
+  type: string
+  description: Dn of Tenant
+  forcenew: true
+  required: true
+  depends_on:
+    resource_name: "tenant"
+    attribute_name:
+      - id
+- attribute: name
+  type: string
+  computed: true 
+  description: Name of Application Profile
+  
+- attribute: name_alias
+  type: string
+  description: Name Alias for Application Profile
+  optional: true
+  computed: true
+- attribute: description
+  type: string
+  description: description for Tenant
+  optional: true
+  computed: true
+- attribute: annotation
+  type: string
+  description: Annotation for Tenant
+  optional: true
+  computed: true
+  default: "orchestrator:terraform"
+- attribute: prio
+  type: string
+  optional: true
+  computed: true
+  default: "unspecified"
+  validation:
+    func_name: "StringInSlice"
+    params:
+      - "unspecified"
+      - "level3"
+      - "level2"
+      - "level1"
+      - "level4"
+      - "level5"
+      - "level6"
+    ignore_case: "false"
