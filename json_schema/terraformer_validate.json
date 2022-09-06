@@ -1,0 +1,56 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Terraformer Schema",
+    "description": "It include provider_name,name,imports,getURL and resource_allowed_empty_attributes.",
+    "required": [ "provider_name","name","imports","getURL","resource_allowed_empty_attributes" ],
+    "type" :"object",
+    "additionalProperties": false,
+    "properties": {
+        "provider_name":{
+            "type":"string",
+            "title": "Provider Name",
+            "description": "Enter Provider name.",
+            "examples": ["Aws","Gcp"]
+        },
+        "name":{
+            "type":"string",
+            "title": "Resource Name",
+            "description": "Enter Resource name.",
+            "examples": ["tenant","application_profile"]
+        },
+        "imports":{
+            "type":"array",
+            "title": "Import Links",
+            "description": "Enter import links of modules.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [ "fmt",
+                          "strconv",
+                          "github.com/GoogleCloudPlatform/terraformer/terraformutils"
+                        ]
+        },
+        "getURL":{
+            "type":"string",
+            "title": "GET URL",
+            "description": "Enter URL to get all resources.",
+            "examples": ["/api/node/class/fvTenant.json"]
+        },
+        "resource_allowed_empty_attributes":{
+            "type":"array",
+            "title": "Allowed Empty Attributes",
+            "description": "Enter attributes for allowed empty fields.",
+            "items": {
+                "type": "string"
+              },
+            "uniqueItems": true,
+            "examples": [ "name_alias",
+                          "relation_fv_rs_tn_deny_rule",
+                          "relation_fv_rs_tenant_mon_pol",
+                          "annotation",
+                          "description"
+                        ]
+        }
+    }
+}    
