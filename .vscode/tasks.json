@@ -1,39 +1,33 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build",
-            "type": "shell",
-            "command": "pyinstaller --icon=terrajinja.ico -F terrajinja.py",
-            "group": "build",
-            "presentation": {
-                "reveal": "silent",
-            }
-        },
-        {
-            "label": "move-binary",
-            "dependsOn": [
-                "build"
-            ],
-            "type": "shell",
-            "command": ".vscode/move_binary.sh",
-            "args": [
-                "terrajinja"
-            ],
-            "presentation": {
-                "reveal": "silent",
-            },
-            "group": "build",
-        },
-        {
-            "label": "default",
-            "dependsOn": [
-                "move-binary"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "pyinstaller --icon=terraninja.ico -F terraninja.py",
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "move-binary",
+      "dependsOn": ["build"],
+      "type": "shell",
+      "command": ".vscode/move_binary.sh",
+      "args": ["terraninja"],
+      "presentation": {
+        "reveal": "silent"
+      },
+      "group": "build"
+    },
+    {
+      "label": "default",
+      "dependsOn": ["move-binary"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
 }

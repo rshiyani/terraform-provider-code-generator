@@ -1,4 +1,4 @@
-cp ./dist/terrajinja.exe ./
+cp ./dist/terraninja.exe ./
 rm -rf ./build
 rm -rf ./dist
-rm terrajinja.spec
+rm terraninja.spec
